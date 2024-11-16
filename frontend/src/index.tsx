@@ -8,6 +8,8 @@ import { Episode, episodeLoader } from "./Episode";
 
 const root = document.getElementById("root");
 
+import "./index.css";
+
 if (!root) {
   throw new Error("No root element found");
 }

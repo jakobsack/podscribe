@@ -14,12 +14,15 @@ export const Speakers = () => {
   }, []);
 
   return (
-    <div>
+    <>
+      <h1>Speakers</h1>
+      <p>Here you can find all speakers in all episodes.</p>
+
       <ul>
         {speakers.map((x) => (
           <li key={x.id}>{x.name}</li>
         ))}
       </ul>
-    </div>
+    </>
   );
 };

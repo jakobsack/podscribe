@@ -7,9 +7,14 @@ interface foo {
   episodeSpeakers: EpisodeSpeaker[];
 }
 
-interface NewPart {
+interface SpeakerPart {
   id: number;
   speaker: string;
+  parts: NewPart[];
+}
+
+interface NewPart {
+  id: number;
   text: string;
   start: number;
 }
@@ -28,42 +33,61 @@ export const TranscriptTable = ({
   }
 
   let lastSpeaker = "";
-  const newParts: NewPart[] = [];
+  let outerid = 1;
+  const newParts: SpeakerPart[] = [];
   for (const part of parts) {
     if (!part.text) {
       continue;
     }
 
     const speaker = speakerNames[part.episode_speaker_id];
-    newParts.push({
+    const somepart: NewPart = {
       id: part.id,
-      speaker: lastSpeaker === speaker ? "" : speaker,
       text: part.text,
       start: part.starts_at,
-    });
-    lastSpeaker = speaker;
+    };
+
+    if (speaker === lastSpeaker) {
+      newParts[newParts.length - 1].parts.push(somepart);
+    } else {
+      lastSpeaker = speaker;
+      newParts.push({
+        id: outerid++,
+        speaker: speaker,
+        parts: [somepart],
+      });
+    }
   }
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Speaker</th>
-          <th>Text</th>
-          <th>Start</th>
-        </tr>
-      </thead>
-      <tbody>
-        {newParts.map((x) => {
-          return (
-            <tr key={x.id}>
-              <td>{x.speaker || " "}</td>
-              <td>{x.text}</td>
-              <td>{x.start}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <div className="flex flex-col">
+      {newParts.map((x) => {
+        return (
+          <div key={x.id} className="flex flex-row items-stretch">
+            <div className="w-40">{x.speaker}</div>
+            <SpeakerParts parts={x.parts} />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+interface bar {
+  parts: NewPart[];
+}
+
+export const SpeakerParts = ({ parts }: bar) => {
+  return (
+    <div className="flex-1">
+      <div className="flex flex-col">
+        {parts.map((x) => (
+          <div key={x.id} className="flex flex-row">
+            <div className="w-20">{x.start.toFixed(2)}</div>
+            <div className="flex-1">{x.text}</div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
