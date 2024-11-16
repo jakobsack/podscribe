@@ -64,7 +64,7 @@ mailer:
 # Database Configuration
 database:
   # Database connection URI
-  uri: {{get_env(name="DATABASE_URL", default="sqlite://podscript_test.sqlite?mode=rwc")}}
+  uri: {{get_env(name="DATABASE_URL", default="sqlite://podscribe_test.sqlite?mode=rwc")}}
   # When enabled, the sql query will be logged.
   enable_logging: false
   # Set the timeout duration when acquiring a connection.

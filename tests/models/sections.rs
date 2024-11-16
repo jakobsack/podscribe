@@ -1,5 +1,5 @@
-use podscript::app::App;
 use loco_rs::testing;
+use podscribe::app::App;
 use serial_test::serial;
 
 macro_rules! configure_insta {

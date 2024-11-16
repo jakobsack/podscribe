@@ -1,4 +1,4 @@
-use podscript::app::App;
+use podscribe::app::App;
 use loco_rs::testing;
 use serial_test::serial;
 

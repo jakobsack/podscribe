@@ -1,5 +1,5 @@
 use loco_rs::{boot::run_task, task, testing};
-use podscript::app::App;
+use podscribe::app::App;
 use serial_test::serial;
 
 #[tokio::test]

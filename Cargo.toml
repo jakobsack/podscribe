@@ -1,11 +1,11 @@
 [workspace]
 
 [package]
-name = "podscript"
+name = "podscribe"
 version = "0.1.0"
 edition = "2021"
 publish = false
-default-run = "podscript-cli"
+default-run = "podscribe-cli"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -42,7 +42,7 @@ unic-langid = "0.9.4"
 # /view engine
 
 [[bin]]
-name = "podscript-cli"
+name = "podscribe-cli"
 path = "src/bin/main.rs"
 required-features = []
 
