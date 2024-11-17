@@ -1,4 +1,4 @@
-import type { EpisodeDisplay } from "./definitions";
+import type { EpisodeDisplay } from "../definitions";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { TranscriptTable } from "./TranscriptTable";

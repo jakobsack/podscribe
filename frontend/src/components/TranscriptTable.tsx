@@ -1,4 +1,4 @@
-import type { Episode, EpisodeSpeaker, Part, Speaker } from "./definitions";
+import type { Episode, EpisodeSpeaker, Part, Speaker } from "../definitions";
 
 interface foo {
   episode: Episode;

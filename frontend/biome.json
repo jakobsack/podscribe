@@ -25,5 +25,8 @@
       "enabled": true,
       "indentStyle": "space"
     }
+  },
+  "files": {
+    "ignore": ["./src/**/*.css"]
   }
 }
