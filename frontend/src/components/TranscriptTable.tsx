@@ -5,11 +5,13 @@ interface foo {
   parts: Part[];
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
+  highlightedSpeaker: number;
 }
 
 interface SpeakerPart {
   id: number;
   speaker: string;
+  speaker_id: number;
   parts: NewPart[];
 }
 
@@ -24,6 +26,7 @@ export const TranscriptTable = ({
   parts,
   speakers,
   episodeSpeakers,
+  highlightedSpeaker,
 }: foo) => {
   const speakerNames: { [key: number]: string } = {};
   for (const episodeSpeaker of episodeSpeakers) {
@@ -54,6 +57,7 @@ export const TranscriptTable = ({
       newParts.push({
         id: outerid++,
         speaker: speaker,
+        speaker_id: part.episode_speaker_id,
         parts: [somepart],
       });
     }
@@ -63,7 +67,10 @@ export const TranscriptTable = ({
     <div className="flex flex-col">
       {newParts.map((x) => {
         return (
-          <div key={x.id} className="flex flex-row items-stretch">
+          <div
+            key={x.id}
+            className={`flex flex-row items-stretch ${x.speaker_id === highlightedSpeaker ? "bg-slate-100" : ""}`}
+          >
             <div className="w-40">{x.speaker}</div>
             <SpeakerParts parts={x.parts} />
           </div>

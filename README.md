@@ -3,8 +3,16 @@
 Podscribe is meant to grow into a tool that can be used to collaboratively work on
 podcast transcriptions.
 
-The backend is written in Rust using the [Loco framework](https://loco.rs), the frontend is a React app
-written in TypeScript.
+The backend is written in Rust using the [Loco framework](https://loco.rs), the frontend is a React
+app written in TypeScript.
+
+# Code quality
+
+I've been programming for years, but I'm relatively new to Rust, the Loco framework and React. So
+if the code looks like I had no idea of what I'm doing: yep, that's the case.
+
+Also, the data structure and users workflow is by no means finished yet. So expect a lot of
+changes all over the place.
 
 # Workflow
 

@@ -2,6 +2,7 @@ import type { EpisodeDisplay } from "../definitions";
 import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { TranscriptTable } from "./TranscriptTable";
+import { useState } from "react";
 
 export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
@@ -13,26 +14,70 @@ export const episodeLoader = (async (args: LoaderFunctionArgs) => {
 export const Episode = () => {
   const { episode } = useLoaderData() as { episode: EpisodeDisplay };
 
+  const [highlightedSpeaker, setHighlightedSpeaker] = useState(0);
+  const selectHighlightedSpeaker = (speakerId: number) => {
+    return () => {
+      setHighlightedSpeaker(speakerId);
+    };
+  };
+
   return (
-    <div>
-      {episode ? (
-        <>
-          <h1>{episode.episode.name}</h1>
+    <section className="relative">
+      <div className="relative">
+        <div className="mx-auto px-6 max-w-7xl md:px-12">
+          {episode ? (
+            <>
+              <h1 className="text-3xl text-title font-semibold pb-2 underline">
+                {episode.episode.name}
+              </h1>
 
-          {episode.episode.description}
+              <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-center lg:gap-12">
+                <div className="lg:pr-24">
+                  <p>{episode.episode.description}</p>
+                  asdf
+                </div>
+                <div className="card variant-outlined overflow-hidden ">
+                  <h3 className="text-xl text-title font-semibold pb-2 underline">
+                    Speakers
+                  </h3>
 
-          <h2>Transcript</h2>
+                  <ul className="mt-8 divide-y border-y *:py-1 *:flex *:items-center *:gap-3">
+                    {episode.episode_speakers.map((x) => (
+                      <li
+                        key={x.id}
+                        onClick={selectHighlightedSpeaker(x.id)}
+                        onKeyDown={selectHighlightedSpeaker(x.id)}
+                        className={
+                          highlightedSpeaker === x.id ? "bg-slate-100" : ""
+                        }
+                      >
+                        {
+                          episode.speakers.find((y) => y.id === x.speaker_id)
+                            ?.name
+                        }
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
 
-          <TranscriptTable
-            episode={episode.episode}
-            episodeSpeakers={episode.episode_speakers}
-            parts={episode.parts}
-            speakers={episode.speakers}
-          />
-        </>
-      ) : (
-        <b>Loading</b>
-      )}
-    </div>
+              <h2 className="text-2xl text-title font-semibold pb-2 underline">
+                Transcript
+              </h2>
+
+              <TranscriptTable
+                episode={episode.episode}
+                episodeSpeakers={episode.episode_speakers}
+                parts={episode.parts}
+                speakers={episode.speakers}
+                highlightedSpeaker={highlightedSpeaker}
+              />
+            </>
+          ) : (
+            <strong>Loading</strong>
+          )}
+        </div>
+      </div>
+    </section>
   );
 };
