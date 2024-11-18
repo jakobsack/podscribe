@@ -17,5 +17,6 @@
   },
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "editor.rulers": [72, 80, 120]
 }
