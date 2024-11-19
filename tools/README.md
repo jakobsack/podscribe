@@ -50,3 +50,5 @@ zip file next to it.
    a 90 minute episode.
 1. Collect the resulting JSON files:
    `find ./output -name complete.json -exec ./collect.sh {} \;`
+1. Until the web server has a proper JSON import upload the data using the
+   `upload.mjs` script.
