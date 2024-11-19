@@ -8,5 +8,5 @@ pub mod episodes;
 pub mod parts;
 pub mod sections;
 pub mod speakers;
-pub mod tokens;
 pub mod users;
+pub mod words;

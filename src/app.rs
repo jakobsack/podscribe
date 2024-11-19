@@ -47,7 +47,7 @@ impl Hooks for App {
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
         AppRoutes::with_default_routes() // controller routes below
-            .add_route(controllers::tokens::routes())
+            .add_route(controllers::words::routes())
             .add_route(controllers::sections::routes())
             .add_route(controllers::parts::routes())
             .add_route(controllers::episode_speakers::routes())

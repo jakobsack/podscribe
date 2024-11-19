@@ -9,7 +9,7 @@ mod m20241113_200452_speakers;
 mod m20241113_200537_episode_speakers;
 mod m20241113_200622_parts;
 mod m20241113_200708_sections;
-mod m20241113_200755_tokens;
+mod m20241113_200755_words;
 mod m20241113_201125_approvals;
 pub struct Migrator;
 
@@ -19,7 +19,7 @@ impl MigratorTrait for Migrator {
         vec![
             // inject-below (do not remove this comment)
             Box::new(m20241113_201125_approvals::Migration),
-            Box::new(m20241113_200755_tokens::Migration),
+            Box::new(m20241113_200755_words::Migration),
             Box::new(m20241113_200708_sections::Migration),
             Box::new(m20241113_200622_parts::Migration),
             Box::new(m20241113_200537_episode_speakers::Migration),

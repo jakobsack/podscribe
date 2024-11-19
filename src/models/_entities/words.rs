@@ -19,6 +19,7 @@ pub struct Model {
     #[sea_orm(column_type = "Double")]
     pub probability: f64,
     pub hidden: bool,
+    pub manual: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

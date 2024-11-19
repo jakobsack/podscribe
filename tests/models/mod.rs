@@ -1,9 +1,9 @@
 mod users;
 
-mod episodes;
-mod speakers;
+mod approvals;
 mod episode_speakers;
+mod episodes;
 mod parts;
 mod sections;
-mod tokens;
-mod approvals;
+mod speakers;
+mod words;

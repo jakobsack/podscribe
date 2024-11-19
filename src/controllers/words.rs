@@ -5,7 +5,7 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::models::_entities::tokens::{ActiveModel, Column, Entity, Model};
+use crate::models::_entities::words::{ActiveModel, Column, Entity, Model};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -14,6 +14,7 @@ pub struct Params {
     pub ends_at: f64,
     pub probability: f64,
     pub hidden: bool,
+    pub manual: bool,
 }
 
 impl Params {
@@ -23,6 +24,7 @@ impl Params {
         item.ends_at = Set(self.ends_at.clone());
         item.probability = Set(self.probability.clone());
         item.hidden = Set(self.hidden.clone());
+        item.manual = Set(self.manual.clone());
     }
 }
 
@@ -94,7 +96,7 @@ pub async fn get_one(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/episodes/:episode_id/parts/:part_id/sections/:section_id/tokens/")
+        .prefix("api/episodes/:episode_id/parts/:part_id/sections/:section_id/words/")
         .add("/", get(list))
         .add("/", post(add))
         .add(":id", get(get_one))

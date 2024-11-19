@@ -34,8 +34,8 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Parts,
-    #[sea_orm(has_many = "super::tokens::Entity")]
-    Tokens,
+    #[sea_orm(has_many = "super::words::Entity")]
+    Words,
 }
 
 impl Related<super::approvals::Entity> for Entity {
@@ -50,9 +50,9 @@ impl Related<super::parts::Entity> for Entity {
     }
 }
 
-impl Related<super::tokens::Entity> for Entity {
+impl Related<super::words::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Tokens.def()
+        Relation::Words.def()
     }
 }
 
