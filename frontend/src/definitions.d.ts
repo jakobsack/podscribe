@@ -39,3 +39,32 @@ export interface Part {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface PartDisplay {
+  part: Part;
+  sections: SectionDisplay[];
+}
+
+export interface SectionDisplay {
+  section: Section;
+  words: Word[];
+}
+
+export interface Section {
+  id: number;
+  words_per_second: number;
+  starts_at: number;
+  ends_at: number;
+  corrected: boolean;
+  text: string;
+}
+
+export interface Word {
+  id: number;
+  starts_at: number;
+  ends_at: number;
+  probability: number;
+  text: string;
+  hidden: boolean;
+  manual: boolean;
+}

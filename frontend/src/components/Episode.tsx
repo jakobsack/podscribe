@@ -3,6 +3,7 @@ import { useLoaderData } from "react-router-dom";
 import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { TranscriptTable } from "./TranscriptTable";
 import { useState } from "react";
+import Markdown from "react-markdown";
 
 export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
@@ -33,8 +34,7 @@ export const Episode = () => {
 
               <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-center lg:gap-12">
                 <div className="lg:pr-24">
-                  <p>{episode.episode.description}</p>
-                  asdf
+                  <Markdown>{episode.episode.description}</Markdown>
                 </div>
                 <div className="card variant-outlined overflow-hidden ">
                   <h3 className="text-xl text-title font-semibold pb-2 underline">

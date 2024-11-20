@@ -6,6 +6,8 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::parts::{ActiveModel, Column, Entity, Model};
+use crate::models::_entities::sections as SectionsNS;
+use crate::models::_entities::words as WordsNS;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -87,13 +89,65 @@ pub async fn get_one(
     format::json(load_item(&ctx, id).await?)
 }
 
+#[debug_handler]
+pub async fn get_display(
+    Path((_episode_id, id)): Path<(i32, i32)>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let part = load_item(&ctx, id).await?;
+
+    let sections = SectionsNS::Entity::find()
+        .filter(SectionsNS::Column::PartId.eq(id))
+        .all(&ctx.db)
+        .await?;
+
+    let section_ids: Vec<i32> = sections.iter().map(|s| s.id).collect();
+
+    let words = WordsNS::Entity::find()
+        .filter(WordsNS::Column::SectionId.is_in(section_ids))
+        .all(&ctx.db)
+        .await?;
+
+    let display_sections: Vec<SectionDisplay> = sections
+        .iter()
+        .map(|s| SectionDisplay {
+            section: s.clone(),
+            words: words
+                .iter()
+                .filter(|w| w.section_id == s.id)
+                .map(|w| w.clone())
+                .collect(),
+        })
+        .collect();
+
+    let output = Display {
+        part,
+        sections: display_sections,
+    };
+
+    format::json(output)
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/episodes/:episode_id/parts/")
         .add("/", get(list))
         .add("/", post(add))
         .add(":id", get(get_one))
+        .add(":id/display", get(get_display))
         .add(":id", delete(remove))
         .add(":id", put(update))
         .add(":id", patch(update))
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Display {
+    pub part: Model,
+    pub sections: Vec<SectionDisplay>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SectionDisplay {
+    pub section: SectionsNS::Model,
+    pub words: Vec<WordsNS::Model>,
 }
