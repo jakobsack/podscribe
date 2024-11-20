@@ -95,7 +95,7 @@ async function dumpFile(file) {
         let existingWord = existingWords.find(x => Math.abs(x.starts_at - word.start) < 0.00001 && Math.abs(x.ends_at - word.end) < 0.00001);
 
         if (!existingWord) {
-          console.log(`Creating token ${word.start} - ${word.end}`)
+          console.log(`Creating word ${word.start} - ${word.end}`)
           const body = JSON.stringify({
             starts_at: word.start,
             ends_at: word.end,
