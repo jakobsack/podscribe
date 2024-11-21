@@ -5,6 +5,7 @@ import type {
   Part,
   PartDisplay,
   Speaker,
+  Word,
 } from "../definitions";
 
 interface foo {
@@ -144,37 +145,155 @@ interface params {
 }
 
 export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
-  const [section, setSection] = useState<PartDisplay | undefined>(undefined);
+  const [part, setPart] = useState<PartDisplay | undefined>(undefined);
+  const [originalWords, setOriginalWords] = useState<Word[]>([]);
+  const [plannedChanges, setPlannedChanges] = useState<Word[]>([]);
 
   useEffect(() => {
     fetch(`/api/episodes/${episodeId}/parts/${partId}/display`)
       .then((x) => {
         return x.json() as Promise<PartDisplay>;
       })
-      .then((x) => setSection(x))
+      .then((x) => {
+        setPart(x);
+        setOriginalWords(
+          JSON.parse(JSON.stringify(x.sections.flatMap((s) => s.words))),
+        );
+      })
       .catch((error) => console.error(error));
   }, [episodeId, partId]);
 
-  return (
-    <div className="bg-red-100">
-      {section ? (
-        <div>
-          {section.sections.map((section) => (
-            <div key={section.section.id} className="flex flex-row">
-              {section.words.map((w) => (
-                <div key={w.id} className="mr-1">
-                  {w.text}
-                </div>
-              ))}
+  const toggleWordHidden = (id: number) => {
+    if (!part) return;
+
+    const word = part.sections.flatMap((x) => x.words).find((x) => x.id === id);
+    const originalWord = originalWords.find((x) => x.id === id);
+    if (!word || !originalWord) {
+      console.error("whoops");
+      return;
+    }
+
+    word.hidden = !word.hidden;
+    const newChanges = plannedChanges.filter((x) => x.id !== id);
+    if (word.hidden !== originalWord.hidden) {
+      newChanges.push(word);
+    }
+    setPlannedChanges(newChanges);
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  const toggleSectionHidden = (id: number) => {
+    if (!part) return;
+
+    const words = part.sections.find((x) => x.section.id === id)?.words;
+    const localWords = words
+      ?.map((w) => originalWords.find((x) => x.id === w.id))
+      .filter((x) => x);
+    if (!words || !localWords || words.length !== localWords.length) {
+      console.error("whoops");
+      return;
+    }
+
+    const hideRest = words.some((x) => !x.hidden);
+    let newChanges = plannedChanges;
+    for (const word of words.filter((x) => x.hidden !== hideRest)) {
+      word.hidden = hideRest;
+      newChanges = newChanges.filter((x) => x.id !== word.id);
+      const originalWord = originalWords.find((x) => x.id === word.id);
+      if (!originalWord) {
+        alert("whoops. Lost an object.");
+        return;
+      }
+
+      if (word.hidden !== originalWord.hidden) {
+        newChanges.push(word);
+      }
+    }
+
+    setPlannedChanges(newChanges);
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  return part ? (
+    <div className="flex-1">
+      {part.sections.map((section) => (
+        <div
+          key={section.section.id}
+          className="flex flex-row border-b border-gray-400"
+        >
+          <div className="w-24">
+            <div className=" flex flex-row">
+              <div className="w-12 text-right">
+                {(section.section.ends_at - section.section.starts_at).toFixed(
+                  2,
+                )}
+              </div>
+              <div className="ml-0.5 flex-1">s</div>
             </div>
-          ))}
-          <p onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
-            Cancel
-          </p>
+            <div className=" flex flex-row">
+              <div className="w-12 text-right">
+                {section.section.words_per_second.toFixed(2)}
+              </div>
+              <div className="ml-0.5 flex-1">wps</div>
+            </div>
+          </div>
+          <div className="flex-1 flex flex-row flex-wrap mb-2">
+            {section.words.map((w) => {
+              const wordColor =
+                w.probability > 0.99
+                  ? "bg-blue-200"
+                  : w.probability > 0.9
+                    ? "bg-green-200"
+                    : w.probability > 0.7
+                      ? "bg-yellow-200"
+                      : "bg-red-200";
+              return (
+                <div key={w.id} className={`group btn sz-sm m-1 ${wordColor}`}>
+                  {w.text}
+                  <span
+                    className="border-l pl-1"
+                    onClick={() => {
+                      toggleWordHidden(w.id);
+                    }}
+                    onKeyDown={() => {
+                      toggleWordHidden(w.id);
+                    }}
+                  >
+                    {w.hidden ? "+" : "-"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="w-10 bg-blue-300">
+            <span
+              className="border-l pl-1"
+              onClick={() => {
+                toggleSectionHidden(section.section.id);
+              }}
+              onKeyDown={() => {
+                toggleSectionHidden(section.section.id);
+              }}
+            >
+              {section.words.some((x) => x.hidden) ? "show all" : "hide all"}
+            </span>
+          </div>
         </div>
-      ) : (
-        <p>Loading</p>
-      )}
+      ))}
+      <div className="flex flex-row">
+        <div
+          className="btn variant-soft p-1"
+          onClick={toggleShowEdit}
+          onKeyDown={toggleShowEdit}
+        >
+          Cancel
+        </div>
+        <div className="btn variant-primary p-1 ml-3">
+          Save {plannedChanges.length} changes
+        </div>
+      </div>
     </div>
+  ) : (
+    <p>Loading</p>
   );
 };

@@ -10,21 +10,21 @@ use crate::models::_entities::words::{ActiveModel, Column, Entity, Model};
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
     pub text: String,
+    pub overwrite: String,
     pub starts_at: f64,
     pub ends_at: f64,
     pub probability: f64,
     pub hidden: bool,
-    pub manual: bool,
 }
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
         item.text = Set(self.text.clone());
+        item.overwrite = Set(self.overwrite.clone());
         item.starts_at = Set(self.starts_at.clone());
         item.ends_at = Set(self.ends_at.clone());
         item.probability = Set(self.probability.clone());
         item.hidden = Set(self.hidden.clone());
-        item.manual = Set(self.manual.clone());
     }
 }
 

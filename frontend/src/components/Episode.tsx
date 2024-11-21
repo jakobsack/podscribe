@@ -32,8 +32,8 @@ export const Episode = () => {
                 {episode.episode.name}
               </h1>
 
-              <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-center lg:gap-12">
-                <div className="lg:pr-24">
+              <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-start lg:gap-12">
+                <div className="lg:pr-24 pt-2">
                   <Markdown>{episode.episode.description}</Markdown>
                 </div>
                 <div className="card variant-outlined overflow-hidden ">

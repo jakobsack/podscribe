@@ -65,6 +65,6 @@ export interface Word {
   ends_at: number;
   probability: number;
   text: string;
+  overwrite: string;
   hidden: boolean;
-  manual: boolean;
 }

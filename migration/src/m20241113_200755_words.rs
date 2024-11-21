@@ -13,11 +13,11 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(Words::Id))
                     .col(integer(Words::SectionId))
                     .col(string(Words::Text))
+                    .col(string(Words::Overwrite))
                     .col(double(Words::StartsAt))
                     .col(double(Words::EndsAt))
                     .col(double(Words::Probability))
                     .col(boolean(Words::Hidden))
-                    .col(boolean(Words::Manual))
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk-words-sections")
@@ -44,11 +44,11 @@ enum Words {
     Id,
     SectionId,
     Text,
+    Overwrite,
     StartsAt,
     EndsAt,
     Probability,
     Hidden,
-    Manual,
 }
 
 #[derive(DeriveIden)]

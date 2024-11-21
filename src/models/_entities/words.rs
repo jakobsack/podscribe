@@ -12,6 +12,7 @@ pub struct Model {
     pub id: i32,
     pub section_id: i32,
     pub text: String,
+    pub overwrite: String,
     #[sea_orm(column_type = "Double")]
     pub starts_at: f64,
     #[sea_orm(column_type = "Double")]
@@ -19,7 +20,6 @@ pub struct Model {
     #[sea_orm(column_type = "Double")]
     pub probability: f64,
     pub hidden: bool,
-    pub manual: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
