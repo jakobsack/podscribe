@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { KeyboardEventHandler } from "react";
 import type {
   Episode,
   EpisodeSpeaker,
@@ -175,7 +176,7 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
 
     word.hidden = !word.hidden;
     const newChanges = plannedChanges.filter((x) => x.id !== id);
-    if (word.hidden !== originalWord.hidden) {
+    if (JSON.stringify(word) !== JSON.stringify(originalWord)) {
       newChanges.push(word);
     }
     setPlannedChanges(newChanges);
@@ -205,11 +206,33 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
         return;
       }
 
-      if (word.hidden !== originalWord.hidden) {
+      if (JSON.stringify(word) !== JSON.stringify(originalWord)) {
         newChanges.push(word);
       }
     }
 
+    setPlannedChanges(newChanges);
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  const wordSaveFunction = (newWord: Word) => {
+    if (!part) return;
+
+    const word = part.sections
+      .flatMap((x) => x.words)
+      .find((x) => x.id === newWord.id);
+    const originalWord = originalWords.find((x) => x.id === newWord.id);
+    if (!word || !originalWord) {
+      console.error("whoops");
+      return;
+    }
+
+    word.overwrite = newWord.overwrite === word.text ? "" : newWord.overwrite;
+
+    const newChanges = plannedChanges.filter((x) => x.id !== newWord.id);
+    if (JSON.stringify(word) !== JSON.stringify(originalWord)) {
+      newChanges.push(word);
+    }
     setPlannedChanges(newChanges);
     setPart({ part: part.part, sections: part.sections });
   };
@@ -249,7 +272,7 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
                       : "bg-red-200";
               return (
                 <div key={w.id} className={`group btn sz-sm m-1 ${wordColor}`}>
-                  {w.text}
+                  <WordForm word={w} saveFunction={wordSaveFunction} />
                   <span
                     className="border-l pl-1"
                     onClick={() => {
@@ -295,5 +318,46 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
     </div>
   ) : (
     <p>Loading</p>
+  );
+};
+
+export interface WordFormParams {
+  word: Word;
+  saveFunction: (word: Word) => void;
+}
+
+export const WordForm = ({ word, saveFunction }: WordFormParams) => {
+  const [showEdit, setShowEdit] = useState(false);
+
+  const toggleShowEdit = () => {
+    setShowEdit(!showEdit);
+  };
+
+  const keyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if (event.code === "Escape") {
+      toggleShowEdit();
+      return;
+    }
+
+    if (event.code !== "Enter") {
+      return;
+    }
+
+    word.overwrite = event.currentTarget.value;
+    saveFunction(word);
+    toggleShowEdit();
+  };
+
+  return showEdit ? (
+    <input
+      type="text"
+      defaultValue={word.overwrite || word.text}
+      onKeyDown={keyDown}
+      className="w-20"
+    />
+  ) : (
+    <span onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
+      {word.overwrite || word.text}
+    </span>
   );
 };
