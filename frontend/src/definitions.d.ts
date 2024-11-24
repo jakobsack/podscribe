@@ -61,6 +61,7 @@ export interface Section {
 
 export interface Word {
   id: number;
+  section_id: number;
   starts_at: number;
   ends_at: number;
   probability: number;

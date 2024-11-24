@@ -78,9 +78,9 @@ export const TranscriptTable = ({
         return (
           <div
             key={x.id}
-            className={`flex flex-row items-stretch ${x.speaker_id === highlightedSpeaker ? "bg-slate-100" : ""}`}
+            className={`flex flex-row items-stretch border-b-2 border-gray-300 ${x.speaker_id === highlightedSpeaker ? "bg-slate-100" : ""}`}
           >
-            <div className="w-40">{x.speaker}</div>
+            <div className="w-40 border-r border-gray-200">{x.speaker}</div>
             <SpeakerParts parts={x.parts} episodeId={episode.id} />
           </div>
         );
@@ -98,8 +98,11 @@ export const SpeakerParts = ({ parts, episodeId }: bar) => {
   return (
     <div className="flex-1">
       <div className="flex flex-col">
-        {parts.map((x) => (
-          <div key={x.id} className="flex flex-row">
+        {parts.map((x, i, a) => (
+          <div
+            key={x.id}
+            className={`flex flex-row ${i === a.length - 1 ? "" : "border-b border-gray-200"}`}
+          >
             <ShowPart episodeId={episodeId} part={x} />
           </div>
         ))}
@@ -237,6 +240,29 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
     setPart({ part: part.part, sections: part.sections });
   };
 
+  const _save_changes = async (
+    episodeId: number,
+    partId: number,
+    words: Word[],
+  ): Promise<void> => {
+    for (const word of words) {
+      const headers = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+      const body = JSON.stringify(word);
+      await fetch(
+        `/api/episodes/${episodeId}/parts/${partId}/sections/${word.section_id}/words/${word.id}`,
+        { method: "PUT", headers, body },
+      );
+    }
+  };
+
+  const saveChanges = () => {
+    _save_changes(episodeId, partId, plannedChanges);
+    toggleShowEdit();
+  };
+
   return part ? (
     <div className="flex-1">
       {part.sections.map((section) => (
@@ -311,7 +337,11 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
         >
           Cancel
         </div>
-        <div className="btn variant-primary p-1 ml-3">
+        <div
+          className="btn variant-primary p-1 ml-3"
+          onClick={saveChanges}
+          onKeyDown={saveChanges}
+        >
           Save {plannedChanges.length} changes
         </div>
       </div>
