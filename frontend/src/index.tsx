@@ -15,6 +15,10 @@ const root = document.getElementById("root");
 
 import "./index.css";
 import { editSpeakerAction } from "./components/EditSpeaker";
+import {
+  EpisodeViewComponent,
+  episodeViewLoader,
+} from "./components/viewEpisode/EpisodeViewComponent";
 
 if (!root) {
   throw new Error("No root element found");
@@ -36,6 +40,11 @@ const router = createBrowserRouter([
       { path: "episodes", element: <Episodes /> },
       {
         path: "episodes/:episodeId",
+        element: <EpisodeViewComponent />,
+        loader: episodeViewLoader,
+      },
+      {
+        path: "episodes/:episodeId/edit",
         element: <Episode />,
         loader: episodeLoader,
       },

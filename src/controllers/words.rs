@@ -103,6 +103,7 @@ pub async fn get_one(
     format::json(load_item(&ctx, id).await?)
 }
 
+// TODO: Move into model?
 async fn update_section_and_part(ctx: &AppContext, part_id: i32, section_id: i32) -> Result<()> {
     let section = SectionsNS::Entity::find_by_id(section_id)
         .one(&ctx.db)
