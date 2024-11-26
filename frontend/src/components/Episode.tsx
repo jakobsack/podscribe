@@ -4,6 +4,7 @@ import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { TranscriptTable } from "./TranscriptTable";
 import { useState } from "react";
 import Markdown from "react-markdown";
+import { EpisodeSpeakerComponent } from "./editEpisode/EpisodeSpeakerComponent";
 
 export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
@@ -57,10 +58,10 @@ export const Episode = () => {
                           highlightedSpeaker === x.id ? "bg-slate-100" : ""
                         }
                       >
-                        {
-                          episode.speakers.find((y) => y.id === x.speaker_id)
-                            ?.name
-                        }
+                        <EpisodeSpeakerComponent
+                          episodeSpeaker={x}
+                          speakers={episode.speakers}
+                        />
                       </li>
                     ))}
                   </ul>

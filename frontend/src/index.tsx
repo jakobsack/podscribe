@@ -19,6 +19,8 @@ import {
   EpisodeViewComponent,
   episodeViewLoader,
 } from "./components/viewEpisode/EpisodeViewComponent";
+import ErrorPage from "./ErrorPage";
+import { editEpisodeSpeakerAction } from "./components/editEpisode/EditEpisodeSpeakerComponent";
 
 if (!root) {
   throw new Error("No root element found");
@@ -28,6 +30,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Index /> },
       {
@@ -47,6 +50,12 @@ const router = createBrowserRouter([
         path: "episodes/:episodeId/edit",
         element: <Episode />,
         loader: episodeLoader,
+        children: [
+          {
+            path: "episodeSpeakers/:episodeSpeakerId",
+            action: editEpisodeSpeakerAction,
+          },
+        ],
       },
     ],
   },

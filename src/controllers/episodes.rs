@@ -82,12 +82,7 @@ pub async fn get_display(Path(id): Path<i32>, State(ctx): State<AppContext>) -> 
         .all(&ctx.db)
         .await?;
 
-    let speaker_ids: Vec<i32> = episode_speakers.iter().map(|f| f.speaker_id).collect();
-
-    let speakers = SpeakersNS::Entity::find()
-        .filter(SpeakersNS::Column::Id.is_in(speaker_ids))
-        .all(&ctx.db)
-        .await?;
+    let speakers = SpeakersNS::Entity::find().all(&ctx.db).await?;
 
     let output = Display {
         episode,
