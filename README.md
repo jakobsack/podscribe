@@ -37,3 +37,10 @@ npm clean-install && npm run build
 cd ..
 cargo loco start
 ```
+
+# Running podscribe in a container
+
+```sh
+docker build -t podscribe:latest .
+docker run --volume "$(pwd)/config/production.yaml:/app/config/production.yaml" -p 5150:5150 podscribe:latest
+```

@@ -275,6 +275,9 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
               className="flex flex-col border-b border-gray-400"
             >
               <div className="flex-1 flex flex-row bg-gray-100">
+                <div className="w-20 text-right">
+                  {section.section.starts_at.toFixed(2)}
+                </div>
                 <div className=" flex flex-row">
                   <div className="w-12 text-right">
                     {(
@@ -301,6 +304,18 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
                     {section.words.some((x) => x.hidden)
                       ? "show all"
                       : "hide all"}
+                  </span>
+                </div>
+                <div className="flex-1 ml-8">
+                  <span
+                    onClick={() => {
+                      toggleSectionHidden(section.section.id);
+                    }}
+                    onKeyDown={() => {
+                      toggleSectionHidden(section.section.id);
+                    }}
+                  >
+                    Change Speaker
                   </span>
                 </div>
               </div>

@@ -1,0 +1,5 @@
+target
+*.sqlite
+*.backup
+tools
+frontend/node_modules
