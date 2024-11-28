@@ -5,6 +5,7 @@ import type {
   EpisodeSpeaker,
   Part,
   PartDisplay,
+  SectionDisplay,
   Speaker,
   Word,
 } from "../definitions";
@@ -48,10 +49,6 @@ export const TranscriptTable = ({
   let outerid = 1;
   const newParts: SpeakerPart[] = [];
   for (const part of parts) {
-    if (!part.text) {
-      continue;
-    }
-
     const speaker = speakerNames[part.episode_speaker_id];
     const somepart: NewPart = {
       id: part.id,
@@ -150,8 +147,10 @@ interface params {
 
 export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
   const [part, setPart] = useState<PartDisplay | undefined>(undefined);
-  const [originalWords, setOriginalWords] = useState<Word[]>([]);
-  const [plannedChanges, setPlannedChanges] = useState<Word[]>([]);
+  const [originalPart, setOriginalPart] = useState<PartDisplay | undefined>(
+    undefined,
+  );
+
   const [activeWord, setActiveWord] = useState<Word | undefined>(undefined);
 
   useEffect(() => {
@@ -161,9 +160,7 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
       })
       .then((x) => {
         setPart(x);
-        setOriginalWords(
-          JSON.parse(JSON.stringify(x.sections.flatMap((s) => s.words))),
-        );
+        setOriginalPart(JSON.parse(JSON.stringify(x)));
       })
       .catch((error) => console.error(error));
   }, [episodeId, partId]);
@@ -172,18 +169,12 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
     if (!part) return;
 
     const word = part.sections.flatMap((x) => x.words).find((x) => x.id === id);
-    const originalWord = originalWords.find((x) => x.id === id);
-    if (!word || !originalWord) {
+    if (!word) {
       console.error("whoops");
       return;
     }
 
     word.hidden = !word.hidden;
-    const newChanges = plannedChanges.filter((x) => x.id !== id);
-    if (JSON.stringify(word) !== JSON.stringify(originalWord)) {
-      newChanges.push(word);
-    }
-    setPlannedChanges(newChanges);
     setPart({ part: part.part, sections: part.sections });
     setActiveWord(word);
   };
@@ -192,31 +183,222 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
     if (!part) return;
 
     const words = part.sections.find((x) => x.section.id === id)?.words;
-    const localWords = words
-      ?.map((w) => originalWords.find((x) => x.id === w.id))
-      .filter((x) => x);
-    if (!words || !localWords || words.length !== localWords.length) {
+    if (!words) {
       console.error("whoops");
       return;
     }
 
     const hideRest = words.some((x) => !x.hidden);
-    let newChanges = plannedChanges;
     for (const word of words.filter((x) => x.hidden !== hideRest)) {
       word.hidden = hideRest;
-      newChanges = newChanges.filter((x) => x.id !== word.id);
-      const originalWord = originalWords.find((x) => x.id === word.id);
-      if (!originalWord) {
-        alert("whoops. Lost an object.");
-        return;
-      }
-
-      if (JSON.stringify(word) !== JSON.stringify(originalWord)) {
-        newChanges.push(word);
-      }
     }
 
-    setPlannedChanges(newChanges);
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  const downNew = (id: number) => {
+    if (!part) return;
+
+    const section = part.sections.find((x) => x.words.some((y) => y.id === id));
+    if (!section) {
+      console.error("whoops");
+      return;
+    }
+
+    const word = section.words.find((x) => x.id === id);
+    if (!word) {
+      console.error("whoops");
+      return;
+    }
+
+    const newSectionWords = section.words.filter(
+      (x) => x.ends_at > word.starts_at,
+    );
+    const oldSectionWords = section.words.filter(
+      (x) => x.starts_at < word.starts_at,
+    );
+
+    if (oldSectionWords.length === 0) {
+      console.log(
+        "Not creating new down section as existing section would be empty",
+      );
+      return;
+    }
+
+    const newSectionId =
+      Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
+
+    const starts_at = newSectionWords[0].starts_at;
+    const ends_at = newSectionWords[newSectionWords.length - 1].ends_at;
+    const newSection: SectionDisplay = {
+      section: {
+        corrected: false,
+        starts_at: starts_at,
+        ends_at: ends_at,
+        id: newSectionId,
+        text: "",
+        words_per_second: newSectionWords.length / (ends_at - starts_at),
+      },
+      words: newSectionWords,
+    };
+
+    section.words = oldSectionWords;
+    section.section.ends_at = section.words[section.words.length - 1].ends_at;
+
+    part.sections.splice(part.sections.indexOf(section) + 1, 0, newSection);
+
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  const downMove = (id: number): void => {
+    if (!part) return;
+
+    const section = part.sections.find((x) => x.words.some((y) => y.id === id));
+    if (!section) {
+      console.error("whoops");
+      return;
+    }
+
+    const word = section.words.find((x) => x.id === id);
+    if (!word) {
+      console.error("whoops");
+      return;
+    }
+
+    const nextSection = part.sections[part.sections.indexOf(section) + 1];
+
+    const oldSectionWords = section.words.filter(
+      (x) => x.starts_at < word.starts_at,
+    );
+
+    if (
+      oldSectionWords.length === 0 &&
+      section.section.id > 0 &&
+      nextSection.section.id < 0
+    ) {
+      // Is old section an existing one and next a temporary one? Then switch.
+      upMove(nextSection.words[nextSection.words.length - 1].id);
+      return;
+    }
+
+    if (oldSectionWords.length === 0)
+      part.sections.splice(part.sections.indexOf(section), 1);
+    else {
+      section.words = oldSectionWords;
+      section.section.ends_at = section.words[section.words.length - 1].ends_at;
+    }
+
+    nextSection.words = section.words
+      .filter((x) => x.ends_at > word.starts_at)
+      .concat(nextSection.words);
+    nextSection.section.starts_at = nextSection.words[0].starts_at;
+    nextSection.section.words_per_second =
+      nextSection.words.length /
+      (nextSection.section.ends_at - nextSection.section.starts_at);
+
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  const upNew = (id: number) => {
+    if (!part) return;
+
+    const section = part.sections.find((x) => x.words.some((y) => y.id === id));
+    if (!section) {
+      console.error("whoops");
+      return;
+    }
+
+    const word = section.words.find((x) => x.id === id);
+    if (!word) {
+      console.error("whoops");
+      return;
+    }
+
+    const newSectionWords = section.words.filter(
+      (x) => x.starts_at < word.ends_at,
+    );
+    const oldSectionWords = section.words.filter(
+      (x) => x.starts_at > word.starts_at,
+    );
+
+    if (oldSectionWords.length === 0) {
+      console.log(
+        "Not creating new up section as existing section would be empty",
+      );
+      return;
+    }
+
+    const newSectionId =
+      Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
+
+    const starts_at = newSectionWords[0].starts_at;
+    const ends_at = newSectionWords[newSectionWords.length - 1].ends_at;
+    const newSection: SectionDisplay = {
+      section: {
+        corrected: false,
+        starts_at: starts_at,
+        ends_at: ends_at,
+        id: newSectionId,
+        text: "",
+        words_per_second: newSectionWords.length / (ends_at - starts_at),
+      },
+      words: newSectionWords,
+    };
+
+    section.words = oldSectionWords;
+    section.section.starts_at = section.words[0].starts_at;
+
+    part.sections.splice(part.sections.indexOf(section), 0, newSection);
+
+    setPart({ part: part.part, sections: part.sections });
+  };
+
+  const upMove = (id: number): void => {
+    if (!part) return;
+
+    const section = part.sections.find((x) => x.words.some((y) => y.id === id));
+    if (!section) {
+      console.error("whoops");
+      return;
+    }
+
+    const word = section.words.find((x) => x.id === id);
+    if (!word) {
+      console.error("whoops");
+      return;
+    }
+
+    const previousSection = part.sections[part.sections.indexOf(section) - 1];
+    const oldSectionWords = section.words.filter(
+      (x) => x.starts_at > word.starts_at,
+    );
+
+    if (
+      oldSectionWords.length === 0 &&
+      section.section.id > 0 &&
+      previousSection.section.id < 0
+    ) {
+      // Is old section an existing one and next a temporary one? Then switch.
+      downMove(previousSection.words[0].id);
+      return;
+    }
+
+    if (oldSectionWords.length === 0)
+      part.sections.splice(part.sections.indexOf(section), 1);
+    else {
+      section.words = oldSectionWords;
+      section.section.starts_at = section.words[0].starts_at;
+    }
+
+    previousSection.words = previousSection.words.concat(
+      section.words.filter((x) => x.starts_at < word.ends_at),
+    );
+    previousSection.section.ends_at =
+      previousSection.words[previousSection.words.length - 1].ends_at;
+    previousSection.section.words_per_second =
+      previousSection.words.length /
+      (previousSection.section.ends_at - previousSection.section.starts_at);
+
     setPart({ part: part.part, sections: part.sections });
   };
 
@@ -226,43 +408,13 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
     const word = part.sections
       .flatMap((x) => x.words)
       .find((x) => x.id === newWord.id);
-    const originalWord = originalWords.find((x) => x.id === newWord.id);
-    if (!word || !originalWord) {
+    if (!word) {
       console.error("whoops");
       return;
     }
 
     word.overwrite = newWord.overwrite === word.text ? "" : newWord.overwrite;
-
-    const newChanges = plannedChanges.filter((x) => x.id !== newWord.id);
-    if (JSON.stringify(word) !== JSON.stringify(originalWord)) {
-      newChanges.push(word);
-    }
-    setPlannedChanges(newChanges);
     setPart({ part: part.part, sections: part.sections });
-  };
-
-  const _save_changes = async (
-    episodeId: number,
-    partId: number,
-    words: Word[],
-  ): Promise<void> => {
-    for (const word of words) {
-      const headers = {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      };
-      const body = JSON.stringify(word);
-      await fetch(
-        `/api/episodes/${episodeId}/parts/${partId}/sections/${word.section_id}/words/${word.id}`,
-        { method: "PUT", headers, body },
-      );
-    }
-  };
-
-  const saveChanges = () => {
-    _save_changes(episodeId, partId, plannedChanges);
-    toggleShowEdit();
   };
 
   return part ? (
@@ -367,17 +519,59 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
                   {activeWord.overwrite || activeWord.text}
                 </span>
               </div>
-              <span
-                className="border-l pl-1 w-3"
+              <div
                 onClick={() => {
-                  toggleWordHidden(activeWord.id);
+                  upMove(activeWord.id);
                 }}
                 onKeyDown={() => {
-                  toggleWordHidden(activeWord.id);
+                  upMove(activeWord.id);
                 }}
               >
-                {activeWord.hidden ? "Show word" : "Hide word"}
-              </span>
+                Move up to next section
+              </div>
+              <div
+                onClick={() => {
+                  upNew(activeWord.id);
+                }}
+                onKeyDown={() => {
+                  upNew(activeWord.id);
+                }}
+              >
+                Move up to new section
+              </div>
+              <div>
+                <span
+                  className="border-l pl-1 w-3"
+                  onClick={() => {
+                    toggleWordHidden(activeWord.id);
+                  }}
+                  onKeyDown={() => {
+                    toggleWordHidden(activeWord.id);
+                  }}
+                >
+                  {activeWord.hidden ? "Show word" : "Hide word"}
+                </span>
+              </div>
+              <div
+                onClick={() => {
+                  downNew(activeWord.id);
+                }}
+                onKeyDown={() => {
+                  downNew(activeWord.id);
+                }}
+              >
+                Move down to new section
+              </div>
+              <div
+                onClick={() => {
+                  downMove(activeWord.id);
+                }}
+                onKeyDown={() => {
+                  downMove(activeWord.id);
+                }}
+              >
+                Move down to next section
+              </div>
             </>
           ) : (
             <p>Select a word</p>
@@ -392,13 +586,7 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
         >
           Cancel
         </div>
-        <div
-          className="btn variant-primary p-1 ml-3"
-          onClick={saveChanges}
-          onKeyDown={saveChanges}
-        >
-          Save {plannedChanges.length} changes
-        </div>
+        <div className="btn variant-primary p-1 ml-3">Save changes</div>
       </div>
     </div>
   ) : (
