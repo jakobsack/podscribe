@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { KeyboardEventHandler } from "react";
+import type { ChangeEvent, KeyboardEventHandler } from "react";
 import type {
   Episode,
   EpisodeSpeaker,
@@ -464,9 +464,7 @@ export const PartEditForm = ({
     return (newEpisodeSpeakerId: number) => {
       if (!part) return;
 
-      const section = part.sections.find(
-        (x) => x.section.id === sectionId,
-      )?.section;
+      const section = part.sections.find((x) => x.section.id === sectionId);
       if (!section) {
         return;
       }
@@ -481,11 +479,34 @@ export const PartEditForm = ({
     };
   };
 
+  const moveSection = (sectionId: number, previous: boolean) => {
+    return (event: ChangeEvent<HTMLInputElement>): void => {
+      if (!part) return;
+
+      const section = part.sections.find((x) => x.section.id === sectionId);
+      if (!section) {
+        return;
+      }
+
+      const active = event.currentTarget.checked;
+
+      if (previous) {
+        section.move_to_previous_part = active || undefined;
+        section.move_to_next_part = undefined;
+      } else {
+        section.move_to_previous_part = undefined;
+        section.move_to_next_part = active || undefined;
+      }
+
+      setPart({ part: part.part, sections: part.sections });
+    };
+  };
+
   return part ? (
     <div className="flex-1">
       <div className="flex flex-row">
         <div className="flex-1">
-          {part.sections.map((section) => (
+          {part.sections.map((section, i) => (
             <div
               key={section.section.id}
               className="flex flex-col border-b border-gray-400"
@@ -494,7 +515,7 @@ export const PartEditForm = ({
                 <div className="w-20 text-right">
                   {section.section.starts_at.toFixed(2)}
                 </div>
-                <div className=" flex flex-row">
+                <div className="w-14 flex flex-row">
                   <div className="w-12 text-right">
                     {(
                       section.section.ends_at - section.section.starts_at
@@ -502,7 +523,7 @@ export const PartEditForm = ({
                   </div>
                   <div className="ml-0.5 flex-1">s</div>
                 </div>
-                <div className=" flex flex-row ml-8">
+                <div className="w-14 flex flex-row ml-8">
                   <div className="w-12 text-right">
                     {section.section.words_per_second.toFixed(2)}
                   </div>
@@ -525,8 +546,7 @@ export const PartEditForm = ({
                 <div className="flex-1 ml-8">
                   <SectionSpeakerComponent
                     speakerId={
-                      section.section.episode_speaker_id ||
-                      part.part.episode_speaker_id
+                      section.episode_speaker_id || part.part.episode_speaker_id
                     }
                     speakers={speakers}
                     episodeSpeakers={episodeSpeakers}
@@ -534,6 +554,38 @@ export const PartEditForm = ({
                       section.section.id,
                     )}
                   />
+                </div>
+                <div className="w-28 flex-0">
+                  {i === 0 ? (
+                    <>
+                      <input
+                        type="checkbox"
+                        name="move_up"
+                        id={`move_up_${section.section.id}`}
+                        onChange={moveSection(section.section.id, true)}
+                      />
+                      <label htmlFor={`move_up_${section.section.id}`}>
+                        Move up
+                      </label>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                  {i === part.sections.length - 1 ? (
+                    <>
+                      <input
+                        type="checkbox"
+                        name="move_down"
+                        id={`move_down_${section.section.id}`}
+                        onChange={moveSection(section.section.id, false)}
+                      />
+                      <label htmlFor={`move_down_${section.section.id}`}>
+                        Move up
+                      </label>
+                    </>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </div>
               <div className="flex-1 flex flex-row flex-wrap mb-2">

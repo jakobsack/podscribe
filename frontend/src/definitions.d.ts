@@ -48,6 +48,9 @@ export interface PartDisplay {
 export interface SectionDisplay {
   section: Section;
   words: Word[];
+  episode_speaker_id?: number;
+  move_to_next_part?: boolean;
+  move_to_previous_part?: boolean;
 }
 
 export interface Section {
@@ -57,7 +60,6 @@ export interface Section {
   ends_at: number;
   corrected: boolean;
   text: string;
-  episode_speaker_id?: number;
 }
 
 export interface Word {
