@@ -21,7 +21,7 @@ interface foo {
 interface SpeakerPart {
   id: number;
   speaker: string;
-  speaker_id: number;
+  episodeSpeakerId: number;
   parts: NewPart[];
 }
 
@@ -63,7 +63,7 @@ export const TranscriptTable = ({
       newParts.push({
         id: outerid++,
         speaker: speaker,
-        speaker_id: part.episode_speaker_id,
+        episodeSpeakerId: part.episode_speaker_id,
         parts: [somepart],
       });
     }
@@ -75,10 +75,16 @@ export const TranscriptTable = ({
         return (
           <div
             key={x.id}
-            className={`flex flex-row items-stretch border-b-2 border-gray-300 ${x.speaker_id === highlightedSpeaker ? "bg-slate-100" : ""}`}
+            className={`flex flex-row items-stretch border-b-2 border-gray-300 ${x.episodeSpeakerId === highlightedSpeaker ? "bg-slate-100" : ""}`}
           >
             <div className="w-40 border-r border-gray-200">{x.speaker}</div>
-            <SpeakerParts parts={x.parts} episodeId={episode.id} />
+            <SpeakerParts
+              parts={x.parts}
+              episodeId={episode.id}
+              episodeSpeakerId={x.episodeSpeakerId}
+              speakers={speakers}
+              episodeSpeakers={episodeSpeakers}
+            />
           </div>
         );
       })}
@@ -89,9 +95,18 @@ export const TranscriptTable = ({
 interface bar {
   parts: NewPart[];
   episodeId: number;
+  episodeSpeakerId: number;
+  speakers: Speaker[];
+  episodeSpeakers: EpisodeSpeaker[];
 }
 
-export const SpeakerParts = ({ parts, episodeId }: bar) => {
+export const SpeakerParts = ({
+  parts,
+  episodeId,
+  episodeSpeakerId,
+  speakers,
+  episodeSpeakers,
+}: bar) => {
   return (
     <div className="flex-1">
       <div className="flex flex-col">
@@ -100,7 +115,13 @@ export const SpeakerParts = ({ parts, episodeId }: bar) => {
             key={x.id}
             className={`flex flex-row ${i === a.length - 1 ? "" : "border-b border-gray-200"}`}
           >
-            <ShowPart episodeId={episodeId} part={x} />
+            <ShowPart
+              episodeId={episodeId}
+              part={x}
+              episodeSpeakerId={episodeSpeakerId}
+              speakers={speakers}
+              episodeSpeakers={episodeSpeakers}
+            />
           </div>
         ))}
       </div>
@@ -111,9 +132,18 @@ export const SpeakerParts = ({ parts, episodeId }: bar) => {
 interface showParams {
   episodeId: number;
   part: NewPart;
+  episodeSpeakerId: number;
+  speakers: Speaker[];
+  episodeSpeakers: EpisodeSpeaker[];
 }
 
-export const ShowPart = ({ part, episodeId }: showParams) => {
+export const ShowPart = ({
+  part,
+  episodeId,
+  episodeSpeakerId,
+  speakers,
+  episodeSpeakers,
+}: showParams) => {
   const [showEdit, setShowEdit] = useState(false);
 
   const toggleShowEdit = () => {
@@ -125,6 +155,9 @@ export const ShowPart = ({ part, episodeId }: showParams) => {
       episodeId={episodeId}
       partId={part.id}
       toggleShowEdit={toggleShowEdit}
+      episodeSpeakerId={episodeSpeakerId}
+      speakers={speakers}
+      episodeSpeakers={episodeSpeakers}
     />
   ) : (
     <>
@@ -143,9 +176,19 @@ interface params {
   episodeId: number;
   partId: number;
   toggleShowEdit: () => void;
+  episodeSpeakerId: number;
+  speakers: Speaker[];
+  episodeSpeakers: EpisodeSpeaker[];
 }
 
-export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
+export const PartEditForm = ({
+  episodeId,
+  partId,
+  toggleShowEdit,
+  episodeSpeakerId,
+  speakers,
+  episodeSpeakers,
+}: params) => {
   const [part, setPart] = useState<PartDisplay | undefined>(undefined);
   const [originalPart, setOriginalPart] = useState<PartDisplay | undefined>(
     undefined,
@@ -417,6 +460,27 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
     setPart({ part: part.part, sections: part.sections });
   };
 
+  const episodeSpeakerSaveFunction = (sectionId: number) => {
+    return (newEpisodeSpeakerId: number) => {
+      if (!part) return;
+
+      const section = part.sections.find(
+        (x) => x.section.id === sectionId,
+      )?.section;
+      if (!section) {
+        return;
+      }
+
+      //
+      section.episode_speaker_id = newEpisodeSpeakerId;
+      if (section.episode_speaker_id === episodeSpeakerId) {
+        section.episode_speaker_id = undefined;
+      }
+
+      setPart({ part: part.part, sections: part.sections });
+    };
+  };
+
   return part ? (
     <div className="flex-1">
       <div className="flex flex-row">
@@ -459,16 +523,17 @@ export const PartEditForm = ({ episodeId, partId, toggleShowEdit }: params) => {
                   </span>
                 </div>
                 <div className="flex-1 ml-8">
-                  <span
-                    onClick={() => {
-                      toggleSectionHidden(section.section.id);
-                    }}
-                    onKeyDown={() => {
-                      toggleSectionHidden(section.section.id);
-                    }}
-                  >
-                    Change Speaker
-                  </span>
+                  <SectionSpeakerComponent
+                    speakerId={
+                      section.section.episode_speaker_id ||
+                      part.part.episode_speaker_id
+                    }
+                    speakers={speakers}
+                    episodeSpeakers={episodeSpeakers}
+                    saveFunction={episodeSpeakerSaveFunction(
+                      section.section.id,
+                    )}
+                  />
                 </div>
               </div>
               <div className="flex-1 flex flex-row flex-wrap mb-2">
@@ -612,7 +677,7 @@ export const WordForm = ({ word, saveFunction }: WordFormParams) => {
       return;
     }
 
-    if (event.code !== "Enter") {
+    if (event.code !== "Enter" && event.code !== "NumpadEnter") {
       return;
     }
 
@@ -635,6 +700,64 @@ export const WordForm = ({ word, saveFunction }: WordFormParams) => {
       className={word.hidden ? "line-through" : ""}
     >
       {word.overwrite || word.text}
+    </span>
+  );
+};
+
+export interface SectionSpeakerParams {
+  speakerId: number;
+  speakers: Speaker[];
+  episodeSpeakers: EpisodeSpeaker[];
+  saveFunction: (speakerId: number) => void;
+}
+
+export const SectionSpeakerComponent = ({
+  speakerId,
+  speakers,
+  episodeSpeakers,
+  saveFunction,
+}: SectionSpeakerParams) => {
+  const [showEdit, setShowEdit] = useState(false);
+
+  const toggleShowEdit = () => {
+    setShowEdit(!showEdit);
+  };
+
+  const keyDown: KeyboardEventHandler<HTMLSelectElement> = (event) => {
+    if (event.code === "Escape") {
+      toggleShowEdit();
+      return;
+    }
+
+    if (event.code !== "Enter" && event.code !== "NumpadEnter") {
+      return;
+    }
+
+    const speakerId = Number.parseInt(event.currentTarget.value);
+
+    saveFunction(speakerId);
+    toggleShowEdit();
+  };
+
+  const episodeSpeaker = episodeSpeakers.find((x) => x.id === speakerId);
+  const speaker = speakers.find((x) => x.id === episodeSpeaker?.speaker_id);
+
+  return showEdit ? (
+    <select
+      size={1}
+      name="speaker_id"
+      defaultValue={speakerId}
+      onKeyDown={keyDown}
+    >
+      {episodeSpeakers.map((x) => (
+        <option key={x.id} value={x.id}>
+          {speakers.find((y) => y.id === x.speaker_id)?.name}
+        </option>
+      ))}
+    </select>
+  ) : (
+    <span onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
+      {speaker?.name}
     </span>
   );
 };

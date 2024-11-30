@@ -57,6 +57,7 @@ export interface Section {
   ends_at: number;
   corrected: boolean;
   text: string;
+  episode_speaker_id?: number;
 }
 
 export interface Word {
