@@ -2,12 +2,7 @@ import { useState } from "react";
 import type { Speaker } from "../definitions";
 
 import { Form, useFetcher, useLoaderData } from "react-router-dom";
-import type {
-  ActionFunction,
-  ActionFunctionArgs,
-  LoaderFunction,
-  LoaderFunctionArgs,
-} from "react-router-dom";
+import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 
 export const speakersLoader = (async (_args: LoaderFunctionArgs) => {
   const response = await fetch("/api/speakers");
@@ -18,9 +13,7 @@ export const speakersLoader = (async (_args: LoaderFunctionArgs) => {
 
 export const speakersAction = (async (event: ActionFunctionArgs) => {
   const formData = await event.request.formData();
-  const update = Object.fromEntries(
-    formData as unknown as Iterable<[PropertyKey, string]>,
-  );
+  const update = Object.fromEntries(formData as unknown as Iterable<[PropertyKey, string]>);
 
   const headers = {
     "Content-Type": "application/json",
@@ -43,9 +36,7 @@ export const Speakers = () => {
     <section className="relative">
       <div className="relative">
         <div className="mx-auto px-6 max-w-7xl md:px-12">
-          <h1 className="text-3xl text-title font-semibold pb-2 underline">
-            Speakers
-          </h1>
+          <h1 className="text-3xl text-title font-semibold pb-2 underline">Speakers</h1>
 
           <p>Here you can find all speakers in all episodes.</p>
 
@@ -88,15 +79,11 @@ export const Speakers = () => {
                       />
                     </div>
                     <div>
-                      <button
-                        type="submit"
-                        className="btn bg-primary-500 text-white p-1"
-                      >
+                      <button type="submit" className="btn bg-primary-500 text-white p-1">
                         Create Speaker
                       </button>
                       <p className="text-gray-400 text-sm pt-1">
-                        The episodes are assigned to the speaker at a later
-                        point in time using the Episode view.
+                        The episodes are assigned to the speaker at a later point in time using the Episode view.
                       </p>
                     </div>
                   </div>
@@ -171,10 +158,7 @@ export const SpeakerView = ({ speaker }: SpeakerViewData) => {
               />
             </div>
             <div className="flex flex-row pt-2">
-              <button
-                type="submit"
-                className="btn bg-primary-500 text-white p-1"
-              >
+              <button type="submit" className="btn bg-primary-500 text-white p-1">
                 Update
               </button>
               <button

@@ -2,9 +2,7 @@ import type { ActionFunctionArgs, ActionFunction } from "react-router-dom";
 
 export const editSpeakerAction = (async (event: ActionFunctionArgs) => {
   const formData = await event.request.formData();
-  const update = Object.fromEntries(
-    formData as unknown as Iterable<[PropertyKey, string]>,
-  );
+  const update = Object.fromEntries(formData as unknown as Iterable<[PropertyKey, string]>);
 
   const headers = {
     "Content-Type": "application/json",

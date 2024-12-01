@@ -29,9 +29,7 @@ export const Episode = () => {
         <div className="mx-auto px-6 max-w-7xl md:px-12">
           {episode ? (
             <>
-              <h1 className="text-3xl text-title font-semibold pb-2 underline">
-                {episode.episode.name}
-              </h1>
+              <h1 className="text-3xl text-title font-semibold pb-2 underline">{episode.episode.name}</h1>
 
               <p>
                 <Link to="./.." className="hover:link ">
@@ -44,9 +42,7 @@ export const Episode = () => {
                   <Markdown>{episode.episode.description}</Markdown>
                 </div>
                 <div className="card variant-outlined overflow-hidden ">
-                  <h3 className="text-xl text-title font-semibold pb-2 underline">
-                    Speakers
-                  </h3>
+                  <h3 className="text-xl text-title font-semibold pb-2 underline">Speakers</h3>
 
                   <ul className="mt-8 divide-y border-y *:py-1 *:flex *:items-center *:gap-3">
                     {episode.episode_speakers.map((x) => (
@@ -54,35 +50,23 @@ export const Episode = () => {
                         key={x.id}
                         onClick={selectHighlightedSpeaker(x.id)}
                         onKeyDown={selectHighlightedSpeaker(x.id)}
-                        className={
-                          highlightedSpeaker === x.id ? "bg-slate-100" : ""
-                        }
+                        className={highlightedSpeaker === x.id ? "bg-slate-100" : ""}
                       >
-                        <EpisodeSpeakerComponent
-                          episodeSpeaker={x}
-                          speakers={episode.speakers}
-                        />
+                        <EpisodeSpeakerComponent episodeSpeaker={x} speakers={episode.speakers} />
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
 
-              <h2 className="text-2xl text-title font-semibold pb-2 underline">
-                Transcript
-              </h2>
+              <h2 className="text-2xl text-title font-semibold pb-2 underline">Transcript</h2>
 
-              <p>
-                When editing the probability of the word is encoded in the
-                color.
-              </p>
+              <p>When editing the probability of the word is encoded in the color.</p>
               <div className="flex flex-row flex-wrap">
                 <div className="group btn sz-sm m-1 bg-gray-200">manual</div>
                 <div className="group btn sz-sm m-1 bg-blue-200">&gt; 99%</div>
                 <div className="group btn sz-sm m-1 bg-green-200">&gt; 90%</div>
-                <div className="group btn sz-sm m-1 bg-yellow-200">
-                  &gt; 70%
-                </div>
+                <div className="group btn sz-sm m-1 bg-yellow-200">&gt; 70%</div>
                 <div className="group btn sz-sm m-1 bg-red-200">&lt;= 70%</div>
               </div>
 

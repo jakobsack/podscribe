@@ -28,9 +28,7 @@ export const EpisodeViewComponent = () => {
         <div className="mx-auto px-6 max-w-7xl md:px-12">
           {episode ? (
             <>
-              <h1 className="text-3xl text-title font-semibold pb-2 underline">
-                {episode.episode.name}
-              </h1>
+              <h1 className="text-3xl text-title font-semibold pb-2 underline">{episode.episode.name}</h1>
 
               <p>
                 <Link to="edit" className="hover:link ">
@@ -43,9 +41,7 @@ export const EpisodeViewComponent = () => {
                   <Markdown>{episode.episode.description}</Markdown>
                 </div>
                 <div className="card variant-outlined overflow-hidden ">
-                  <h3 className="text-xl text-title font-semibold pb-2 underline">
-                    Speakers
-                  </h3>
+                  <h3 className="text-xl text-title font-semibold pb-2 underline">Speakers</h3>
 
                   <ul className="mt-8 divide-y border-y *:py-1 *:flex *:items-center *:gap-3">
                     {episode.episode_speakers.map((x) => (
@@ -53,23 +49,16 @@ export const EpisodeViewComponent = () => {
                         key={x.id}
                         onClick={selectHighlightedSpeaker(x.id)}
                         onKeyDown={selectHighlightedSpeaker(x.id)}
-                        className={
-                          highlightedSpeaker === x.id ? "bg-slate-100" : ""
-                        }
+                        className={highlightedSpeaker === x.id ? "bg-slate-100" : ""}
                       >
-                        {
-                          episode.speakers.find((y) => y.id === x.speaker_id)
-                            ?.name
-                        }
+                        {episode.speakers.find((y) => y.id === x.speaker_id)?.name}
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
 
-              <h2 className="text-2xl text-title font-semibold pb-2 underline">
-                Transcript
-              </h2>
+              <h2 className="text-2xl text-title font-semibold pb-2 underline">Transcript</h2>
 
               <TranscriptionViewComponent
                 episode={episode.episode}

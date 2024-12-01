@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, KeyboardEventHandler } from "react";
-import type {
-  Episode,
-  EpisodeSpeaker,
-  Part,
-  PartDisplay,
-  SectionDisplay,
-  Speaker,
-  Word,
-} from "../definitions";
+import type { Episode, EpisodeSpeaker, Part, PartDisplay, SectionDisplay, Speaker, Word } from "../definitions";
 
 interface foo {
   episode: Episode;
@@ -31,18 +23,10 @@ interface NewPart {
   start: number;
 }
 
-export const TranscriptTable = ({
-  episode,
-  parts,
-  speakers,
-  episodeSpeakers,
-  highlightedSpeaker,
-}: foo) => {
+export const TranscriptTable = ({ episode, parts, speakers, episodeSpeakers, highlightedSpeaker }: foo) => {
   const speakerNames: { [key: number]: string } = {};
   for (const episodeSpeaker of episodeSpeakers) {
-    speakerNames[episodeSpeaker.id] =
-      speakers.find((x) => x.id === episodeSpeaker.speaker_id)?.name ||
-      "UNKNOWN";
+    speakerNames[episodeSpeaker.id] = speakers.find((x) => x.id === episodeSpeaker.speaker_id)?.name || "UNKNOWN";
   }
 
   let lastSpeaker = "";
@@ -100,21 +84,12 @@ interface bar {
   episodeSpeakers: EpisodeSpeaker[];
 }
 
-export const SpeakerParts = ({
-  parts,
-  episodeId,
-  episodeSpeakerId,
-  speakers,
-  episodeSpeakers,
-}: bar) => {
+export const SpeakerParts = ({ parts, episodeId, episodeSpeakerId, speakers, episodeSpeakers }: bar) => {
   return (
     <div className="flex-1">
       <div className="flex flex-col">
         {parts.map((x, i, a) => (
-          <div
-            key={x.id}
-            className={`flex flex-row ${i === a.length - 1 ? "" : "border-b border-gray-200"}`}
-          >
+          <div key={x.id} className={`flex flex-row ${i === a.length - 1 ? "" : "border-b border-gray-200"}`}>
             <ShowPart
               episodeId={episodeId}
               part={x}
@@ -137,13 +112,7 @@ interface showParams {
   episodeSpeakers: EpisodeSpeaker[];
 }
 
-export const ShowPart = ({
-  part,
-  episodeId,
-  episodeSpeakerId,
-  speakers,
-  episodeSpeakers,
-}: showParams) => {
+export const ShowPart = ({ part, episodeId, episodeSpeakerId, speakers, episodeSpeakers }: showParams) => {
   const [showEdit, setShowEdit] = useState(false);
 
   const toggleShowEdit = () => {
@@ -190,9 +159,7 @@ export const PartEditForm = ({
   episodeSpeakers,
 }: params) => {
   const [part, setPart] = useState<PartDisplay | undefined>(undefined);
-  const [originalPart, setOriginalPart] = useState<PartDisplay | undefined>(
-    undefined,
-  );
+  const [originalPart, setOriginalPart] = useState<PartDisplay | undefined>(undefined);
 
   const [activeWord, setActiveWord] = useState<Word | undefined>(undefined);
 
@@ -254,22 +221,15 @@ export const PartEditForm = ({
       return;
     }
 
-    const newSectionWords = section.words.filter(
-      (x) => x.ends_at > word.starts_at,
-    );
-    const oldSectionWords = section.words.filter(
-      (x) => x.starts_at < word.starts_at,
-    );
+    const newSectionWords = section.words.filter((x) => x.ends_at > word.starts_at);
+    const oldSectionWords = section.words.filter((x) => x.starts_at < word.starts_at);
 
     if (oldSectionWords.length === 0) {
-      console.log(
-        "Not creating new down section as existing section would be empty",
-      );
+      console.log("Not creating new down section as existing section would be empty");
       return;
     }
 
-    const newSectionId =
-      Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
+    const newSectionId = Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
 
     const starts_at = newSectionWords[0].starts_at;
     const ends_at = newSectionWords[newSectionWords.length - 1].ends_at;
@@ -310,34 +270,24 @@ export const PartEditForm = ({
 
     const nextSection = part.sections[part.sections.indexOf(section) + 1];
 
-    const oldSectionWords = section.words.filter(
-      (x) => x.starts_at < word.starts_at,
-    );
+    const oldSectionWords = section.words.filter((x) => x.starts_at < word.starts_at);
 
-    if (
-      oldSectionWords.length === 0 &&
-      section.section.id > 0 &&
-      nextSection.section.id < 0
-    ) {
+    if (oldSectionWords.length === 0 && section.section.id > 0 && nextSection.section.id < 0) {
       // Is old section an existing one and next a temporary one? Then switch.
       upMove(nextSection.words[nextSection.words.length - 1].id);
       return;
     }
 
-    if (oldSectionWords.length === 0)
-      part.sections.splice(part.sections.indexOf(section), 1);
+    if (oldSectionWords.length === 0) part.sections.splice(part.sections.indexOf(section), 1);
     else {
       section.words = oldSectionWords;
       section.section.ends_at = section.words[section.words.length - 1].ends_at;
     }
 
-    nextSection.words = section.words
-      .filter((x) => x.ends_at > word.starts_at)
-      .concat(nextSection.words);
+    nextSection.words = section.words.filter((x) => x.ends_at > word.starts_at).concat(nextSection.words);
     nextSection.section.starts_at = nextSection.words[0].starts_at;
     nextSection.section.words_per_second =
-      nextSection.words.length /
-      (nextSection.section.ends_at - nextSection.section.starts_at);
+      nextSection.words.length / (nextSection.section.ends_at - nextSection.section.starts_at);
 
     setPart({ part: part.part, sections: part.sections });
   };
@@ -357,22 +307,15 @@ export const PartEditForm = ({
       return;
     }
 
-    const newSectionWords = section.words.filter(
-      (x) => x.starts_at < word.ends_at,
-    );
-    const oldSectionWords = section.words.filter(
-      (x) => x.starts_at > word.starts_at,
-    );
+    const newSectionWords = section.words.filter((x) => x.starts_at < word.ends_at);
+    const oldSectionWords = section.words.filter((x) => x.starts_at > word.starts_at);
 
     if (oldSectionWords.length === 0) {
-      console.log(
-        "Not creating new up section as existing section would be empty",
-      );
+      console.log("Not creating new up section as existing section would be empty");
       return;
     }
 
-    const newSectionId =
-      Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
+    const newSectionId = Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
 
     const starts_at = newSectionWords[0].starts_at;
     const ends_at = newSectionWords[newSectionWords.length - 1].ends_at;
@@ -412,35 +355,24 @@ export const PartEditForm = ({
     }
 
     const previousSection = part.sections[part.sections.indexOf(section) - 1];
-    const oldSectionWords = section.words.filter(
-      (x) => x.starts_at > word.starts_at,
-    );
+    const oldSectionWords = section.words.filter((x) => x.starts_at > word.starts_at);
 
-    if (
-      oldSectionWords.length === 0 &&
-      section.section.id > 0 &&
-      previousSection.section.id < 0
-    ) {
+    if (oldSectionWords.length === 0 && section.section.id > 0 && previousSection.section.id < 0) {
       // Is old section an existing one and next a temporary one? Then switch.
       downMove(previousSection.words[0].id);
       return;
     }
 
-    if (oldSectionWords.length === 0)
-      part.sections.splice(part.sections.indexOf(section), 1);
+    if (oldSectionWords.length === 0) part.sections.splice(part.sections.indexOf(section), 1);
     else {
       section.words = oldSectionWords;
       section.section.starts_at = section.words[0].starts_at;
     }
 
-    previousSection.words = previousSection.words.concat(
-      section.words.filter((x) => x.starts_at < word.ends_at),
-    );
-    previousSection.section.ends_at =
-      previousSection.words[previousSection.words.length - 1].ends_at;
+    previousSection.words = previousSection.words.concat(section.words.filter((x) => x.starts_at < word.ends_at));
+    previousSection.section.ends_at = previousSection.words[previousSection.words.length - 1].ends_at;
     previousSection.section.words_per_second =
-      previousSection.words.length /
-      (previousSection.section.ends_at - previousSection.section.starts_at);
+      previousSection.words.length / (previousSection.section.ends_at - previousSection.section.starts_at);
 
     setPart({ part: part.part, sections: part.sections });
   };
@@ -448,9 +380,7 @@ export const PartEditForm = ({
   const wordSaveFunction = (newWord: Word) => {
     if (!part) return;
 
-    const word = part.sections
-      .flatMap((x) => x.words)
-      .find((x) => x.id === newWord.id);
+    const word = part.sections.flatMap((x) => x.words).find((x) => x.id === newWord.id);
     if (!word) {
       console.error("whoops");
       return;
@@ -507,26 +437,17 @@ export const PartEditForm = ({
       <div className="flex flex-row">
         <div className="flex-1">
           {part.sections.map((section, i) => (
-            <div
-              key={section.section.id}
-              className="flex flex-col border-b border-gray-400"
-            >
+            <div key={section.section.id} className="flex flex-col border-b border-gray-400">
               <div className="flex-1 flex flex-row bg-gray-100">
-                <div className="w-20 text-right">
-                  {section.section.starts_at.toFixed(2)}
-                </div>
+                <div className="w-20 text-right">{section.section.starts_at.toFixed(2)}</div>
                 <div className="w-14 flex flex-row">
                   <div className="w-12 text-right">
-                    {(
-                      section.section.ends_at - section.section.starts_at
-                    ).toFixed(2)}
+                    {(section.section.ends_at - section.section.starts_at).toFixed(2)}
                   </div>
                   <div className="ml-0.5 flex-1">s</div>
                 </div>
                 <div className="w-14 flex flex-row ml-8">
-                  <div className="w-12 text-right">
-                    {section.section.words_per_second.toFixed(2)}
-                  </div>
+                  <div className="w-12 text-right">{section.section.words_per_second.toFixed(2)}</div>
                   <div className="ml-0.5 flex-1">wps</div>
                 </div>
                 <div className="flex-1 ml-8">
@@ -538,21 +459,15 @@ export const PartEditForm = ({
                       toggleSectionHidden(section.section.id);
                     }}
                   >
-                    {section.words.some((x) => x.hidden)
-                      ? "show all"
-                      : "hide all"}
+                    {section.words.some((x) => x.hidden) ? "show all" : "hide all"}
                   </span>
                 </div>
                 <div className="flex-1 ml-8">
                   <SectionSpeakerComponent
-                    speakerId={
-                      section.episode_speaker_id || part.part.episode_speaker_id
-                    }
+                    speakerId={section.episode_speaker_id || part.part.episode_speaker_id}
                     speakers={speakers}
                     episodeSpeakers={episodeSpeakers}
-                    saveFunction={episodeSpeakerSaveFunction(
-                      section.section.id,
-                    )}
+                    saveFunction={episodeSpeakerSaveFunction(section.section.id)}
                   />
                 </div>
                 <div className="w-28 flex-0">
@@ -564,9 +479,7 @@ export const PartEditForm = ({
                         id={`move_up_${section.section.id}`}
                         onChange={moveSection(section.section.id, true)}
                       />
-                      <label htmlFor={`move_up_${section.section.id}`}>
-                        Move up
-                      </label>
+                      <label htmlFor={`move_up_${section.section.id}`}>Move up</label>
                     </>
                   ) : (
                     <></>
@@ -579,9 +492,7 @@ export const PartEditForm = ({
                         id={`move_down_${section.section.id}`}
                         onChange={moveSection(section.section.id, false)}
                       />
-                      <label htmlFor={`move_down_${section.section.id}`}>
-                        Move up
-                      </label>
+                      <label htmlFor={`move_down_${section.section.id}`}>Move up</label>
                     </>
                   ) : (
                     <></>
@@ -592,10 +503,7 @@ export const PartEditForm = ({
                 {section.words.map((w) => {
                   const wordColor = getWordColor(w);
                   return (
-                    <div
-                      key={w.id}
-                      className={`group btn sz-sm m-1 ${wordColor}`}
-                    >
+                    <div key={w.id} className={`group btn sz-sm m-1 ${wordColor}`}>
                       <WordForm word={w} saveFunction={wordSaveFunction} />
                       <svg
                         fill="#000000"
@@ -629,9 +537,7 @@ export const PartEditForm = ({
           <p>Info</p>
           {activeWord ? (
             <>
-              <div
-                className={`group btn sz-sm m-1 ${getWordColor(activeWord)}`}
-              >
+              <div className={`group btn sz-sm m-1 ${getWordColor(activeWord)}`}>
                 <span className={activeWord.hidden ? "line-through" : ""}>
                   {activeWord.overwrite || activeWord.text}
                 </span>
@@ -696,11 +602,7 @@ export const PartEditForm = ({
         </div>
       </div>
       <div className="flex flex-row">
-        <div
-          className="btn variant-soft p-1"
-          onClick={toggleShowEdit}
-          onKeyDown={toggleShowEdit}
-        >
+        <div className="btn variant-soft p-1" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
           Cancel
         </div>
         <div className="btn variant-primary p-1 ml-3">Save changes</div>
@@ -739,18 +641,9 @@ export const WordForm = ({ word, saveFunction }: WordFormParams) => {
   };
 
   return showEdit ? (
-    <input
-      type="text"
-      defaultValue={word.overwrite || word.text}
-      onKeyDown={keyDown}
-      className="w-20"
-    />
+    <input type="text" defaultValue={word.overwrite || word.text} onKeyDown={keyDown} className="w-20" />
   ) : (
-    <span
-      onClick={toggleShowEdit}
-      onKeyDown={toggleShowEdit}
-      className={word.hidden ? "line-through" : ""}
-    >
+    <span onClick={toggleShowEdit} onKeyDown={toggleShowEdit} className={word.hidden ? "line-through" : ""}>
       {word.overwrite || word.text}
     </span>
   );
@@ -795,12 +688,7 @@ export const SectionSpeakerComponent = ({
   const speaker = speakers.find((x) => x.id === episodeSpeaker?.speaker_id);
 
   return showEdit ? (
-    <select
-      size={1}
-      name="speaker_id"
-      defaultValue={speakerId}
-      onKeyDown={keyDown}
-    >
+    <select size={1} name="speaker_id" defaultValue={speakerId} onKeyDown={keyDown}>
       {episodeSpeakers.map((x) => (
         <option key={x.id} value={x.id}>
           {speakers.find((y) => y.id === x.speaker_id)?.name}

@@ -27,11 +27,7 @@ export const Root = () => {
                       stroke="currentColor"
                     >
                       <title>Open Menu</title>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3.75 9h16.5m-16.5 6.75h16.5"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
                     </svg>
                     <svg
                       className="text-title absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 transition-[transform,opacity] duration-300 group-data-[state=active]:rotate-0 group-data-[state=active]:scale-100 group-data-[state=active]:opacity-100"
@@ -42,11 +38,7 @@ export const Root = () => {
                       stroke="currentColor"
                     >
                       <title>Close menu</title>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18 18 6M6 6l12 12"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
@@ -55,19 +47,13 @@ export const Root = () => {
                 <div className="mt-6 dark:text-body md:-ml-4 lg:pr-4 lg:mt-0">
                   <ul className="space-y-6 tracking-wide text-base lg:text-sm lg:flex lg:space-y-0">
                     <li>
-                      <Link
-                        to={"episodes"}
-                        className="hover:link md:px-4 block"
-                      >
+                      <Link to={"episodes"} className="hover:link md:px-4 block">
                         <span>Episode</span>
                       </Link>
                     </li>
 
                     <li>
-                      <Link
-                        to={"speakers"}
-                        className="hover:link md:px-4 block"
-                      >
+                      <Link to={"speakers"} className="hover:link md:px-4 block">
                         <span>Speakers</span>
                       </Link>
                     </li>

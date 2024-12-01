@@ -1,11 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Root } from "./components/Root";
-import {
-  Speakers,
-  speakersAction,
-  speakersLoader,
-} from "./components/Speakers";
+import { Speakers, speakersAction, speakersLoader } from "./components/Speakers";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Episodes } from "./components/Episodes";
 import { Episode, episodeLoader } from "./components/Episode";
@@ -15,10 +11,7 @@ const root = document.getElementById("root");
 
 import "./index.css";
 import { editSpeakerAction } from "./components/EditSpeaker";
-import {
-  EpisodeViewComponent,
-  episodeViewLoader,
-} from "./components/viewEpisode/EpisodeViewComponent";
+import { EpisodeViewComponent, episodeViewLoader } from "./components/viewEpisode/EpisodeViewComponent";
 import ErrorPage from "./ErrorPage";
 import { editEpisodeSpeakerAction } from "./components/editEpisode/EditEpisodeSpeakerComponent";
 

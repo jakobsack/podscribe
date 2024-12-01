@@ -7,10 +7,7 @@ export interface EpisodeSpeakerParams {
   speakers: Speaker[];
 }
 
-export const EpisodeSpeakerComponent = ({
-  episodeSpeaker,
-  speakers,
-}: EpisodeSpeakerParams) => {
+export const EpisodeSpeakerComponent = ({ episodeSpeaker, speakers }: EpisodeSpeakerParams) => {
   const [showEdit, setShowEdit] = useState(false);
 
   const toggleShowEdit = () => {
@@ -21,25 +18,16 @@ export const EpisodeSpeakerComponent = ({
 
   if (fetcher.formData && showEdit) {
     setShowEdit(false);
-    episodeSpeaker.speaker_id = Number.parseInt(
-      `${fetcher.formData.get("description")}`,
-    );
+    episodeSpeaker.speaker_id = Number.parseInt(`${fetcher.formData.get("description")}`);
   }
 
   return (
     <>
       {speakers.find((y) => y.id === episodeSpeaker.speaker_id)?.name}
       {showEdit ? (
-        <fetcher.Form
-          method="post"
-          action={`episodeSpeakers/${episodeSpeaker.id}`}
-        >
+        <fetcher.Form method="post" action={`episodeSpeakers/${episodeSpeaker.id}`}>
           <div className="flex flex-row">
-            <select
-              size={1}
-              name="speaker_id"
-              defaultValue={episodeSpeaker.speaker_id}
-            >
+            <select size={1} name="speaker_id" defaultValue={episodeSpeaker.speaker_id}>
               {speakers.map((x) => (
                 <option key={x.id} value={x.id}>
                   {x.name}
