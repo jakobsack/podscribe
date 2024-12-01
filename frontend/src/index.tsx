@@ -14,6 +14,7 @@ import { editSpeakerAction } from "./components/EditSpeaker";
 import { EpisodeViewComponent, episodeViewLoader } from "./components/viewEpisode/EpisodeViewComponent";
 import ErrorPage from "./ErrorPage";
 import { editEpisodeSpeakerAction } from "./components/editEpisode/EditEpisodeSpeakerComponent";
+import { editPartAction } from "./components/editEpisode/EditPartComponent";
 
 if (!root) {
   throw new Error("No root element found");
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
           {
             path: "episodeSpeakers/:episodeSpeakerId",
             action: editEpisodeSpeakerAction,
+          },
+          {
+            path: "parts/:partId/update",
+            action: editPartAction,
           },
         ],
       },

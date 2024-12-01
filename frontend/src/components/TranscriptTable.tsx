@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, KeyboardEventHandler } from "react";
 import type { Episode, EpisodeSpeaker, Part, PartDisplay, SectionDisplay, Speaker, Word } from "../definitions";
+import { useFetcher } from "react-router-dom";
 
 interface foo {
   episode: Episode;
@@ -432,7 +433,13 @@ export const PartEditForm = ({
     };
   };
 
-  return part ? (
+  const fetcher = useFetcher();
+
+  if (!part) {
+    return <p>Loading</p>;
+  }
+
+  return (
     <div className="flex-1">
       <div className="flex flex-row">
         <div className="flex-1">
@@ -479,7 +486,9 @@ export const PartEditForm = ({
                         id={`move_up_${section.section.id}`}
                         onChange={moveSection(section.section.id, true)}
                       />
-                      <label htmlFor={`move_up_${section.section.id}`}>Move up</label>
+                      <label className="ml-1" htmlFor={`move_up_${section.section.id}`}>
+                        Move up
+                      </label>
                     </>
                   ) : (
                     <></>
@@ -492,7 +501,9 @@ export const PartEditForm = ({
                         id={`move_down_${section.section.id}`}
                         onChange={moveSection(section.section.id, false)}
                       />
-                      <label htmlFor={`move_down_${section.section.id}`}>Move up</label>
+                      <label className="ml-1" htmlFor={`move_down_${section.section.id}`}>
+                        Move down
+                      </label>
                     </>
                   ) : (
                     <></>
@@ -601,15 +612,21 @@ export const PartEditForm = ({
           )}
         </div>
       </div>
-      <div className="flex flex-row">
-        <div className="btn variant-soft p-1" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
-          Cancel
+      <fetcher.Form method="post" action={`parts/${part.part.id}/update`}>
+        <div className="flex flex-row">
+          <textarea id="json" name="json" className="hidden" readOnly={true} value={JSON.stringify(part)} />
+          <div className="btn variant-soft p-1" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
+            Cancel
+          </div>
+          <button type="submit" name="yolo" className="btn bg-primary-500 text-white p-1 ml-3">
+            Update
+          </button>
+          <button type="submit" name="yala" className="btn bg-primary-500 text-white p-1 ml-3">
+            Update
+          </button>
         </div>
-        <div className="btn variant-primary p-1 ml-3">Save changes</div>
-      </div>
+      </fetcher.Form>
     </div>
-  ) : (
-    <p>Loading</p>
   );
 };
 
