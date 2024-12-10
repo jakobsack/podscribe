@@ -3,7 +3,6 @@ import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
 export const editPartAction = (async (event: ActionFunctionArgs) => {
   const formData = await event.request.formData();
 
-  console.log(formData);
   const episodeId = event.params.episodeId;
   const partId = event.params.partId;
 
@@ -18,9 +17,8 @@ export const editPartAction = (async (event: ActionFunctionArgs) => {
   };
   const body = json;
 
-  return;
   const req = await fetch(`/api/episodes/${episodeId}/parts/${partId}/update`, {
-    method: "PUT",
+    method: "POST",
     headers,
     body,
   });

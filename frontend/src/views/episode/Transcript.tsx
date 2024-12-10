@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
-import type { KeyboardEventHandler } from "react";
-import type { Episode, EpisodeSpeaker, Part, PartDisplay, Speaker, Word } from "../../definitions";
+import type { Episode, EpisodeSpeaker, Part, Speaker } from "../../definitions";
+import { SpeakerPartsComponent } from "./SpeakerParts";
 
-interface foo {
-  episode: Episode;
+interface TranscriptParams {
   parts: Part[];
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
@@ -17,13 +15,13 @@ interface SpeakerPart {
   parts: NewPart[];
 }
 
-interface NewPart {
+export interface NewPart {
   id: number;
   text: string;
   start: number;
 }
 
-export const TranscriptionViewComponent = ({ episode, parts, speakers, episodeSpeakers, highlightedSpeaker }: foo) => {
+export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highlightedSpeaker }: TranscriptParams) => {
   const speakerNames: { [key: number]: string } = {};
   for (const episodeSpeaker of episodeSpeakers) {
     speakerNames[episodeSpeaker.id] = speakers.find((x) => x.id === episodeSpeaker.speaker_id)?.name || "UNKNOWN";
@@ -70,25 +68,6 @@ export const TranscriptionViewComponent = ({ episode, parts, speakers, episodeSp
           </div>
         );
       })}
-    </div>
-  );
-};
-
-interface SpeakerPartsParams {
-  parts: NewPart[];
-}
-
-export const SpeakerPartsComponent = ({ parts }: SpeakerPartsParams) => {
-  return (
-    <div className="flex-1">
-      <div className="flex flex-col">
-        {parts.map((x, i, a) => (
-          <div key={x.id} className={`flex flex-row ${i === a.length - 1 ? "" : "border-b border-gray-200"}`}>
-            <div className="w-20 text-right">{x.start.toFixed(2)}</div>
-            <div className="flex-1 ml-2">{x.text}</div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };

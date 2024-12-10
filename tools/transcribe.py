@@ -85,41 +85,41 @@ def run():
         section_json = output_folder.joinpath(f"{i}.wav.json")
         try:
             with open(section_json, mode="r", encoding="utf-8") as openfile:
-                transcribed = json.load(openfile)
+                transcription_result = json.load(openfile)
         except:
             log(f"Unable to load {section_json} in utf-8")
             with open(section_json, mode="r", encoding="LATIN1") as openfile:
-                transcribed = json.load(openfile)
+                transcription_result = json.load(openfile)
 
         if i == 0:
-            data["systeminfo"] = transcribed["systeminfo"]
-            data["model"] = transcribed["model"]
-            data["params"] = transcribed["params"]
-            data["result"] = transcribed["result"]
+            data["systeminfo"] = transcription_result["systeminfo"]
+            data["model"] = transcription_result["model"]
+            data["params"] = transcription_result["params"]
+            data["result"] = transcription_result["result"]
 
         expected_duration = (section["end"] - section["start"]) * 1000.0
-        token_groups = []
+        sentences = []
         text = ""
-        for t_section in transcribed["transcription"]:
+        for section_result in transcription_result["transcription"]:
             words = []
             # Sanity check
-            if t_section["offsets"]["to"] - expected_duration > 1000.0:
+            if section_result["offsets"]["to"] - expected_duration > 1000.0:
                 log(
-                    f"Skipping section in file {i}.wav.json that supposedly is over a second longer than the actual snippet. Overlength: {t_section["offsets"]["to"] - expected_duration}"
+                    f"Skipping section in file {i}.wav.json that supposedly is over a second longer than the actual snippet. Overlength: {section_result["offsets"]["to"] - expected_duration}"
                 )
                 continue
 
-            section_duration = t_section["offsets"]["to"] - t_section["offsets"]["from"]
-            if section_duration <= 0:
+            sentence_duration = section_result["offsets"]["to"] - section_result["offsets"]["from"]
+            if sentence_duration <= 0:
                 log("Skipping section in file {i}.wav.json that has length 0")
                 continue
 
             # Add text
-            section_text = t_section["text"].strip()
-            total_words = len(section_text.split())
-            words_per_second = total_words / section_duration * 1000
-            text += t_section["text"]
-            for token in t_section["tokens"]:
+            sentence_text = section_result["text"].strip()
+            total_words = len(sentence_text.split())
+            words_per_second = total_words / sentence_duration * 1000
+            text += section_result["text"]
+            for token in section_result["tokens"]:
                 if token["text"].startswith("["):
                     continue
 
@@ -141,18 +141,18 @@ def run():
                     if token["p"] < words[-1]["probability"]:
                         words[-1]["probability"] = token["p"]
 
-            token_groups.append(
+            sentences.append(
                 {
-                    "text": t_section["text"].strip(),
+                    "text": section_result["text"].strip(),
                     "words": words,
-                    "start": (t_section["offsets"]["from"] / 1000.0) + section["start"],
-                    "end": (t_section["offsets"]["to"] / 1000.0) + section["start"],
+                    "start": (section_result["offsets"]["from"] / 1000.0) + section["start"],
+                    "end": (section_result["offsets"]["to"] / 1000.0) + section["start"],
                     "words_per_second": words_per_second,
                 }
             )
 
         data["transcription"].append(
-            {**section, "text": text.strip(), "sections": token_groups}
+            {**section, "text": text.strip(), "sentences": sentences}
         )
 
     with open(complete_json, mode="w", encoding="utf-8") as outfile:

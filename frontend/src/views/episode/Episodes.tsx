@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import type { Episode } from "../definitions";
+import type { Episode } from "../../definitions";
 import { Link } from "react-router-dom";
 
-export const Episodes = () => {
+export const EpisodesComponent = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
 
   useEffect(() => {

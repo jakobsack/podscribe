@@ -1,8 +1,9 @@
 import { useState } from "react";
-import type { Speaker } from "../definitions";
+import type { Speaker } from "../../definitions";
 
-import { Form, useFetcher, useLoaderData } from "react-router-dom";
+import { Form, useLoaderData } from "react-router-dom";
 import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
+import { SpeakerDetailComponent } from "./SpeakerDetail";
 
 export const speakersLoader = (async (_args: LoaderFunctionArgs) => {
   const response = await fetch("/api/speakers");
@@ -24,7 +25,7 @@ export const speakersAction = (async (event: ActionFunctionArgs) => {
   return await req.json();
 }) satisfies ActionFunction;
 
-export const Speakers = () => {
+export const SpeakersComponent = () => {
   const { speakers } = useLoaderData() as { speakers: Speaker[] };
   const [showNew, setShowNew] = useState(!speakers || !speakers.length);
 
@@ -45,7 +46,7 @@ export const Speakers = () => {
               <ul className="mt-8 divide-y border-y *:py-3 *:flex *:items-center *:gap-3">
                 {speakers.map((x) => (
                   <li key={x.id}>
-                    <SpeakerView speaker={x} />
+                    <SpeakerDetailComponent speaker={x} />
                   </li>
                 ))}
               </ul>
@@ -103,85 +104,5 @@ export const Speakers = () => {
         </div>
       </div>
     </section>
-  );
-};
-
-interface SpeakerViewData {
-  speaker: Speaker;
-}
-
-export const SpeakerView = ({ speaker }: SpeakerViewData) => {
-  const [showEdit, setShowEdit] = useState(false);
-
-  const toggleShowEdit = () => {
-    setShowEdit(!showEdit);
-  };
-
-  const fetcher = useFetcher();
-
-  if (fetcher.formData && showEdit) {
-    setShowEdit(false);
-    speaker.name = `${fetcher.formData.get("name")}`;
-    speaker.description = `${fetcher.formData.get("description")}`;
-  }
-
-  return (
-    <>
-      {showEdit ? (
-        <fetcher.Form method="post" action={`${speaker.id}/edit`}>
-          <div className="flex flex-col">
-            <div className="flex flex-row">
-              <div className="w-40">
-                <label htmlFor="formName">Name</label>
-              </div>
-              <div className="flex-1">
-                <input
-                  type="text"
-                  name="name"
-                  id="formName"
-                  className="border border-gray-300"
-                  placeholder="Name"
-                  defaultValue={speaker.name}
-                />
-              </div>
-            </div>
-            <div className="flex flex-row pt-2">
-              <div className="w-40">
-                <label htmlFor="formDescription">Description</label>
-              </div>
-              <textarea
-                className="border border-gray-300"
-                name="description"
-                id="formDescription"
-                placeholder="Description (optional)"
-                defaultValue={speaker.description}
-              />
-            </div>
-            <div className="flex flex-row pt-2">
-              <button type="submit" className="btn bg-primary-500 text-white p-1">
-                Update
-              </button>
-              <button
-                type="button"
-                className="btn bg-slate-500 text-white p-1 ml-3"
-                onClick={toggleShowEdit}
-                onKeyDown={toggleShowEdit}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </fetcher.Form>
-      ) : (
-        <>
-          <p>
-            {speaker.name} - {speaker.description || " "}
-          </p>
-          <p onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
-            Edit
-          </p>
-        </>
-      )}
-    </>
   );
 };

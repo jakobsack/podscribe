@@ -1,20 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Root } from "./components/Root";
-import { Speakers, speakersAction, speakersLoader } from "./components/Speakers";
+import { SpeakersComponent, speakersAction, speakersLoader } from "./views/speakers/Speakers";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Episodes } from "./components/Episodes";
-import { Episode, episodeLoader } from "./components/Episode";
+import { EpisodesComponent } from "./views/episode/Episodes";
+import { EpisodeComponent, episodeLoader } from "./views/episode/Episode";
 import { Index } from "./components/Index";
 
 const root = document.getElementById("root");
 
 import "./index.css";
-import { editSpeakerAction } from "./components/EditSpeaker";
-import { EpisodeViewComponent, episodeViewLoader } from "./components/viewEpisode/EpisodeViewComponent";
-import ErrorPage from "./ErrorPage";
-import { editEpisodeSpeakerAction } from "./components/editEpisode/EditEpisodeSpeakerComponent";
-import { editPartAction } from "./components/editEpisode/EditPartComponent";
+import { editSpeakerAction } from "./views/speakers/EditSpeaker";
+import { EpisodeViewComponent, episodeViewLoader } from "./views/episode/EpisodeView";
+import ErrorPage from "./components/ErrorPage";
+import { editEpisodeSpeakerAction } from "./views/editEpisode/EditEpisodeSpeaker";
+import { editPartAction } from "./views/editEpisode/EditPart";
 
 if (!root) {
   throw new Error("No root element found");
@@ -29,12 +29,12 @@ const router = createBrowserRouter([
       { index: true, element: <Index /> },
       {
         path: "speakers",
-        element: <Speakers />,
+        element: <SpeakersComponent />,
         loader: speakersLoader,
         action: speakersAction,
         children: [{ path: ":speakerId/edit", action: editSpeakerAction }],
       },
-      { path: "episodes", element: <Episodes /> },
+      { path: "episodes", element: <EpisodesComponent /> },
       {
         path: "episodes/:episodeId",
         element: <EpisodeViewComponent />,
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
       },
       {
         path: "episodes/:episodeId/edit",
-        element: <Episode />,
+        element: <EpisodeComponent />,
         loader: episodeLoader,
         children: [
           {
