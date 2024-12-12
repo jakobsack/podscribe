@@ -48,8 +48,7 @@ export interface PartDisplay {
 export interface SectionDisplay {
   section: Section;
   words: Word[];
-  episode_speaker_id?: number;
-  move?: "up" | "upnew" | "downnew" | "down";
+  move_section?: "up" | "upnew" | "downnew" | "down";
 }
 
 export interface Section {

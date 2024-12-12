@@ -241,9 +241,9 @@ export const PartEditFormComponent = ({
       }
 
       if (direction) {
-        section.move = direction;
+        section.move_section = direction;
       } else {
-        section.move = undefined;
+        section.move_section = undefined;
       }
 
       setPart({ part: part.part, sections: part.sections });
@@ -260,7 +260,7 @@ export const PartEditFormComponent = ({
     <div className="flex-1">
       <div className="flex flex-row">
         <div className="flex-1">
-          {part.sections.length && part.sections[0].move?.startsWith("up") ? (
+          {part.sections.length && part.sections[0].move_section?.startsWith("up") ? (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
               <SectionEditFormComponent
@@ -289,7 +289,7 @@ export const PartEditFormComponent = ({
               </div>
             </div>
             {part.sections
-              .filter((x) => !x.move)
+              .filter((x) => !x.move_section)
               .map((section, i) => {
                 return (
                   <div key={section.section.id} className="flex flex-row">
@@ -307,7 +307,7 @@ export const PartEditFormComponent = ({
                 );
               })}
           </div>
-          {part.sections.length && part.sections[part.sections.length - 1].move?.startsWith("down") ? (
+          {part.sections.length && part.sections[part.sections.length - 1].move_section?.startsWith("down") ? (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
               <SectionEditFormComponent

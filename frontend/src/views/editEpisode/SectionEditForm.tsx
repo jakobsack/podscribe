@@ -47,7 +47,7 @@ export function SectionEditFormComponent({
         </div>
         <div className="w-48 flex-0">
           {isFirst ? (
-            section.move === "up" ? (
+            section.move_section === "up" ? (
               <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
                 Undo move
               </span>
@@ -61,7 +61,7 @@ export function SectionEditFormComponent({
           )}
           {isFirst && isLast ? <br /> : <></>}
           {isLast ? (
-            section.move === "down" ? (
+            section.move_section === "down" ? (
               <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
                 Undo move
               </span>
@@ -79,7 +79,7 @@ export function SectionEditFormComponent({
         </div>
         <div className="w-48 flex-0">
           {isFirst ? (
-            section.move === "upnew" ? (
+            section.move_section === "upnew" ? (
               <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
                 Undo move
               </span>
@@ -96,7 +96,7 @@ export function SectionEditFormComponent({
           )}
           {isFirst && isLast ? <br /> : <></>}
           {isLast ? (
-            section.move === "downnew" ? (
+            section.move_section === "downnew" ? (
               <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
                 Undo move
               </span>
