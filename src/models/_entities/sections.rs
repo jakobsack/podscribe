@@ -19,13 +19,10 @@ pub struct Model {
     pub ends_at: f64,
     #[sea_orm(column_type = "Double")]
     pub words_per_second: f64,
-    pub corrected: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::approvals::Entity")]
-    Approvals,
     #[sea_orm(
         belongs_to = "super::parts::Entity",
         from = "Column::PartId",
@@ -38,12 +35,6 @@ pub enum Relation {
     Words,
 }
 
-impl Related<super::approvals::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Approvals.def()
-    }
-}
-
 impl Related<super::parts::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Parts.def()
@@ -53,14 +44,5 @@ impl Related<super::parts::Entity> for Entity {
 impl Related<super::words::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Words.def()
-    }
-}
-
-impl Related<super::users::Entity> for Entity {
-    fn to() -> RelationDef {
-        super::approvals::Relation::Users.def()
-    }
-    fn via() -> Option<RelationDef> {
-        Some(super::approvals::Relation::Sections.def().rev())
     }
 }

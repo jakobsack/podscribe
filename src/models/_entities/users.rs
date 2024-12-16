@@ -36,9 +36,9 @@ impl Related<super::approvals::Entity> for Entity {
     }
 }
 
-impl Related<super::sections::Entity> for Entity {
+impl Related<super::parts::Entity> for Entity {
     fn to() -> RelationDef {
-        super::approvals::Relation::Sections.def()
+        super::approvals::Relation::Parts.def()
     }
     fn via() -> Option<RelationDef> {
         Some(super::approvals::Relation::Users.def().rev())

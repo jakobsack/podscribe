@@ -14,6 +14,7 @@ impl MigrationTrait for Migration {
                     .col(string(Episodes::Name))
                     .col(string(Episodes::Link))
                     .col(text(Episodes::Description))
+                    .col(boolean(Episodes::HasAudioFile))
                     .to_owned(),
             )
             .await
@@ -33,7 +34,5 @@ enum Episodes {
     Name,
     Link,
     Description,
-    
+    HasAudioFile,
 }
-
-

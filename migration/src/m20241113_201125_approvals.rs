@@ -14,17 +14,16 @@ impl MigrationTrait for Migration {
                         Index::create()
                             .name("idx-approvals-refs-pk")
                             .table(Approvals::Table)
-                            .col(Approvals::SectionId)
-                            .col(Approvals::UserId)
-                            ,
+                            .col(Approvals::PartId)
+                            .col(Approvals::UserId),
                     )
-                    .col(integer(Approvals::SectionId))
+                    .col(integer(Approvals::PartId))
                     .col(integer(Approvals::UserId))
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk-approvals-sections")
-                            .from(Approvals::Table, Approvals::SectionId)
-                            .to(Sections::Table, Sections::Id)
+                            .from(Approvals::Table, Approvals::PartId)
+                            .to(Parts::Table, Parts::Id)
                             .on_delete(ForeignKeyAction::Cascade)
                             .on_update(ForeignKeyAction::Cascade),
                     )
@@ -51,14 +50,12 @@ impl MigrationTrait for Migration {
 #[derive(DeriveIden)]
 enum Approvals {
     Table,
-    SectionId,
+    PartId,
     UserId,
-    
 }
 
-
 #[derive(DeriveIden)]
-enum Sections {
+enum Parts {
     Table,
     Id,
 }

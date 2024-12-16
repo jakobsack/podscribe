@@ -13,7 +13,6 @@ pub struct Params {
     pub starts_at: f64,
     pub ends_at: f64,
     pub words_per_second: f64,
-    pub corrected: bool,
 }
 
 impl Params {
@@ -22,7 +21,6 @@ impl Params {
         item.starts_at = Set(self.starts_at.clone());
         item.ends_at = Set(self.ends_at.clone());
         item.words_per_second = Set(self.words_per_second.clone());
-        item.corrected = Set(self.corrected.clone());
     }
 }
 

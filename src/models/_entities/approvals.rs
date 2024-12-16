@@ -9,7 +9,7 @@ pub struct Model {
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key, auto_increment = false)]
-    pub section_id: i32,
+    pub part_id: i32,
     #[sea_orm(primary_key, auto_increment = false)]
     pub user_id: i32,
 }
@@ -17,13 +17,13 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::sections::Entity",
-        from = "Column::SectionId",
-        to = "super::sections::Column::Id",
+        belongs_to = "super::parts::Entity",
+        from = "Column::PartId",
+        to = "super::parts::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Sections,
+    Parts,
     #[sea_orm(
         belongs_to = "super::users::Entity",
         from = "Column::UserId",
@@ -34,9 +34,9 @@ pub enum Relation {
     Users,
 }
 
-impl Related<super::sections::Entity> for Entity {
+impl Related<super::parts::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Sections.def()
+        Relation::Parts.def()
     }
 }
 

@@ -15,6 +15,7 @@ pub struct Params {
     pub name: String,
     pub link: String,
     pub description: String,
+    pub has_audio_file: bool,
 }
 
 impl Params {
@@ -22,6 +23,7 @@ impl Params {
         item.name = Set(self.name.clone());
         item.link = Set(self.link.clone());
         item.description = Set(self.description.clone());
+        item.has_audio_file = Set(self.has_audio_file.clone());
     }
 }
 

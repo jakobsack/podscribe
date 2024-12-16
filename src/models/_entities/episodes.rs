@@ -14,6 +14,7 @@ pub struct Model {
     pub link: String,
     #[sea_orm(column_type = "Text")]
     pub description: String,
+    pub has_audio_file: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

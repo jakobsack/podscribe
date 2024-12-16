@@ -16,7 +16,6 @@ impl MigrationTrait for Migration {
                     .col(double(Sections::StartsAt))
                     .col(double(Sections::EndsAt))
                     .col(double(Sections::WordsPerSecond))
-                    .col(boolean(Sections::Corrected))
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk-sections-parts")
@@ -46,10 +45,7 @@ enum Sections {
     StartsAt,
     EndsAt,
     WordsPerSecond,
-    Corrected,
-    
 }
-
 
 #[derive(DeriveIden)]
 enum Parts {
