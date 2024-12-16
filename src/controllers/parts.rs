@@ -137,9 +137,95 @@ pub async fn ui_update(
 ) -> Result<Response> {
     // First make the function word. Do not yet optimize.
     let original_part = load_item(&ctx, id).await?;
+    if original_part.episode_id != episode_id {
+        return Err(Error::NotFound);
+    }
+
+    let original_sections = SectionsNS::Entity::find()
+        .filter(SectionsNS::Column::PartId.eq(original_part.id))
+        .all(&ctx.db)
+        .await?;
+
+    let original_section_ids: Vec<i32> = original_sections.iter().map(|s| s.id).collect();
+
+    let original_words = WordsNS::Entity::find()
+        .filter(WordsNS::Column::SectionId.is_in(original_section_ids))
+        .all(&ctx.db)
+        .await?;
+
+    // Sanity check: all words in list
+    let ui_words: Vec<UiUpdateParamsSectionWord> = params
+        .sections
+        .iter()
+        .flat_map(|x| x.words.clone())
+        .collect();
+    if ui_words.len() != original_words.len() {
+        return Err(Error::BadRequest(String::from(
+            "Amount of words does not match",
+        )));
+    }
+    if !ui_words
+        .iter()
+        .all(|x| ui_words.iter().filter(|y| y.id == x.id).count() == 1)
+    {
+        return Err(Error::BadRequest(String::from(
+            "Not all word ids are unique",
+        )));
+    }
+    if !original_words.iter().all(|original_word| {
+        ui_words
+            .iter()
+            .any(|ui_word| original_word.id == ui_word.id)
+    }) {
+        return Err(Error::BadRequest(String::from("Not all words included")));
+    }
+
+    // Sanity check: no duplicate section ids
+    if !params.sections.iter().all(|x| {
+        params
+            .sections
+            .iter()
+            .filter(|y| y.section.id == x.section.id)
+            .count()
+            == 1
+    }) {
+        return Err(Error::BadRequest(String::from(
+            "Not all section ids are unique",
+        )));
+    }
+
+    // Sanity check: all section ids > 0 loaded
+    if !params
+        .sections
+        .iter()
+        .filter(|x| x.section.id > 0)
+        .all(|x| original_sections.iter().any(|y| y.id == x.section.id))
+    {
+        return Err(Error::BadRequest(String::from(
+            "Not all sections were loaded",
+        )));
+    }
+
+    // Sanity check: No empty sections
+    if !params.sections.iter().all(|x| x.words.len() > 0) {
+        return Err(Error::BadRequest(String::from(
+            "Not all sections contain words",
+        )));
+    }
+
+    let moved_sections: Vec<&UiUpdateParamsSection> = params
+        .sections
+        .iter()
+        .filter(|x| x.move_section.is_some())
+        .collect();
+    let sticky_sections: Vec<&UiUpdateParamsSection> = params
+        .sections
+        .iter()
+        .filter(|x| x.move_section.is_none())
+        .collect();
 
     // First we work on sections that move
-    for ui_section in params.sections.iter().filter(|x| x.move_section.is_some()) {
+    for ui_section in moved_sections {
         let target_part = match ui_section.move_section.as_deref() {
             Some("up") => find_previous_part(&original_part, &ctx).await?,
             Some("upnew") => create_part(&original_part, &ctx).await?,
@@ -148,69 +234,59 @@ pub async fn ui_update(
             _ => panic!("Unexpected data"),
         };
 
-        // Create or fetch section
-        let section = find_or_create_section(&ui_section.section, &target_part, &ctx).await?;
-        let section_id = section.id;
-        let mut section = section.into_active_model();
-        let text: Vec<String> = ui_section
-            .words
-            .iter()
-            .filter(|x| !x.hidden)
-            .map(|x| {
-                if x.overwrite.is_empty() {
-                    x.text.clone()
-                } else {
-                    x.overwrite.clone()
-                }
-            })
-            .collect();
-        section.part_id = Set(target_part.id);
-        section.text = Set(text.join(" "));
-        section.starts_at = Set(ui_section.words[0].starts_at);
-        section.ends_at = Set(ui_section.words[ui_section.words.len() - 1].ends_at);
-        section.save(&ctx.db).await?;
-
-        let word_ids: Vec<i32> = ui_section.words.iter().map(|x| x.id).collect();
-        let words = WordsNS::Entity::find()
-            .filter(WordsNS::Column::Id.is_in(word_ids))
-            .all(&ctx.db)
-            .await?;
-        for word in words {
-            let ui_word = ui_section.words.iter().find(|x| x.id == word.id).unwrap();
-            let mut word = word.into_active_model();
-            word.section_id = Set(section_id);
-            word.hidden = Set(ui_word.hidden);
-            word.text = Set(ui_word.text.clone());
-            word.overwrite = Set(ui_word.overwrite.clone());
-            word.save(&ctx.db).await?;
-        }
+        let new_text = update_section(&ui_section, &target_part, &ctx).await?;
 
         // Update part
-        // Save time
-        // Save text
-        // Change to ActiveModel
-        // Update times
-        // Update text
-        // Save part
+        let old_starts_at = target_part.starts_at;
+        let old_ends_at = target_part.ends_at;
+        let old_text = target_part.text.clone();
+
+        let mut target_part = target_part.into_active_model();
+        if old_starts_at == old_ends_at {
+            // We just created this part
+            target_part.starts_at = Set(ui_section.words[0].starts_at);
+            target_part.ends_at = Set(ui_section.words[ui_section.words.len()].ends_at);
+            target_part.text = Set(new_text)
+        } else if ui_section.move_section.as_deref() == Some("up") {
+            // We are appending to the previous
+            target_part.ends_at = Set(ui_section.words[ui_section.words.len()].ends_at);
+            target_part.text = Set(format!("{} {}", old_text, new_text));
+        } else {
+            // We are appending to the previous
+            target_part.starts_at = Set(ui_section.words[0].starts_at);
+            target_part.text = Set(format!("{} {}", new_text, old_text));
+        };
+
+        target_part.save(&ctx.db).await?;
     }
 
-    for ui_section in params.sections.iter().filter(|x| x.move_section.is_none()) {
-        let section = find_or_create_section(&ui_section.section, &original_part, &ctx).await?;
-        // set text
-        // set times
-        // save section
+    let mut complete_text: String = String::new();
+    for ui_section in &sticky_sections {
+        let new_text = update_section(&ui_section, &original_part, &ctx).await?;
+        complete_text.push_str(" ");
+        complete_text.push_str(&new_text);
+    }
 
-        // Update words
-
+    if sticky_sections.len() == 0 {
+        original_part.delete(&ctx.db).await?;
+    } else {
         // Update part
-        // Save time
-        // Save text
-        // Change to ActiveModel
-        // Update times
-        // Update text
+        let last_section = sticky_sections[sticky_sections.len() - 1];
+        let mut original_part = original_part.into_active_model();
+        original_part.starts_at = Set(sticky_sections[0].words[0].starts_at);
+        original_part.ends_at = Set(last_section.words[last_section.words.len() - 1].ends_at);
+        original_part.text = Set(complete_text.clone());
+        original_part.save(&ctx.db).await?;
     }
 
-    // Save part
+    // Remove sections that are not required anymore
+    for section in original_sections
+        .iter()
+        .filter(|x| !params.sections.iter().any(|y| y.section.id == x.id))
+    {
+        let section = section.clone();
+        section.delete(&ctx.db).await?;
+    }
 
     format::empty()
 }
@@ -272,6 +348,59 @@ async fn create_part(part: &Model, ctx: &AppContext) -> Result<Model> {
     let item = item.insert(&ctx.db).await?;
 
     Ok(item)
+}
+
+async fn update_section(
+    ui_section: &UiUpdateParamsSection,
+    target_part: &Model,
+    ctx: &AppContext,
+) -> Result<String> {
+    // Create or fetch section
+    let section = find_or_create_section(&ui_section.section, &target_part, &ctx).await?;
+    let section_id = section.id;
+    let mut section = section.into_active_model();
+    let text: Vec<String> = ui_section
+        .words
+        .iter()
+        .filter(|x| !x.hidden)
+        .map(|x| {
+            if x.overwrite.is_empty() {
+                x.text.clone()
+            } else {
+                x.overwrite.clone()
+            }
+        })
+        .collect();
+    let new_text = text.join(" ");
+    let text_len: i32 = text.len().try_into().unwrap();
+    let text_len: f64 = text_len.try_into().unwrap();
+    let words_per_second: f64 = (ui_section.words[ui_section.words.len() - 1].ends_at
+        - ui_section.words[0].starts_at)
+        / text_len;
+    section.part_id = Set(target_part.id);
+    section.text = Set(new_text.clone());
+    section.starts_at = Set(ui_section.words[0].starts_at);
+    section.ends_at = Set(ui_section.words[ui_section.words.len() - 1].ends_at);
+    section.words_per_second = Set(words_per_second);
+    section.save(&ctx.db).await?;
+
+    // Update words
+    let word_ids: Vec<i32> = ui_section.words.iter().map(|x| x.id).collect();
+    let words = WordsNS::Entity::find()
+        .filter(WordsNS::Column::Id.is_in(word_ids))
+        .all(&ctx.db)
+        .await?;
+    for word in words {
+        let ui_word = ui_section.words.iter().find(|x| x.id == word.id).unwrap();
+        let mut word = word.into_active_model();
+        word.section_id = Set(section_id);
+        word.hidden = Set(ui_word.hidden);
+        word.text = Set(ui_word.text.clone());
+        word.overwrite = Set(ui_word.overwrite.clone());
+        word.save(&ctx.db).await?;
+    }
+
+    Ok(new_text)
 }
 
 async fn find_or_create_section(
