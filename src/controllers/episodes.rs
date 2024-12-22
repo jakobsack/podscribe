@@ -100,6 +100,38 @@ pub async fn get_display(Path(id): Path<i32>, State(ctx): State<AppContext>) -> 
 }
 
 #[debug_handler]
+pub async fn attach_audio(
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+    content: axum::body::Bytes,
+) -> Result<Response> {
+    let item = load_item(&ctx, id).await?;
+    let path = std::path::PathBuf::from("episodes").join(format!("{}.mp3", id));
+    ctx.storage
+        .as_ref()
+        .upload(path.as_path(), &content)
+        .await?;
+
+    let mut item = item.into_active_model();
+    item.has_audio_file = Set(true);
+    let item = item.update(&ctx.db).await?;
+
+    format::json(item)
+}
+
+#[debug_handler]
+pub async fn get_audio(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+    let item = load_item(&ctx, id).await?;
+    if !item.has_audio_file {
+        return Err(Error::BadRequest("Episode has no audio file".into()));
+    }
+
+    let path = std::path::PathBuf::from("episodes").join(format!("{}.mp3", id));
+    let content: Vec<u8> = ctx.storage.download(&path.as_path()).await?;
+    Ok(axum::body::Bytes::from(content).into_response())
+}
+
+#[debug_handler]
 pub async fn import(
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
@@ -226,6 +258,8 @@ pub fn routes() -> Routes {
         .add(":id", get(get_one))
         .add(":id", post(import))
         .add(":id/display", get(get_display))
+        .add(":id/audio", get(get_audio))
+        .add(":id/audio", post(attach_audio))
         .add(":id", delete(remove))
         .add(":id", put(update))
         .add(":id", patch(update))
