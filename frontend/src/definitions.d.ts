@@ -11,6 +11,7 @@ export interface Episode {
   name: string;
   link: string;
   description: string;
+  has_audio_file: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -56,7 +57,6 @@ export interface Section {
   words_per_second: number;
   starts_at: number;
   ends_at: number;
-  corrected: boolean;
   text: string;
 }
 

@@ -4,7 +4,7 @@ import { Root } from "./components/Root";
 import { SpeakersComponent, speakersAction, speakersLoader } from "./views/speakers/Speakers";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { EpisodesComponent } from "./views/episode/Episodes";
-import { EpisodeComponent, episodeLoader } from "./views/episode/Episode";
+import { EpisodeComponent, episodeLoader } from "./views/editEpisode/Episode";
 import { Index } from "./components/Index";
 
 const root = document.getElementById("root");
@@ -15,6 +15,7 @@ import { EpisodeViewComponent, episodeViewLoader } from "./views/episode/Episode
 import ErrorPage from "./components/ErrorPage";
 import { editEpisodeSpeakerAction } from "./views/editEpisode/EditEpisodeSpeaker";
 import { editPartAction } from "./views/editEpisode/EditPart";
+import { loginAction, LoginComponent } from "./views/session/Login";
 
 if (!root) {
   throw new Error("No root element found");
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Index /> },
+      { path: "session/login", element: <LoginComponent />, action: loginAction },
       {
         path: "speakers",
         element: <SpeakersComponent />,

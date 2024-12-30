@@ -2,6 +2,7 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use axum::debug_handler;
+use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -36,12 +37,16 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 #[debug_handler]
-pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list(_auth: middleware::auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
     format::json(Entity::find().all(&ctx.db).await?)
 }
 
 #[debug_handler]
-pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
+pub async fn add(
+    _auth: middleware::auth::JWT,
+    State(ctx): State<AppContext>,
+    Json(params): Json<Params>,
+) -> Result<Response> {
     let mut item = ActiveModel {
         ..Default::default()
     };
@@ -52,6 +57,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
 
 #[debug_handler]
 pub async fn update(
+    _auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
@@ -64,18 +70,30 @@ pub async fn update(
 }
 
 #[debug_handler]
-pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn remove(
+    _auth: middleware::auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
-pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn get_one(
+    _auth: middleware::auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     format::json(load_item(&ctx, id).await?)
 }
 
 #[debug_handler]
-pub async fn get_display(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn get_display(
+    _auth: middleware::auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     let episode = load_item(&ctx, id).await?;
     let parts = PartsNS::Entity::find()
         .filter(PartsNS::Column::EpisodeId.eq(id))
@@ -101,6 +119,7 @@ pub async fn get_display(Path(id): Path<i32>, State(ctx): State<AppContext>) -> 
 
 #[debug_handler]
 pub async fn attach_audio(
+    _auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     content: axum::body::Bytes,
@@ -120,7 +139,11 @@ pub async fn attach_audio(
 }
 
 #[debug_handler]
-pub async fn get_audio(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn get_audio(
+    _auth: middleware::auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     let item = load_item(&ctx, id).await?;
     if !item.has_audio_file {
         return Err(Error::BadRequest("Episode has no audio file".into()));
@@ -133,6 +156,7 @@ pub async fn get_audio(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Re
 
 #[debug_handler]
 pub async fn import(
+    _auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(transcription): Json<ImportTranscription>,

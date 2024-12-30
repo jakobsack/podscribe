@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import type { Episode } from "../../definitions";
 import { Link } from "react-router-dom";
+import { jwtFetch } from "../../common/jwtFetch";
 
 export const EpisodesComponent = () => {
   const [episodes, setEpisodes] = useState<Episode[]>([]);
 
   useEffect(() => {
-    fetch("/api/episodes")
+    jwtFetch("/api/episodes")
       .then((x) => {
         return x.json() as Promise<Episode[]>;
       })

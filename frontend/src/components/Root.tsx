@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 
 export const Root = () => {
+  const [jwtToken, setJwtToken] = useState(localStorage.getItem("jwtToken"));
+
   return (
     <>
       <header id="header" className="group">
@@ -45,28 +48,48 @@ export const Root = () => {
               </div>
               <div className="w-full group-data-[state=active]:h-fit h-0 lg:w-fit flex-wrap justify-end items-center space-y-8 lg:space-y-0 lg:flex lg:h-fit md:flex-nowrap">
                 <div className="mt-6 dark:text-body md:-ml-4 lg:pr-4 lg:mt-0">
-                  <ul className="space-y-6 tracking-wide text-base lg:text-sm lg:flex lg:space-y-0">
-                    <li>
-                      <Link to={"episodes"} className="hover:link md:px-4 block">
-                        <span>Episode</span>
-                      </Link>
-                    </li>
+                  {jwtToken ? (
+                    <ul className="space-y-6 tracking-wide text-base lg:text-sm lg:flex lg:space-y-0">
+                      <li>
+                        <Link to={"episodes"} className="hover:link md:px-4 block">
+                          <span>Episode</span>
+                        </Link>
+                      </li>
 
-                    <li>
-                      <Link to={"speakers"} className="hover:link md:px-4 block">
-                        <span>Speakers</span>
-                      </Link>
-                    </li>
-                  </ul>
+                      <li>
+                        <Link to={"speakers"} className="hover:link md:px-4 block">
+                          <span>Speakers</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  ) : (
+                    <></>
+                  )}
                 </div>
 
                 <div className="w-full space-y-2 gap-2 pt-6 pb-4 lg:pb-0 border-t items-center flex flex-col lg:flex-row lg:space-y-0 lg:w-fit lg:border-l lg:border-t-0 lg:pt-0 lg:pl-2">
-                  <button className="btn variant-ghost sz-sm" type="button">
-                    <span className="btn-label">Login</span>
-                  </button>
-                  <button className="btn variant-neutral sz-sm" type="button">
-                    <span>Sign Up</span>
-                  </button>
+                  {jwtToken ? (
+                    <button
+                      className="btn variant-danger sz-sm"
+                      type="button"
+                      onClick={() => {
+                        setJwtToken(null);
+                      }}
+                    >
+                      <span>Logout</span>
+                    </button>
+                  ) : (
+                    <>
+                      <Link to={"session/login"}>
+                        <button className="btn variant-ghost sz-sm" type="button">
+                          <span className="btn-label">Login</span>
+                        </button>
+                      </Link>
+                      <button className="btn variant-neutral sz-sm" type="button">
+                        <span>Sign Up</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

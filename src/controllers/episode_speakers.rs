@@ -2,6 +2,7 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use axum::debug_handler;
+use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +25,11 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 #[debug_handler]
-pub async fn list(State(ctx): State<AppContext>, Path(episode_id): Path<i32>) -> Result<Response> {
+pub async fn list(
+    _auth: middleware::auth::JWT,
+    State(ctx): State<AppContext>,
+    Path(episode_id): Path<i32>,
+) -> Result<Response> {
     format::json(
         Entity::find()
             .filter(Column::EpisodeId.eq(episode_id))
@@ -35,6 +40,7 @@ pub async fn list(State(ctx): State<AppContext>, Path(episode_id): Path<i32>) ->
 
 #[debug_handler]
 pub async fn add(
+    _auth: middleware::auth::JWT,
     State(ctx): State<AppContext>,
     Path(episode_id): Path<i32>,
     Json(params): Json<Params>,
@@ -50,6 +56,7 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn update(
+    _auth: middleware::auth::JWT,
     Path((episode_id, id)): Path<(i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
@@ -65,13 +72,21 @@ pub async fn update(
 }
 
 #[debug_handler]
-pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn remove(
+    _auth: middleware::auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
-pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn get_one(
+    _auth: middleware::auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     format::json(load_item(&ctx, id).await?)
 }
 

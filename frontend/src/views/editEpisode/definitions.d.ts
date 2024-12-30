@@ -10,3 +10,7 @@ export interface NewPart {
   text: string;
   start: number;
 }
+
+export interface AudioControl {
+  play: React.Dispatch<React.SetStateAction<boolean | undefined>>;
+}

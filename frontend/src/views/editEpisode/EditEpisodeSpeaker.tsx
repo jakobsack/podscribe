@@ -1,4 +1,5 @@
 import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
+import { jwtFetch } from "../../common/jwtFetch";
 
 export const editEpisodeSpeakerAction = (async (event: ActionFunctionArgs) => {
   const formData = await event.request.formData();
@@ -20,7 +21,7 @@ export const editEpisodeSpeakerAction = (async (event: ActionFunctionArgs) => {
     Accept: "application/json",
   };
   const body = JSON.stringify(update);
-  const req = await fetch(`/api/episodes/${episodeId}/speakers/${speakerId}`, {
+  const req = await jwtFetch(`/api/episodes/${episodeId}/speakers/${speakerId}`, {
     method: "PUT",
     headers,
     body,

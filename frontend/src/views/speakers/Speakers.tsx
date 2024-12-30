@@ -4,9 +4,10 @@ import type { Speaker } from "../../definitions";
 import { Form, useLoaderData } from "react-router-dom";
 import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { SpeakerDetailComponent } from "./SpeakerDetail";
+import { jwtFetch } from "../../common/jwtFetch";
 
 export const speakersLoader = (async (_args: LoaderFunctionArgs) => {
-  const response = await fetch("/api/speakers");
+  const response = await jwtFetch("/api/speakers");
   const result = (await response.json()) as Speaker[];
   const filtered = result.filter((x) => !x.name.startsWith("SPEAKER_"));
   return { speakers: filtered };
@@ -21,7 +22,7 @@ export const speakersAction = (async (event: ActionFunctionArgs) => {
     Accept: "application/json",
   };
   const body = JSON.stringify(update);
-  const req = await fetch("/api/speakers", { method: "POST", headers, body });
+  const req = await jwtFetch("/api/speakers", { method: "POST", headers, body });
   return await req.json();
 }) satisfies ActionFunction;
 

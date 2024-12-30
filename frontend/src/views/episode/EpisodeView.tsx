@@ -4,10 +4,11 @@ import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import { TranscriptComponent } from "./Transcript";
+import { jwtFetch } from "../../common/jwtFetch";
 
 export const episodeViewLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
-  const response = await fetch(`/api/episodes/${episodeId}/display`);
+  const response = await jwtFetch(`/api/episodes/${episodeId}/display`);
   const result = (await response.json()) as EpisodeDisplay;
   return { episode: result };
 }) satisfies LoaderFunction;

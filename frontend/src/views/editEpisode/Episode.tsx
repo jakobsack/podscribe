@@ -1,14 +1,15 @@
 import type { EpisodeDisplay } from "../../definitions";
 import { Link, useLoaderData } from "react-router-dom";
 import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
-import { TranscriptTableComponent } from "../editEpisode/TranscriptTable";
-import { useState } from "react";
+import { TranscriptTableComponent } from "./TranscriptTable";
+import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import { EpisodeSpeakerComponent } from "../editEpisode/EpisodeSpeaker";
+import { EpisodeSpeakerComponent } from "./EpisodeSpeaker";
+import { jwtFetch } from "../../common/jwtFetch";
 
 export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
-  const response = await fetch(`/api/episodes/${episodeId}/display`);
+  const response = await jwtFetch(`/api/episodes/${episodeId}/display`);
   const result = (await response.json()) as EpisodeDisplay;
   return { episode: result };
 }) satisfies LoaderFunction;
@@ -22,6 +23,42 @@ export const EpisodeComponent = () => {
       setHighlightedSpeaker(speakerId);
     };
   };
+
+  const [duration, setDuration] = useState<number | undefined>();
+  const [curTime, setCurTime] = useState<number>(0);
+  const [playing, setPlaying] = useState(false);
+  const [clickedTime, setClickedTime] = useState<number | null>();
+
+  useEffect(() => {
+    const audio = document.getElementById("audio") as HTMLAudioElement;
+    if (!audio) return;
+
+    const setAudioData = () => {
+      if (audio) {
+        setDuration(audio.duration);
+        setCurTime(audio.currentTime);
+      }
+    };
+
+    const setAudioTime = () => {
+      setCurTime(audio.currentTime);
+    };
+
+    audio.addEventListener("loadeddata", setAudioData);
+    audio.addEventListener("timeupdate", setAudioTime);
+
+    playing ? audio.play() : audio.pause();
+
+    if (clickedTime && clickedTime !== curTime) {
+      audio.currentTime = clickedTime;
+      setClickedTime(null);
+    }
+
+    return () => {
+      audio.removeEventListener("loadeddata", setAudioData);
+      audio.removeEventListener("timeupdate", setAudioTime);
+    };
+  }, [clickedTime, playing, curTime]);
 
   return (
     <section className="relative">
@@ -37,8 +74,17 @@ export const EpisodeComponent = () => {
                 </Link>
               </p>
 
+              {episode.episode.has_audio_file ? (
+                <audio id="audio" controls={true} preload="none">
+                  <source src={`/api/episodes/${episode.episode.id}/audio`} type="audio/mpeg" />
+                  <track kind="captions" />
+                </audio>
+              ) : (
+                <></>
+              )}
+
               <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-start lg:gap-12">
-                <div className="lg:pr-2     4 pt-2">
+                <div className="lg:pr-24 pt-2">
                   <Markdown>{episode.episode.description}</Markdown>
                 </div>
                 <div className="card variant-outlined overflow-hidden ">

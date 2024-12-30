@@ -1,4 +1,5 @@
 import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
+import { jwtFetch } from "../../common/jwtFetch";
 
 export const editPartAction = (async (event: ActionFunctionArgs) => {
   const formData = await event.request.formData();
@@ -17,7 +18,7 @@ export const editPartAction = (async (event: ActionFunctionArgs) => {
   };
   const body = json;
 
-  const req = await fetch(`/api/episodes/${episodeId}/parts/${partId}/update`, {
+  const req = await jwtFetch(`/api/episodes/${episodeId}/parts/${partId}/update`, {
     method: "POST",
     headers,
     body,

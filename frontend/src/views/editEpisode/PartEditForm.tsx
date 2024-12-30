@@ -4,6 +4,7 @@ import type { Speaker, EpisodeSpeaker, PartDisplay, Word, SectionDisplay } from 
 import { getWordColor } from "./getWordColor";
 import { PartSpeakerComponent } from "./PartSpeaker";
 import { SectionEditFormComponent } from "./SectionEditForm";
+import { jwtFetch } from "../../common/jwtFetch";
 
 interface PartEditFormParams {
   episodeId: number;
@@ -28,7 +29,7 @@ export const PartEditFormComponent = ({
   const [activeWord, setActiveWord] = useState<Word | undefined>(undefined);
 
   useEffect(() => {
-    fetch(`/api/episodes/${episodeId}/parts/${partId}/display`)
+    jwtFetch(`/api/episodes/${episodeId}/parts/${partId}/display`)
       .then((x) => {
         return x.json() as Promise<PartDisplay>;
       })
@@ -113,7 +114,6 @@ export const PartEditFormComponent = ({
 
         targetSection = {
           section: {
-            corrected: false,
             starts_at: 0,
             ends_at: 0,
             id: newSectionId,
@@ -156,7 +156,6 @@ export const PartEditFormComponent = ({
 
         targetSection = {
           section: {
-            corrected: false,
             starts_at: 0,
             ends_at: 0,
             id: newSectionId,
