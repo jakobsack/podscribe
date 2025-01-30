@@ -3,7 +3,7 @@ type JwtRequestInit = Omit<RequestInit, "headers"> & {
 };
 
 export async function jwtFetch(input: RequestInfo | URL, init?: JwtRequestInit): Promise<Response> {
-  const token = localStorage.getItem("jwtToken");
+  const token = localStorage.getItem("token");
   if (token) {
     const newInit = init || {};
     newInit.headers ||= {};

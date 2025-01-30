@@ -1,15 +1,21 @@
+import process from "node:process"
 import fs from "node:fs";
 import path from "node:path"
+
+const argv = process.argv;
+if (argv.length && path.basename(argv[0]) === "node") {
+  argv.shift();
+}
 
 async function dumpFile(file) {
   console.log(`Processing ${file}`)
   const episodeName = path.basename(file, "json");
 
-  const headers = { "Content-Type": "application/json", "Accept": "application/json" }
+  const headers = { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${process.argv[1]}` }
   const transcript = JSON.parse(fs.readFileSync(file, { encoding: "utf-8" }));
 
   // Episodes
-  const existingEpisodes = await (await fetch("http://localhost:5150/api/episodes")).json();
+  const existingEpisodes = await (await fetch("http://localhost:5150/api/episodes", { headers })).json();
   let existingEpisode = existingEpisodes.find(x => x.name === episodeName);
   if (!existingEpisode) {
     console.log(`Creating episode ${episodeName}`)

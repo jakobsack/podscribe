@@ -138,9 +138,10 @@ pub async fn attach_audio(
     format::json(item)
 }
 
+// TODO: auth in get. Maybe use query param?
 #[debug_handler]
 pub async fn get_audio(
-    _auth: middleware::auth::JWT,
+    // _auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
@@ -267,7 +268,10 @@ pub async fn import(
                 })
                 .collect::<Vec<WordsNS::ActiveModel>>();
 
-            WordsNS::Entity::insert_many(words);
+            WordsNS::Entity::insert_many(words)
+                .on_empty_do_nothing()
+                .exec(&ctx.db)
+                .await?;
         }
     }
 

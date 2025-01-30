@@ -1,4 +1,4 @@
-export const Index = () => {
+export const WelcomePage = () => {
   return (
     <section className="relative">
       <div className="relative">
