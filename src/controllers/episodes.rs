@@ -16,7 +16,7 @@ use crate::models::_entities::words as WordsNS;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
-    pub name: String,
+    pub title: String,
     pub link: String,
     pub description: String,
     pub has_audio_file: bool,
@@ -24,7 +24,7 @@ pub struct Params {
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-        item.name = Set(self.name.clone());
+        item.title = Set(self.title.clone());
         item.link = Set(self.link.clone());
         item.description = Set(self.description.clone());
         item.has_audio_file = Set(self.has_audio_file.clone());
@@ -283,14 +283,14 @@ pub fn routes() -> Routes {
         .prefix("api/episodes/")
         .add("/", get(list))
         .add("/", post(add))
-        .add(":id", get(get_one))
-        .add(":id", post(import))
-        .add(":id/display", get(get_display))
-        .add(":id/audio", get(get_audio))
-        .add(":id/audio", post(attach_audio))
-        .add(":id", delete(remove))
-        .add(":id", put(update))
-        .add(":id", patch(update))
+        .add("{id}", get(get_one))
+        .add("{id}", post(import))
+        .add("{id}/display", get(get_display))
+        .add("{id}/audio", get(get_audio))
+        .add("{id}/audio", post(attach_audio))
+        .add("{id}", delete(remove))
+        .add("{id}", put(update))
+        .add("{id}", patch(update))
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

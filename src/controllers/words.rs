@@ -164,11 +164,11 @@ async fn update_section_and_part(ctx: &AppContext, part_id: i32, section_id: i32
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/episodes/:episode_id/parts/:part_id/sections/:section_id/words/")
+        .prefix("api/episodes/{episode_id}/parts/{part_id}/sections/{section_id}/words/")
         .add("/", get(list))
         .add("/", post(add))
-        .add(":id", get(get_one))
-        .add(":id", delete(remove))
-        .add(":id", put(update))
-        .add(":id", patch(update))
+        .add("{id}", get(get_one))
+        .add("{id}", delete(remove))
+        .add("{id}", put(update))
+        .add("{id}", patch(update))
 }

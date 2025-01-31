@@ -14,6 +14,7 @@ use crate::models::_entities::words as WordsNS;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
     pub text: String,
+    pub part_type: i32,
     pub starts_at: f64,
     pub ends_at: f64,
     pub episode_speaker_id: i32,
@@ -22,6 +23,7 @@ pub struct Params {
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
         item.text = Set(self.text.clone());
+        item.part_type = Set(self.part_type);
         item.starts_at = Set(self.starts_at);
         item.ends_at = Set(self.ends_at);
         item.episode_speaker_id = Set(self.episode_speaker_id);
@@ -304,15 +306,15 @@ pub async fn ui_update(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/episodes/:episode_id/parts/")
+        .prefix("api/episodes/{episode_id}/parts/")
         .add("/", get(list))
         .add("/", post(add))
-        .add(":id", get(get_one))
-        .add(":id/display", get(get_display))
-        .add(":id/update", post(ui_update))
-        .add(":id", delete(remove))
-        .add(":id", put(update))
-        .add(":id", patch(update))
+        .add("{id}", get(get_one))
+        .add("{id}/display", get(get_display))
+        .add("{id}/update", post(ui_update))
+        .add("{id}", delete(remove))
+        .add("{id}", put(update))
+        .add("{id}", patch(update))
 }
 
 async fn find_previous_part(part: &Model, ctx: &AppContext) -> Result<Model> {

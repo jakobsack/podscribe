@@ -98,11 +98,11 @@ pub async fn get_one(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/episodes/:episode_id/parts/:part_id/sections/")
+        .prefix("api/episodes/{episode_id}/parts/{part_id}/sections/")
         .add("/", get(list))
         .add("/", post(add))
-        .add(":id", get(get_one))
-        .add(":id", delete(remove))
-        .add(":id", put(update))
-        .add(":id", patch(update))
+        .add("{id}", get(get_one))
+        .add("{id}", delete(remove))
+        .add("{id}", put(update))
+        .add("{id}", patch(update))
 }
