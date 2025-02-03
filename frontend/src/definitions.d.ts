@@ -8,7 +8,7 @@ export interface Speaker {
 
 export interface Episode {
   id: number;
-  name: string;
+  title: string;
   link: string;
   description: string;
   has_audio_file: string;
@@ -35,6 +35,7 @@ export interface Part {
   id: number;
   episode_speaker_id: number;
   text: string;
+  part_type: number;
   starts_at: number;
   ends_at: number;
   created_at: Date;

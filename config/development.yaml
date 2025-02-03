@@ -18,50 +18,17 @@ logger:
 server:
   # Port on which the server will listen. the server binding is 0.0.0.0:{PORT}
   port: 5150
+  # Binding for the server (which interface to bind to)
+  binding: localhost
   # The UI hostname or IP address that mailers will point to.
   host: http://localhost
   # Out of the box middleware configuration. to disable middleware you can changed the `enable` field to `false` of comment the middleware block
   middlewares:
+    fallback:
+      enable: false
     limit_payload:
       enable: true
       body_limit: 50mb
-
-    # #############################################
-    # Full stack SaaS asset serving
-    # #############################################
-    #
-    # You can choose from:
-    #
-    # (1) Server-side rendered templates (like erb in Ruby, ejs in nodejs) based on the Tera templating engine.
-    # (2) Client-side frontend set up
-    #
-    # You can also choose both.
-    #
-    # Uncomment the relevant sections below:
-
-    #
-    # (1) Server-side static assets config
-    # ====================================
-    #
-    # for use with the view_engine in initializers/view_engine.rs
-    # (server-block-start)
-    # static:
-    #   enable: true
-    #   must_exist: true
-    #   precompressed: false
-    #   folder:
-    #     uri: "/static"
-    #     path: "assets/static"
-    #   fallback: "assets/static/404.html"
-    # (server-block-end)
-
-    #
-    # (2) Client side app static config
-    # =================================
-    #
-    # Note that you need to go in `frontend` and run your frontend build first,
-    # e.g.: $ npm install & npm build
-    #
     static:
       enable: true
       must_exist: true
@@ -70,7 +37,6 @@ server:
         uri: "/"
         path: "frontend/dist"
       fallback: "frontend/dist/index.html"
-    #
 
 # Worker Configuration
 workers:
@@ -87,7 +53,7 @@ mailer:
     # Enable/Disable smtp mailer.
     enable: true
     # SMTP server host. e.x localhost, smtp.gmail.com
-    host: {{ get_env(name="MAILER_HOST", default="localhost") }}
+    host: localhost
     # SMTP server port
     port: 1025
     # Use secure connection (SSL/TLS).
@@ -95,6 +61,8 @@ mailer:
     # auth:
     #   user:
     #   password:
+    # Override the SMTP hello name (default is the machine's hostname)
+    # hello_name:
 
 # Initializers Configuration
 # initializers:
@@ -112,11 +80,11 @@ database:
   # Set the timeout duration when acquiring a connection.
   connect_timeout: {{ get_env(name="DB_CONNECT_TIMEOUT", default="500") }}
   # Set the idle duration before closing a connection.
-  idle_timeout: 500
+  idle_timeout: {{ get_env(name="DB_IDLE_TIMEOUT", default="500") }}
   # Minimum number of connections for a pool.
-  min_connections: 1
+  min_connections: {{ get_env(name="DB_MIN_CONNECTIONS", default="1") }}
   # Maximum number of connections for a pool.
-  max_connections: 1
+  max_connections: {{ get_env(name="DB_MAX_CONNECTIONS", default="1") }}
   # Run migration up when application loaded
   auto_migrate: true
   # Truncate database when application loaded. This is a dangerous operation, make sure that you using this flag only on dev environments or test mode
@@ -124,19 +92,11 @@ database:
   # Recreating schema when application loaded.  This is a dangerous operation, make sure that you using this flag only on dev environments or test mode
   dangerously_recreate: false
 
-# Queue Configuration
-queue:
-  kind: Redis
-  # Redis connection URI
-  uri: {{ get_env(name="REDIS_URL", default="redis://127.0.0.1") }}
-  # Dangerously flush all data in Redis on startup. dangerous operation, make sure that you using this flag only on dev environments or test mode
-  dangerously_flush: false
-
 # Authentication Configuration
 auth:
   # JWT authentication
   jwt:
     # Secret key for token generation and verification
-    secret: mnXIYdZCzMiEsaiI3LlI
+    secret: strQmrtTOBypB8LZWrzQ
     # Token expiration time in seconds
     expiration: 604800 # 7 days

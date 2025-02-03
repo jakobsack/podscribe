@@ -24,7 +24,7 @@ export const EpisodesComponent = () => {
           <ul className="mt-8 divide-y border-y *:py-3 *:flex *:items-center *:gap-3">
             {episodes.map((x) => (
               <li key={x.id}>
-                <Link to={`${x.id}`}>{x.name}</Link>
+                <Link to={`${x.id}`}>{x.title}</Link>
               </li>
             ))}
           </ul>

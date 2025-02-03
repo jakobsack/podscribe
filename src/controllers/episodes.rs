@@ -234,6 +234,7 @@ pub async fn import(
         item.episode_speaker_id = Set(*episode_speaker_map.get(&import_part.speaker).unwrap());
         item.episode_id = Set(id);
         item.text = Set(import_part.text.clone());
+        item.part_type = Set(0);
         item.starts_at = Set(import_part.start);
         item.ends_at = Set(import_part.end);
         let part = item.insert(&ctx.db).await?;

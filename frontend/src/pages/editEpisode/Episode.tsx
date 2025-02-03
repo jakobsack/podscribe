@@ -66,7 +66,7 @@ export const EpisodeComponent = () => {
         <div className="mx-auto px-6 max-w-7xl md:px-12">
           {episode ? (
             <>
-              <h1 className="text-3xl text-title font-semibold pb-2 underline">{episode.episode.name}</h1>
+              <h1 className="text-3xl text-title font-semibold pb-2 underline">{episode.episode.title}</h1>
 
               <p>
                 <Link to="./.." className="hover:link ">
