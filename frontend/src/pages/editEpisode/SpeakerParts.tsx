@@ -8,6 +8,8 @@ interface SpeakerPartsParams {
   episodeSpeakerId: number;
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
+  startAudioAt: (position: number) => void;
+  curTime: number;
 }
 
 export const SpeakerPartsComponent = ({
@@ -16,6 +18,8 @@ export const SpeakerPartsComponent = ({
   episodeSpeakerId,
   speakers,
   episodeSpeakers,
+  startAudioAt,
+  curTime,
 }: SpeakerPartsParams) => {
   return (
     <div className="flex-1">
@@ -28,6 +32,8 @@ export const SpeakerPartsComponent = ({
               episodeSpeakerId={episodeSpeakerId}
               speakers={speakers}
               episodeSpeakers={episodeSpeakers}
+              startAudioAt={startAudioAt}
+              curTime={curTime}
             />
           </div>
         ))}

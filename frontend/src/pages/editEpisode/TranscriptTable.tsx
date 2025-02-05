@@ -8,6 +8,8 @@ interface TranscriptTableParams {
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
   highlightedSpeaker: number;
+  startAudioAt: (position: number) => void;
+  curTime: number;
 }
 
 export const TranscriptTableComponent = ({
@@ -16,6 +18,8 @@ export const TranscriptTableComponent = ({
   speakers,
   episodeSpeakers,
   highlightedSpeaker,
+  startAudioAt,
+  curTime,
 }: TranscriptTableParams) => {
   const speakerNames: { [key: number]: string } = {};
   for (const episodeSpeaker of episodeSpeakers) {
@@ -31,6 +35,7 @@ export const TranscriptTableComponent = ({
       id: part.id,
       text: part.text,
       start: part.starts_at,
+      end: part.ends_at,
     };
 
     if (speaker === lastSpeaker) {
@@ -61,6 +66,8 @@ export const TranscriptTableComponent = ({
               episodeSpeakerId={x.episodeSpeakerId}
               speakers={speakers}
               episodeSpeakers={episodeSpeakers}
+              startAudioAt={startAudioAt}
+              curTime={curTime}
             />
           </div>
         );

@@ -1,4 +1,4 @@
-FROM node:22-bullseye AS builder
+FROM node:22-bookworm AS builder
 
 ENV PATH="/root/.cargo/bin:$PATH"
 RUN apt-get update \
@@ -14,7 +14,7 @@ RUN cd frontend \
   && cd .. \
   && cargo build --release
 
-FROM debian:bullseye-slim
+FROM debian:testing-slim
 
 RUN apt-get update \
   && apt-get upgrade -y \

@@ -13,6 +13,8 @@ interface PartEditFormParams {
   episodeSpeakerId: number;
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
+  startAudioAt: (position: number) => void;
+  curTime: number;
 }
 
 export const PartEditFormComponent = ({
@@ -22,6 +24,8 @@ export const PartEditFormComponent = ({
   episodeSpeakerId,
   speakers,
   episodeSpeakers,
+  startAudioAt,
+  curTime,
 }: PartEditFormParams) => {
   const [part, setPart] = useState<PartDisplay | undefined>(undefined);
   const [originalPart, setOriginalPart] = useState<PartDisplay | undefined>(undefined);
@@ -271,6 +275,8 @@ export const PartEditFormComponent = ({
                 setActiveWord={setActiveWord}
                 isFirst={true}
                 isLast={part.sections.length === 1}
+                startAudioAt={startAudioAt}
+                curTime={curTime}
               />
             </div>
           ) : (
@@ -301,6 +307,8 @@ export const PartEditFormComponent = ({
                       setActiveWord={setActiveWord}
                       isFirst={part.sections[0].section.id === section.section.id}
                       isLast={part.sections[part.sections.length - 1].section.id === section.section.id}
+                      startAudioAt={startAudioAt}
+                      curTime={curTime}
                     />
                   </div>
                 );
@@ -318,6 +326,8 @@ export const PartEditFormComponent = ({
                 setActiveWord={setActiveWord}
                 isFirst={part.sections.length === 1}
                 isLast={true}
+                startAudioAt={startAudioAt}
+                curTime={curTime}
               />
             </div>
           ) : (

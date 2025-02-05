@@ -10,6 +10,8 @@ interface SectionEditFormParams {
   setActiveWord: React.Dispatch<React.SetStateAction<Word | undefined>>;
   isFirst?: boolean;
   isLast?: boolean;
+  startAudioAt: (position: number) => void;
+  curTime: number;
 }
 
 export function SectionEditFormComponent({
@@ -20,11 +22,20 @@ export function SectionEditFormComponent({
   setActiveWord,
   isFirst,
   isLast,
+  startAudioAt,
+  curTime,
 }: SectionEditFormParams) {
   return (
     <div className="flex-1 flex flex-col border-b border-gray-400">
       <div className="flex-1 flex flex-row bg-gray-100">
-        <div className="w-20 text-right">{section.section.starts_at.toFixed(2)}</div>
+        <div
+          className="w-20 text-right"
+          onClick={() => {
+            startAudioAt(section.section.starts_at);
+          }}
+        >
+          {section.section.starts_at.toFixed(2)}
+        </div>
         <div className="w-14 flex flex-row">
           <div className="w-12 text-right">{(section.section.ends_at - section.section.starts_at).toFixed(2)}</div>
           <div className="ml-0.5 flex-1">s</div>
@@ -113,7 +124,9 @@ export function SectionEditFormComponent({
           )}
         </div>
       </div>
-      <div className="flex-1 flex flex-row flex-wrap mb-2">
+      <div
+        className={`flex-1 flex flex-row flex-wrap mb-2 ${curTime >= section.section.starts_at && curTime < section.section.ends_at ? "bg-yellow-200" : ""}`}
+      >
         {section.words.map((w) => {
           const wordColor = getWordColor(w);
           return (

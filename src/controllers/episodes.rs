@@ -19,6 +19,7 @@ pub struct Params {
     pub title: String,
     pub link: String,
     pub description: String,
+    pub filename: String,
     pub has_audio_file: bool,
 }
 
@@ -27,6 +28,7 @@ impl Params {
         item.title = Set(self.title.clone());
         item.link = Set(self.link.clone());
         item.description = Set(self.description.clone());
+        item.filename = Set(self.filename.clone());
         item.has_audio_file = Set(self.has_audio_file.clone());
     }
 }
@@ -138,10 +140,9 @@ pub async fn attach_audio(
     format::json(item)
 }
 
-// TODO: auth in get. Maybe use query param?
 #[debug_handler]
 pub async fn get_audio(
-    // _auth: middleware::auth::JWT,
+    _auth: middleware::auth::JWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
@@ -228,6 +229,10 @@ pub async fn import(
 
     // Now got for the parts
     for import_part in transcription.transcription {
+        if import_part.text.is_empty() {
+            continue;
+        }
+
         let mut item = PartsNS::ActiveModel {
             ..Default::default()
         };
@@ -240,6 +245,10 @@ pub async fn import(
         let part = item.insert(&ctx.db).await?;
 
         for import_section in import_part.sections {
+            if import_section.text.is_empty() {
+                continue;
+            }
+
             let mut item = SectionsNS::ActiveModel {
                 ..Default::default()
             };

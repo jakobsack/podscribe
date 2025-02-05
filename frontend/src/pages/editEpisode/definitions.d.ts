@@ -9,6 +9,7 @@ export interface NewPart {
   id: number;
   text: string;
   start: number;
+  end: number;
 }
 
 export interface AudioControl {

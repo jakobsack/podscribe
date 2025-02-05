@@ -16,10 +16,10 @@ async function dumpFile(file) {
 
   // Episodes
   const existingEpisodes = await (await fetch("http://localhost:5150/api/episodes", { headers })).json();
-  let existingEpisode = existingEpisodes.find(x => x.title === episodeName);
+  let existingEpisode = existingEpisodes.find(x => x.filename === episodeName);
   if (!existingEpisode) {
     console.log(`Creating episode ${episodeName}`)
-    const body = JSON.stringify({ title: episodeName, description: "", link: "", has_audio_file: false })
+    const body = JSON.stringify({ title: episodeName, description: "", link: "", filename: episodeName, has_audio_file: false })
     const req = await fetch("http://localhost:5150/api/episodes", { method: "POST", headers, body })
     existingEpisode = await req.json()
     existingEpisodes.push(existingEpisode)
