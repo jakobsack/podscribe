@@ -38,6 +38,7 @@ include_dir = { version = "0.7" }
 # view engine i18n
 fluent-templates = { version = "0.8.0", features = ["tera"] }
 unic-langid = { version = "0.9.4" }
+tantivy = "0.22.0"
 # /view engine
 
 [[bin]]

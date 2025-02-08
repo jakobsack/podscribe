@@ -1,12 +1,14 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use axum::debug_handler;
+use axum::{debug_handler, Extension};
 use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
 use sea_orm::{QueryOrder, QuerySelect};
 use serde::{Deserialize, Serialize};
+use tantivy::doc;
 
+use crate::extensions::tantivy_search::TantivyContainer;
 use crate::models::_entities::parts::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::sections as SectionsNS;
 use crate::models::_entities::words as WordsNS;
@@ -52,6 +54,7 @@ pub async fn list(
 #[debug_handler]
 pub async fn add(
     _auth: middleware::auth::JWT,
+    Extension(tantivy): Extension<TantivyContainer>,
     Path(episode_id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
@@ -62,6 +65,22 @@ pub async fn add(
     params.update(&mut item);
     item.episode_id = Set(episode_id);
     let item = item.insert(&ctx.db).await?;
+
+    let index = tantivy.writer.clone();
+    let mut index_writer = index.write().unwrap();
+    let schema = tantivy.schema;
+    let id = schema.get_field("id").unwrap();
+    let text = schema.get_field("text").unwrap();
+
+    index_writer
+        .add_document(doc!(
+            id => item.id.to_string(),
+            text => item.text.clone()))
+        .map_err(|e| Error::Message(e.to_string()))?;
+    index_writer
+        .commit()
+        .map_err(|e| Error::Message(e.to_string()))?;
+
     format::json(item)
 }
 

@@ -6,6 +6,8 @@ on podcast transcriptions.
 The backend is written in Rust using the [Loco framework](https://loco.rs), the
 frontend is a React app written in TypeScript.
 
+Styling is done using [tailwindcss](https://tailwindcss.com/).
+
 # Code quality
 
 I've been programming for years, but I'm relatively new to Rust, the Loco

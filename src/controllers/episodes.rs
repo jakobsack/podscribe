@@ -1,14 +1,20 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use axum::debug_handler;
+use axum::extract::Query;
+use axum::{debug_handler, Extension};
 use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use tantivy::collector::TopDocs;
+use tantivy::query::QueryParser;
+use tantivy::schema::Value;
+use tantivy::{doc, Score, TantivyDocument};
 
+use crate::extensions::tantivy_search::TantivyContainer;
 use crate::models::_entities::episode_speakers as EpisodeSpeakersNS;
-use crate::models::_entities::episodes::{ActiveModel, Entity, Model};
+use crate::models::_entities::episodes::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::parts as PartsNS;
 use crate::models::_entities::sections as SectionsNS;
 use crate::models::_entities::speakers as SpeakersNS;
@@ -157,8 +163,73 @@ pub async fn get_audio(
 }
 
 #[debug_handler]
+pub async fn search(
+    _auth: middleware::auth::JWT,
+    Extension(tantivy): Extension<TantivyContainer>,
+    State(ctx): State<AppContext>,
+    search: Query<SearchQueryParams>,
+) -> Result<Response> {
+    let searcher = tantivy.reader.searcher();
+
+    let schema = tantivy.schema;
+    let index_id = schema.get_field("id").unwrap();
+    let index_text = schema.get_field("text").unwrap();
+
+    let query_parser = QueryParser::for_index(&tantivy.index, vec![index_text]);
+    let query = query_parser
+        .parse_query(&search.query)
+        .map_err(|e| Error::Message(e.to_string()))?;
+
+    let top_docs = searcher
+        .search(&query, &TopDocs::with_limit(10))
+        .map_err(|e| Error::Message(e.to_string()))?;
+
+    let mut search_results: Vec<SearchDocument> = vec![];
+    let mut part_ids: Vec<i32> = vec![];
+    for (score, doc_address) in top_docs {
+        let retrieved_doc: TantivyDocument = searcher
+            .doc(doc_address)
+            .map_err(|e| Error::Message(e.to_string()))?;
+        let id_str = retrieved_doc
+            .get_first(index_id)
+            .unwrap()
+            .as_value()
+            .as_str()
+            .unwrap();
+        let id: i32 = id_str.parse().unwrap();
+        part_ids.push(id);
+        search_results.push(SearchDocument { id, score });
+    }
+
+    let parts = PartsNS::Entity::find()
+        .filter(PartsNS::Column::Id.is_in(part_ids))
+        .all(&ctx.db)
+        .await?;
+
+    let episode_ids: Vec<i32> = parts
+        .iter()
+        .map(|x| x.episode_id)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
+    let episodes = Entity::find()
+        .filter(Column::Id.is_in(episode_ids))
+        .all(&ctx.db)
+        .await?;
+
+    let search_result = SearchResult {
+        search_results,
+        episodes,
+        parts,
+    };
+
+    format::json(search_result)
+}
+
+#[debug_handler]
 pub async fn import(
     _auth: middleware::auth::JWT,
+    Extension(tantivy): Extension<TantivyContainer>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(transcription): Json<ImportTranscription>,
@@ -181,7 +252,7 @@ pub async fn import(
         .await?;
     if existing_speakers.len() != 0 {
         return Err(Error::BadRequest(String::from(
-            "Import only works for b lank episodes",
+            "Import only works for blank episodes",
         )));
     }
 
@@ -227,6 +298,12 @@ pub async fn import(
         episode_speaker_map.insert(speaker_entry.0.clone(), item.id);
     }
 
+    // Prepare indexer
+    let index = tantivy.writer.clone();
+    let schema = tantivy.schema;
+    let index_id = schema.get_field("id").unwrap();
+    let index_text = schema.get_field("text").unwrap();
+
     // Now got for the parts
     for import_part in transcription.transcription {
         if import_part.text.is_empty() {
@@ -243,6 +320,14 @@ pub async fn import(
         item.starts_at = Set(import_part.start);
         item.ends_at = Set(import_part.end);
         let part = item.insert(&ctx.db).await?;
+
+        index
+            .read()
+            .unwrap()
+            .add_document(doc!(
+                index_id => part.id.to_string(),
+                index_text => part.text.clone()))
+            .map_err(|e| Error::Message(e.to_string()))?;
 
         for import_section in import_part.sections {
             if import_section.text.is_empty() {
@@ -285,6 +370,12 @@ pub async fn import(
         }
     }
 
+    index
+        .write()
+        .unwrap()
+        .commit()
+        .map_err(|e| Error::Message(e.to_string()))?;
+
     format::empty()
 }
 
@@ -293,6 +384,7 @@ pub fn routes() -> Routes {
         .prefix("api/episodes/")
         .add("/", get(list))
         .add("/", post(add))
+        .add("/search", get(search))
         .add("{id}", get(get_one))
         .add("{id}", post(import))
         .add("{id}/display", get(get_display))
@@ -340,4 +432,22 @@ pub struct ImportWord {
     pub start: f64,
     pub end: f64,
     pub probability: f64,
+}
+
+#[derive(Deserialize)]
+pub struct SearchQueryParams {
+    query: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SearchDocument {
+    pub id: i32,
+    pub score: Score,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SearchResult {
+    pub search_results: Vec<SearchDocument>,
+    pub episodes: Vec<Model>,
+    pub parts: Vec<PartsNS::Model>,
 }

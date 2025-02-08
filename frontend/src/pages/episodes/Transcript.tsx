@@ -8,14 +8,14 @@ interface TranscriptParams {
   highlightedSpeaker: number;
 }
 
-interface SpeakerPart {
+export interface SpeakerPart {
   id: number;
   speaker: string;
   speaker_id: number;
-  parts: NewPart[];
+  parts: ReducedPart[];
 }
 
-export interface NewPart {
+export interface ReducedPart {
   id: number;
   text: string;
   start: number;
@@ -28,7 +28,6 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
   }
 
   let lastSpeaker = "";
-  let outerid = 1;
   const newParts: SpeakerPart[] = [];
   for (const part of parts) {
     if (!part.text) {
@@ -36,7 +35,7 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
     }
 
     const speaker = speakerNames[part.episode_speaker_id];
-    const somepart: NewPart = {
+    const somepart: ReducedPart = {
       id: part.id,
       text: part.text,
       start: part.starts_at,
@@ -47,7 +46,7 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
     } else {
       lastSpeaker = speaker;
       newParts.push({
-        id: outerid++,
+        id: part.id,
         speaker: speaker,
         speaker_id: part.episode_speaker_id,
         parts: [somepart],
@@ -59,13 +58,12 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
     <div className="flex flex-col">
       {newParts.map((x, i, a) => {
         return (
-          <div
+          <SpeakerPartsComponent
             key={x.id}
-            className={`flex flex-row items-stretch border-b-2 border-gray-300 ${x.speaker_id === highlightedSpeaker ? "bg-slate-100" : ""}`}
-          >
-            <div className={`w-40 ${i === a.length - 1 ? "" : "border-r border-gray-200"}`}>{x.speaker}</div>
-            <SpeakerPartsComponent parts={x.parts} />
-          </div>
+            speakerPart={x}
+            isLastRow={i === a.length - 1}
+            isHighlighted={x.speaker_id === highlightedSpeaker}
+          />
         );
       })}
     </div>

@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 /* html tailus ui */
+/* https://github.com/Tailus-UI/ada-html/blob/main/assets/css/tailus.css */
 @layer base {
     :root {
         /* Border Radius */

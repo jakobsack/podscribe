@@ -13,6 +13,7 @@ import { EpisodesComponent } from "../pages/episodes/Episodes";
 import { EpisodeComponent, episodeLoader } from "../pages/editEpisode/Episode";
 import { editEpisodeSpeakerAction } from "../pages/editEpisode/EditEpisodeSpeaker";
 import { editPartAction } from "../pages/editEpisode/EditPart";
+import { searchAction, SearchComponent } from "../pages/search/Search";
 
 export const Routes = () => {
   const { token } = useAuth();
@@ -48,6 +49,7 @@ export const Routes = () => {
           children: [{ path: ":speakerId/edit", action: editSpeakerAction }],
         },
         { path: "episodes", element: <EpisodesComponent /> },
+        { path: "search", element: <SearchComponent />, action: searchAction },
         {
           path: "episodes/:episodeId",
           element: <EpisodeViewComponent />,

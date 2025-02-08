@@ -1,5 +1,6 @@
 pub mod app;
 pub mod controllers;
+pub mod extensions;
 pub mod initializers;
 pub mod mailers;
 pub mod models;

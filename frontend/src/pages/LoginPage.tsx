@@ -23,7 +23,6 @@ export const LoginPage = () => {
   const { setToken } = useAuth();
 
   const actionData = useActionData() as LoginParams;
-  console.log(actionData);
 
   if (actionData?.token) {
     setToken(actionData.token);

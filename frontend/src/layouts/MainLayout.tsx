@@ -56,6 +56,12 @@ export const MainLayout = () => {
                 <div className="mt-6 dark:text-body md:-ml-4 lg:pr-4 lg:mt-0">
                   <ul className="space-y-6 tracking-wide text-base lg:text-sm lg:flex lg:space-y-0">
                     <li>
+                      <Link to={"search"} className="hover:link md:px-4 block">
+                        <span>Search</span>
+                      </Link>
+                    </li>
+
+                    <li>
                       <Link to={"episodes"} className="hover:link md:px-4 block">
                         <span>Episode</span>
                       </Link>
