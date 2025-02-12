@@ -57,7 +57,7 @@ export interface SectionDisplay {
 
 export interface Section {
   id: number;
-  part_id: number;
+  part_id?: number;
   words_per_second: number;
   starts_at: number;
   ends_at: number;

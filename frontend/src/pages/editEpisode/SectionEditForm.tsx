@@ -1,3 +1,4 @@
+import { Timestamp } from "../../common/Timestamp";
 import type { SectionDisplay, Word } from "../../definitions";
 import { getWordColor } from "./getWordColor";
 import { WordFormComponent } from "./WordForm";
@@ -34,7 +35,7 @@ export function SectionEditFormComponent({
             startAudioAt(section.section.starts_at);
           }}
         >
-          {section.section.starts_at.toFixed(2)}
+          <Timestamp seconds={section.section.starts_at} includeHundredth={true} />
         </div>
         <div className="w-14 flex flex-row">
           <div className="w-12 text-right">{(section.section.ends_at - section.section.starts_at).toFixed(2)}</div>

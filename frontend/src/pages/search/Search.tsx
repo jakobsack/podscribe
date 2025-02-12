@@ -33,8 +33,8 @@ export const searchAction = (async (event: ActionFunctionArgs) => {
 export const SearchComponent = () => {
   const actionData = useActionData() as SearchResult;
 
-  let partsInOrder: Part[] | undefined;
-  let episodesInOrder: Episode[] | undefined;
+  let partsInOrder: Part[] | undefined = undefined;
+  let episodesInOrder: Episode[] | undefined = undefined;
 
   if (actionData) {
     partsInOrder = actionData.search_results
@@ -44,6 +44,10 @@ export const SearchComponent = () => {
     episodesInOrder = partsInOrder
       .map((x) => actionData.episodes.find((y) => y.id === x.episode_id))
       .filter((x, i, a) => x && a.indexOf(x) === i) as Episode[];
+
+    // Resort parts. We want the episodes sorted by relevance,
+    // but it looks strange if the parts are not sorted ascending
+    partsInOrder.sort((a, b) => a.starts_at - b.starts_at);
   }
 
   return (
@@ -55,51 +59,54 @@ export const SearchComponent = () => {
           <p>Welcome to the search page. You can use the box below to search for text in all episodes.</p>
 
           <Form method="post">
-            <div className="flex flex-col">
-              <div className="flex flex-row">
-                <div className="w-40">
-                  <label htmlFor="formQuery">Name</label>
-                </div>
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    name="query"
-                    id="formQuery"
-                    className="border border-gray-300"
-                    placeholder="Search"
-                    defaultValue=""
-                  />
-                </div>
-                <button type="submit" className="btn bg-primary-500 text-white p-1">
-                  Search
-                </button>
+            <div className="flex flex-row">
+              <div className="hidden w-40">
+                <label htmlFor="formQuery">Name</label>
               </div>
+              <div className="w-80">
+                <input
+                  type="text"
+                  name="query"
+                  id="formQuery"
+                  className="border border-gray-300 rounded-md w-80 p-1"
+                  placeholder="Search"
+                  defaultValue=""
+                />
+              </div>
+              <button type="submit" className="btn bg-primary-500 text-white p-1 ml-2">
+                Search
+              </button>
             </div>
           </Form>
         </div>
+
         {actionData && episodesInOrder && partsInOrder ? (
           <div className="mx-auto px-6 max-w-7xl md:px-12">
             <h2 className="text-2xl text-title font-semibold pb-2 underline">Search results</h2>
 
-            {episodesInOrder.map((episode) => (
-              <>
-                <h3 key={episode.id} className="text-xl text-title pt-2 pb-4 underline">
-                  {episode.title}
-                </h3>
+            {episodesInOrder.length ? (
+              episodesInOrder.map((episode) => (
+                <>
+                  <h3 key={episode.id} className="text-xl text-title pt-2 pb-4 underline">
+                    {episode.title}
+                  </h3>
 
-                <div key={episode.id} className="flex flex-col">
-                  {partsInOrder
-                    .filter((x) => x.episode_id === episode.id)
-                    .map((part, i, a) => (
-                      <SpeakerPartComponent
-                        key={part.id}
-                        part={{ id: part.id, text: part.text, start: part.starts_at }}
-                        isLastRow={i === a.length - 1}
-                      />
-                    ))}
-                </div>
-              </>
-            ))}
+                  <div key={episode.id} className="flex flex-col">
+                    {partsInOrder
+                      .filter((x) => x.episode_id === episode.id)
+                      .map((part, i, a) => (
+                        <SpeakerPartComponent
+                          key={part.id}
+                          part={{ id: part.id, text: part.text, start: part.starts_at }}
+                          isLastRow={i === a.length - 1}
+                        />
+                      ))}
+                  </div>
+                </>
+              ))
+            ) : (
+              <p>Sorry, we did not find any results.</p>
+            )}
           </div>
         ) : (
           <></>

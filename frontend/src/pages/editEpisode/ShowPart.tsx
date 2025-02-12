@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Speaker, EpisodeSpeaker } from "../../definitions";
 import { PartEditFormComponent } from "./PartEditForm";
 import type { NewPart } from "./definitions";
+import { Timestamp } from "../../common/Timestamp";
 
 interface ShowPartParams {
   episodeId: number;
@@ -42,7 +43,7 @@ export const ShowPartComponent = ({
   ) : (
     <>
       <div className="w-20 text-right" onClick={() => startAudioAt(part.start)}>
-        {part.start.toFixed(2)}
+        <Timestamp seconds={part.start} />
       </div>
       <div className={`flex-1 ml-2 ${curTime >= part.start && curTime < part.end ? "bg-yellow-200" : ""}`}>
         {part.text}
