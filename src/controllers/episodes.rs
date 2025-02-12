@@ -12,7 +12,7 @@ use tantivy::query::QueryParser;
 use tantivy::schema::Value;
 use tantivy::{doc, Score, TantivyDocument};
 
-use crate::extensions::tantivy_search::TantivyContainer;
+use crate::initializers::tantivy_search::TantivyContainer;
 use crate::models::_entities::episode_speakers as EpisodeSpeakersNS;
 use crate::models::_entities::episodes::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::parts as PartsNS;

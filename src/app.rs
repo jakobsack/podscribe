@@ -45,10 +45,9 @@ impl Hooks for App {
     }
 
     async fn initializers(_ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
-        Ok(vec![
-            Box::new(initializers::view_engine::ViewEngineInitializer),
-            Box::new(crate::extensions::tantivy_search::TantivySearchInitializer),
-        ])
+        Ok(vec![Box::new(
+            initializers::tantivy_search::TantivySearchInitializer,
+        )])
     }
 
     fn routes(_ctx: &AppContext) -> AppRoutes {

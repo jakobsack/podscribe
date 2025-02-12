@@ -32,7 +32,6 @@ export const searchAction = (async (event: ActionFunctionArgs) => {
 
 export const SearchComponent = () => {
   const actionData = useActionData() as SearchResult;
-  console.log(actionData);
 
   let partsInOrder: Part[] | undefined;
   let episodesInOrder: Episode[] | undefined;

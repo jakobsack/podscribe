@@ -6,9 +6,12 @@ use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
 use sea_orm::{QueryOrder, QuerySelect};
 use serde::{Deserialize, Serialize};
-use tantivy::doc;
+use tantivy::collector::TopDocs;
+use tantivy::query::TermQuery;
+use tantivy::schema::IndexRecordOption;
+use tantivy::{doc, IndexReader, TantivyDocument, Term};
 
-use crate::extensions::tantivy_search::TantivyContainer;
+use crate::initializers::tantivy_search::TantivyContainer;
 use crate::models::_entities::parts::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::sections as SectionsNS;
 use crate::models::_entities::words as WordsNS;
@@ -163,6 +166,7 @@ pub async fn get_display(
 #[debug_handler]
 pub async fn ui_update(
     _auth: middleware::auth::JWT,
+    Extension(tantivy): Extension<TantivyContainer>,
     Path((episode_id, id)): Path<(i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<UiUpdateParams>,
@@ -196,6 +200,7 @@ pub async fn ui_update(
             "Amount of words does not match",
         )));
     }
+
     if !ui_words
         .iter()
         .all(|x| ui_words.iter().filter(|y| y.id == x.id).count() == 1)
@@ -204,6 +209,7 @@ pub async fn ui_update(
             "Not all word ids are unique",
         )));
     }
+
     if !original_words.iter().all(|original_word| {
         ui_words
             .iter()
@@ -245,6 +251,14 @@ pub async fn ui_update(
         )));
     }
 
+    // Prepare indexer
+    let index = tantivy.writer.clone();
+    let reader = tantivy.reader;
+    let schema = tantivy.schema;
+    let index_id = schema.get_field("id").unwrap();
+    let index_text = schema.get_field("text").unwrap();
+
+    // Find out which sections stay and which ones are moved.
     let moved_sections: Vec<&UiUpdateParamsSection> = params
         .sections
         .iter()
@@ -289,7 +303,26 @@ pub async fn ui_update(
             target_part.text = Set(format!("{} {}", new_text, old_text));
         };
 
-        target_part.save(&ctx.db).await?;
+        let target_part: Model = target_part.update(&ctx.db).await?;
+
+        // Tantivy remove index
+        let index_writer = index.read().unwrap();
+        let index_id_term = Term::from_field_text(index_id, &target_part.id.to_string());
+        let extracted_item = extract_part_from_search_index(&reader, &index_id_term)
+            .map_err(|e| Error::Message(e.to_string()))?;
+
+        if extracted_item.is_some() {
+            index_writer.delete_term(index_id_term.clone());
+        }
+
+        // Tantivy update index
+        index
+            .read()
+            .unwrap()
+            .add_document(doc!(
+                index_id => target_part.id.to_string(),
+                index_text => target_part.text.clone()))
+            .map_err(|e| Error::Message(e.to_string()))?;
     }
 
     let mut complete_text: String = String::new();
@@ -297,6 +330,17 @@ pub async fn ui_update(
         let new_text = update_section(&ui_section, &original_part, &ctx).await?;
         complete_text.push_str(" ");
         complete_text.push_str(&new_text);
+    }
+
+    {
+        let index_writer = index.read().unwrap();
+        let index_id_term = Term::from_field_text(index_id, &id.to_string());
+        let extracted_item = extract_part_from_search_index(&reader, &index_id_term)
+            .map_err(|e| Error::Message(e.to_string()))?;
+
+        if extracted_item.is_some() {
+            index_writer.delete_term(index_id_term.clone());
+        }
     }
 
     if sticky_sections.len() == 0 {
@@ -308,7 +352,16 @@ pub async fn ui_update(
         original_part.starts_at = Set(sticky_sections[0].words[0].starts_at);
         original_part.ends_at = Set(last_section.words[last_section.words.len() - 1].ends_at);
         original_part.text = Set(complete_text.clone());
-        original_part.save(&ctx.db).await?;
+        let original_part = original_part.update(&ctx.db).await?;
+
+        // Tantivy update index
+        index
+            .read()
+            .unwrap()
+            .add_document(doc!(
+                    index_id => original_part.id.to_string(),
+                    index_text => original_part.text.clone()))
+            .map_err(|e| Error::Message(e.to_string()))?;
     }
 
     // Remove sections that are not required anymore
@@ -319,6 +372,14 @@ pub async fn ui_update(
         let section = section.clone();
         section.delete(&ctx.db).await?;
     }
+
+    index
+        .write()
+        .unwrap()
+        .commit()
+        .map_err(|e| Error::Message(e.to_string()))?;
+
+    reader.reload().map_err(|e| Error::Message(e.to_string()))?;
 
     format::empty()
 }
@@ -459,6 +520,23 @@ async fn find_or_create_section(
     Ok(item.unwrap())
 }
 
+fn extract_part_from_search_index(
+    reader: &IndexReader,
+    id_term: &Term,
+) -> tantivy::Result<Option<TantivyDocument>> {
+    let searcher = reader.searcher();
+
+    let term_query = TermQuery::new(id_term.clone(), IndexRecordOption::Basic);
+    let top_docs = searcher.search(&term_query, &TopDocs::with_limit(1))?;
+
+    if let Some((_score, doc_address)) = top_docs.first() {
+        let doc = searcher.doc(*doc_address)?;
+        Ok(Some(doc))
+    } else {
+        Ok(None)
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Display {
     pub part: Model,
@@ -500,7 +578,6 @@ pub struct UiUpdateParamsSectionSection {
     pub starts_at: f64,
     pub ends_at: f64,
     pub words_per_second: f64,
-    pub corrected: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

@@ -23,5 +23,5 @@ export const editPartAction = (async (event: ActionFunctionArgs) => {
     headers,
     body,
   });
-  return await req.json();
+  return await req.text();
 }) satisfies ActionFunction;
