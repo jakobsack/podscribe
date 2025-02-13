@@ -25,8 +25,6 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/target/release/podscribe-cli /app/podscribe-cli
-COPY --from=builder /app/frontend/dist /app/frontend/dist
-COPY --from=builder /app/assets /app/assets
 
 WORKDIR /app
 USER default
