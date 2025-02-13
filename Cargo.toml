@@ -13,7 +13,7 @@ default-run = "podscribe-cli"
 loco-rs = { version = "0.14.0" }
 
 [dependencies]
-loco-rs = { workspace = true  }
+loco-rs = { workspace = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 tokio = { version = "1.33.0", default-features = false, features = [
@@ -38,8 +38,15 @@ include_dir = { version = "0.7" }
 # view engine i18n
 fluent-templates = { version = "0.8.0", features = ["tera"] }
 unic-langid = { version = "0.9.4" }
-tantivy = "0.22.0"
 # /view engine
+
+# ^^^  L O C O  ^^^
+# vvv Podscribe vvv
+# Full text search
+tantivy = "0.22.0"
+# rust-embed and mime_guess to serve the static assets (one exe deploy)
+rust-embed = { version = "8.5.0", features = ["debug-embed"] }
+mime_guess = "2.0.5"
 
 [[bin]]
 name = "podscribe-cli"

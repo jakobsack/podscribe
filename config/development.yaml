@@ -30,7 +30,7 @@ server:
       enable: true
       body_limit: 50mb
     static:
-      enable: true
+      enable: false
       must_exist: true
       precompressed: false
       folder:

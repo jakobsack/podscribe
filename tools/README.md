@@ -20,7 +20,7 @@ but the Mac Mini M1 was the fastest computer for this task available to me.
 * **whisper.cpp** - This tool is used to do the transcription. It is way
   faster than the python library and can make use of the Apple Neural Engine.
 
-  The version shupped in *Homwebrew* does not include support for the Neural
+  The version shipped in *Homwebrew* does not include support for the Neural
   Engine, so you have to compile the stuff yourself from the source code.
 
   ```sh

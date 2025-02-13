@@ -22,3 +22,5 @@ target/
 *.pdb
 
 *.sqlite
+*.backup
+*.DS_Stor
