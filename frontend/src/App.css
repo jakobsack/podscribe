@@ -866,3 +866,17 @@
         offset-distance: 100%;
     }
 }
+
+/* ^^^ tailus ada ui ^^^ */
+/* vvv   podscribe   vvv */
+h1.podscribe {
+  @apply text-3xl text-title font-semibold pb-2 underline;
+}
+
+h2.podscribe {
+  @apply text-2xl text-title font-semibold pb-2 underline mt-5;
+}
+
+p+p {
+  @apply pt-2
+}

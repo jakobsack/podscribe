@@ -21,6 +21,6 @@ target/
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
-*.sqlite
+*.sqlite*
 *.backup
-*.DS_Stor
+*.DS_Store
