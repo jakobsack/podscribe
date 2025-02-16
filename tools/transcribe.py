@@ -42,6 +42,7 @@ def run():
     log_path = output_folder.joinpath("transcribe.log")
 
     convert_to_wav(mp3_file, output_folder)
+    convert_to_mp3(output_folder)
     run_diarization(output_folder)
     sections = load_sections(output_folder)
 
@@ -184,6 +185,26 @@ def convert_to_wav(mp3_file, output_folder):
     log(f"Executing: {' '.join(command)}")
     _ = subprocess.check_output(command)
 
+def convert_to_mp3(output_folder):
+    wav_file = output_folder.joinpath("converted.wav")
+    output_file = output_folder.joinpath("tiny.mp3")
+    if output_file.exists():
+        log(f"File {wav_file} already has been converted")
+        return
+
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(wav_file),
+        "-loglevel",
+        "panic",
+        "-b:a",
+        "32k",
+        str(output_file),
+    ]
+    log(f"Executing: {' '.join(command)}")
+    _ = subprocess.check_output(command)
 
 def run_diarization(output_folder):
     global pipeline
