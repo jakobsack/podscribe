@@ -1,5 +1,7 @@
 target
-*.sqlite
+*.sqlite*
 *.backup
 tools
 frontend/node_modules
+search-index
+storage-uploads
