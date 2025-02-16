@@ -3,3 +3,5 @@ output
 collection
 transcribe.log
 whisper.cpp
+node_modules
+settings.json

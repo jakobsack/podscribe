@@ -11,6 +11,7 @@ export interface Episode {
   title: string;
   link: string;
   description: string;
+  published_at?: string;
   filename: string;
   has_audio_file: string;
   created_at: Date;

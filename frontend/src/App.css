@@ -880,3 +880,8 @@ h2.podscribe {
 p+p {
   @apply pt-2
 }
+
+.markdown ol>li {
+  list-style: decimal;
+  @apply ml-5;
+}

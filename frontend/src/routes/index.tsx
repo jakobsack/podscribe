@@ -9,7 +9,7 @@ import { WelcomePage } from "../pages/WelcomePage";
 import { speakersAction, SpeakersComponent, speakersLoader } from "../pages/speakers/SpeakersPage";
 import { editSpeakerAction } from "../pages/speakers/EditSpeaker";
 import { EpisodeViewComponent, episodeViewLoader } from "../pages/episodes/EpisodeView";
-import { EpisodesComponent } from "../pages/episodes/Episodes";
+import { EpisodesComponent, episodesLoader } from "../pages/episodes/Episodes";
 import { EpisodeComponent, episodeLoader } from "../pages/editEpisode/Episode";
 import { editEpisodeSpeakerAction } from "../pages/editEpisode/EditEpisodeSpeaker";
 import { editPartAction } from "../pages/editEpisode/EditPart";
@@ -48,7 +48,7 @@ export const Routes = () => {
           action: speakersAction,
           children: [{ path: ":speakerId/edit", action: editSpeakerAction }],
         },
-        { path: "episodes", element: <EpisodesComponent /> },
+        { path: "episodes", element: <EpisodesComponent />, loader: episodesLoader },
         { path: "search", element: <SearchComponent />, action: searchAction },
         {
           path: "episodes/:episodeId",
