@@ -200,7 +200,7 @@ def convert_to_mp3(output_folder):
         "-loglevel",
         "panic",
         "-b:a",
-        "32k",
+        "24k",
         str(output_file),
     ]
     log(f"Executing: {' '.join(command)}")
