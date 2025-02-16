@@ -7,7 +7,7 @@ mod m20250131_212153_episodes;
 mod m20250131_212218_speakers;
 mod m20250131_212242_episode_speakers;
 mod m20250131_212307_parts;
-mod m20250131_212332_sections;
+mod m20250131_212332_sentences;
 mod m20250131_212358_words;
 mod m20250131_212844_approvals;
 pub struct Migrator;
@@ -21,7 +21,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250131_212218_speakers::Migration),
             Box::new(m20250131_212242_episode_speakers::Migration),
             Box::new(m20250131_212307_parts::Migration),
-            Box::new(m20250131_212332_sections::Migration),
+            Box::new(m20250131_212332_sentences::Migration),
             Box::new(m20250131_212358_words::Migration),
             Box::new(m20250131_212844_approvals::Migration),
             // inject-above (do not remove this comment)

@@ -1,8 +1,8 @@
 mod users;
 
-mod episodes;
-mod speakers;
 mod episode_speakers;
+mod episodes;
 mod parts;
-mod sections;
+mod sentences;
+mod speakers;
 mod words;

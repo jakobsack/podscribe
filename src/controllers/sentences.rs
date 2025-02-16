@@ -6,7 +6,7 @@ use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::models::_entities::sections::{ActiveModel, Column, Entity, Model};
+use crate::models::_entities::sentences::{ActiveModel, Column, Entity, Model};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -98,7 +98,7 @@ pub async fn get_one(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/episodes/{episode_id}/parts/{part_id}/sections/")
+        .prefix("api/episodes/{episode_id}/parts/{part_id}/sentences/")
         .add("/", get(list))
         .add("/", post(add))
         .add("{id}", get(get_one))

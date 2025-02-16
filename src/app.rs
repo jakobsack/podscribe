@@ -54,7 +54,7 @@ impl Hooks for App {
         AppRoutes::with_default_routes() // controller routes below
             .add_route(controllers::frontend::routes())
             .add_route(controllers::words::routes())
-            .add_route(controllers::sections::routes())
+            .add_route(controllers::sentences::routes())
             .add_route(controllers::parts::routes())
             .add_route(controllers::episode_speakers::routes())
             .add_route(controllers::speakers::routes())

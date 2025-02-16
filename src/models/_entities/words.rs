@@ -19,23 +19,23 @@ pub struct Model {
     #[sea_orm(column_type = "Double")]
     pub probability: f64,
     pub hidden: bool,
-    pub section_id: i32,
+    pub sentence_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::sections::Entity",
-        from = "Column::SectionId",
-        to = "super::sections::Column::Id",
+        belongs_to = "super::sentences::Entity",
+        from = "Column::SentenceId",
+        to = "super::sentences::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Sections,
+    Sentences,
 }
 
-impl Related<super::sections::Entity> for Entity {
+impl Related<super::sentences::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Sections.def()
+        Relation::Sentences.def()
     }
 }

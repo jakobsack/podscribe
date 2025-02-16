@@ -4,7 +4,7 @@ pub use super::approvals::Entity as Approvals;
 pub use super::episode_speakers::Entity as EpisodeSpeakers;
 pub use super::episodes::Entity as Episodes;
 pub use super::parts::Entity as Parts;
-pub use super::sections::Entity as Sections;
+pub use super::sentences::Entity as Sentences;
 pub use super::speakers::Entity as Speakers;
 pub use super::users::Entity as Users;
 pub use super::words::Entity as Words;

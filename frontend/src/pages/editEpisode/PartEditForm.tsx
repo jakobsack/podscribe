@@ -1,9 +1,9 @@
 import { useState, useEffect, type ChangeEvent } from "react";
 import { useFetcher } from "react-router-dom";
-import type { Speaker, EpisodeSpeaker, PartDisplay, Word, SectionDisplay } from "../../definitions";
+import type { Speaker, EpisodeSpeaker, PartDisplay, Word, SentenceDisplay } from "../../definitions";
 import { getWordColor } from "./getWordColor";
 import { PartSpeakerComponent } from "./PartSpeaker";
-import { SectionEditFormComponent } from "./SectionEditForm";
+import { SentenceEditFormComponent } from "./SentenceEditForm";
 import { jwtFetch } from "../../common/jwtFetch";
 
 interface PartEditFormParams {
@@ -49,23 +49,23 @@ export const PartEditFormComponent = ({
   const toggleWordHidden = (id: number) => {
     if (!part) return;
 
-    const word = part.sections.flatMap((x) => x.words).find((x) => x.id === id);
+    const word = part.sentences.flatMap((x) => x.words).find((x) => x.id === id);
     if (!word) {
       console.error("whoops");
       return;
     }
 
     word.hidden = !word.hidden;
-    setPart({ part: part.part, sections: part.sections });
+    setPart({ part: part.part, sentences: part.sentences });
     setActiveWord(word);
   };
 
   // -------------------------------------------------------------------
-  // Toggle Section
-  const toggleSectionHidden = (id: number) => {
+  // Toggle Sentence
+  const toggleSentenceHidden = (id: number) => {
     if (!part) return;
 
-    const words = part.sections.find((x) => x.section.id === id)?.words;
+    const words = part.sentences.find((x) => x.sentence.id === id)?.words;
     if (!words) {
       console.error("whoops");
       return;
@@ -76,22 +76,22 @@ export const PartEditFormComponent = ({
       word.hidden = hideRest;
     }
 
-    setPart({ part: part.part, sections: part.sections });
+    setPart({ part: part.part, sentences: part.sentences });
   };
 
   // -------------------------------------------------------------------
-  // Move words to another section
+  // Move words to another sentence
   const moveWords = (id: number, direction: "up" | "down", create: boolean) => {
     return () => {
       if (!part) return;
 
-      const sourceSection = part.sections.find((x) => x.words.some((y) => y.id === id));
-      if (!sourceSection) {
-        console.error(`Cannot find section with word with id ${id}`);
+      const sourceSentence = part.sentences.find((x) => x.words.some((y) => y.id === id));
+      if (!sourceSentence) {
+        console.error(`Cannot find sentence with word with id ${id}`);
         return;
       }
 
-      const word = sourceSection.words.find((x) => x.id === id);
+      const word = sourceSentence.words.find((x) => x.id === id);
       if (!word) {
         console.error(`Cannot find word with id ${id}`);
         return;
@@ -100,110 +100,110 @@ export const PartEditFormComponent = ({
       let movedWords: Word[];
       let keptWords: Word[];
       if (direction === "up") {
-        movedWords = sourceSection.words.filter((x) => x.starts_at < word.ends_at);
-        keptWords = sourceSection.words.filter((x) => x.starts_at > word.starts_at);
+        movedWords = sourceSentence.words.filter((x) => x.starts_at < word.ends_at);
+        keptWords = sourceSentence.words.filter((x) => x.starts_at > word.starts_at);
       } else {
-        movedWords = sourceSection.words.filter((x) => x.ends_at > word.starts_at);
-        keptWords = sourceSection.words.filter((x) => x.starts_at < word.starts_at);
+        movedWords = sourceSentence.words.filter((x) => x.ends_at > word.starts_at);
+        keptWords = sourceSentence.words.filter((x) => x.starts_at < word.starts_at);
       }
 
-      let targetSection: SectionDisplay;
+      let targetSentence: SentenceDisplay;
       if (direction === "up" && create) {
         if (keptWords.length === 0) {
-          console.log("Not creating new up section as existing section would be empty");
+          console.log("Not creating new up sentence as existing sentence would be empty");
           return;
         }
 
-        const newSectionId = Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
+        const newSentenceId = Math.min(0, ...part.sentences.map((x) => x.sentence.id)) - 1;
 
-        targetSection = {
-          section: {
+        targetSentence = {
+          sentence: {
             starts_at: 0,
             ends_at: 0,
-            id: newSectionId,
+            id: newSentenceId,
             text: "",
             words_per_second: 0,
           },
           words: movedWords,
         };
 
-        sourceSection.words = keptWords;
+        sourceSentence.words = keptWords;
 
-        part.sections.splice(part.sections.indexOf(sourceSection), 0, targetSection);
+        part.sentences.splice(part.sentences.indexOf(sourceSentence), 0, targetSentence);
       } else if (direction === "up") {
-        targetSection = part.sections[part.sections.indexOf(sourceSection) - 1];
-        if (!targetSection) {
-          console.log("Unable to find previous target section");
+        targetSentence = part.sentences[part.sentences.indexOf(sourceSentence) - 1];
+        if (!targetSentence) {
+          console.log("Unable to find previous target sentence");
           return;
         }
 
-        if (keptWords.length === 0 && sourceSection.section.id > 0 && targetSection.section.id < 0) {
-          // Is old section an existing one and next a temporary one? Then switch.
-          moveWords(targetSection.words[0].id, "down", false)();
+        if (keptWords.length === 0 && sourceSentence.sentence.id > 0 && targetSentence.sentence.id < 0) {
+          // Is old sentence an existing one and next a temporary one? Then switch.
+          moveWords(targetSentence.words[0].id, "down", false)();
           return;
         }
 
         if (keptWords.length === 0) {
-          part.sections.splice(part.sections.indexOf(sourceSection), 1);
+          part.sentences.splice(part.sentences.indexOf(sourceSentence), 1);
         } else {
-          sourceSection.words = keptWords;
+          sourceSentence.words = keptWords;
         }
 
-        targetSection.words = targetSection.words.concat(movedWords);
+        targetSentence.words = targetSentence.words.concat(movedWords);
       } else if (create) {
         if (keptWords.length === 0) {
-          console.log("Not creating new down section as existing section would be empty");
+          console.log("Not creating new down sentence as existing sentence would be empty");
           return;
         }
 
-        const newSectionId = Math.min(0, ...part.sections.map((x) => x.section.id)) - 1;
+        const newSentenceId = Math.min(0, ...part.sentences.map((x) => x.sentence.id)) - 1;
 
-        targetSection = {
-          section: {
+        targetSentence = {
+          sentence: {
             starts_at: 0,
             ends_at: 0,
-            id: newSectionId,
+            id: newSentenceId,
             text: "",
             words_per_second: 0,
           },
           words: movedWords,
         };
 
-        sourceSection.words = keptWords;
+        sourceSentence.words = keptWords;
 
-        part.sections.splice(part.sections.indexOf(sourceSection) + 1, 0, targetSection);
+        part.sentences.splice(part.sentences.indexOf(sourceSentence) + 1, 0, targetSentence);
       } else {
-        targetSection = part.sections[part.sections.indexOf(sourceSection) + 1];
-        if (!targetSection) {
-          console.log("Unable to find next target section");
+        targetSentence = part.sentences[part.sentences.indexOf(sourceSentence) + 1];
+        if (!targetSentence) {
+          console.log("Unable to find next target sentence");
           return;
         }
 
-        if (keptWords.length === 0 && sourceSection.section.id > 0 && targetSection.section.id < 0) {
-          // Is old section an existing one and next a temporary one? Then switch.
-          moveWords(targetSection.words[targetSection.words.length - 1].id, "up", false)();
+        if (keptWords.length === 0 && sourceSentence.sentence.id > 0 && targetSentence.sentence.id < 0) {
+          // Is old sentence an existing one and next a temporary one? Then switch.
+          moveWords(targetSentence.words[targetSentence.words.length - 1].id, "up", false)();
           return;
         }
 
-        if (keptWords.length === 0) part.sections.splice(part.sections.indexOf(sourceSection), 1);
+        if (keptWords.length === 0) part.sentences.splice(part.sentences.indexOf(sourceSentence), 1);
         else {
-          sourceSection.words = keptWords;
+          sourceSentence.words = keptWords;
         }
 
-        targetSection.words = movedWords.concat(targetSection.words);
+        targetSentence.words = movedWords.concat(targetSentence.words);
       }
 
-      targetSection.section.starts_at = targetSection.words[0].starts_at;
-      targetSection.section.ends_at = targetSection.words[targetSection.words.length - 1].ends_at;
-      targetSection.section.words_per_second =
-        targetSection.words.length / (targetSection.section.ends_at - targetSection.section.starts_at);
+      targetSentence.sentence.starts_at = targetSentence.words[0].starts_at;
+      targetSentence.sentence.ends_at = targetSentence.words[targetSentence.words.length - 1].ends_at;
+      targetSentence.sentence.words_per_second =
+        targetSentence.words.length / (targetSentence.sentence.ends_at - targetSentence.sentence.starts_at);
 
-      sourceSection.section.starts_at = sourceSection.words[0].starts_at;
-      sourceSection.section.ends_at = sourceSection.words[sourceSection.words.length - 1].ends_at;
-      sourceSection.section.words_per_second =
-        sourceSection.words.length / (sourceSection.section.ends_at - sourceSection.section.starts_at);
+      sourceSentence.sentence.starts_at = sourceSentence.words[0].starts_at;
+      sourceSentence.sentence.ends_at = sourceSentence.words[sourceSentence.words.length - 1].ends_at;
+      sourceSentence.sentence.words_per_second =
+        sourceSentence.words.length / (sourceSentence.sentence.ends_at - sourceSentence.sentence.starts_at);
 
-      setPart({ part: part.part, sections: part.sections });
+      setPart({ part: part.part, sentences: part.sentences });
     };
   };
 
@@ -212,14 +212,14 @@ export const PartEditFormComponent = ({
   const wordSaveFunction = (newWord: Word) => {
     if (!part) return;
 
-    const word = part.sections.flatMap((x) => x.words).find((x) => x.id === newWord.id);
+    const word = part.sentences.flatMap((x) => x.words).find((x) => x.id === newWord.id);
     if (!word) {
       console.error("whoops");
       return;
     }
 
     word.overwrite = newWord.overwrite === word.text ? "" : newWord.overwrite;
-    setPart({ part: part.part, sections: part.sections });
+    setPart({ part: part.part, sentences: part.sentences });
   };
 
   // -------------------------------------------------------------------
@@ -229,27 +229,27 @@ export const PartEditFormComponent = ({
 
     part.part.episode_speaker_id = newEpisodeSpeakerId;
 
-    setPart({ part: part.part, sections: part.sections });
+    setPart({ part: part.part, sentences: part.sentences });
   };
 
   // -------------------------------------------------------------------
-  // Move a section
-  const moveSection = (sectionId: number, direction: "up" | "upnew" | "downnew" | "down" | "") => {
+  // Move a sentence
+  const moveSentence = (sentenceId: number, direction: "up" | "upnew" | "downnew" | "down" | "") => {
     return (): void => {
       if (!part) return;
 
-      const section = part.sections.find((x) => x.section.id === sectionId);
-      if (!section) {
+      const sentence = part.sentences.find((x) => x.sentence.id === sentenceId);
+      if (!sentence) {
         return;
       }
 
       if (direction) {
-        section.move_section = direction;
+        sentence.move_sentence = direction;
       } else {
-        section.move_section = undefined;
+        sentence.move_sentence = undefined;
       }
 
-      setPart({ part: part.part, sections: part.sections });
+      setPart({ part: part.part, sentences: part.sentences });
     };
   };
 
@@ -263,18 +263,18 @@ export const PartEditFormComponent = ({
     <div className="flex-1">
       <div className="flex flex-row">
         <div className="flex-1">
-          {part.sections.length && part.sections[0].move_section?.startsWith("up") ? (
+          {part.sentences.length && part.sentences[0].move_sentence?.startsWith("up") ? (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
-              <SectionEditFormComponent
-                key={part.sections[0].section.id}
-                section={part.sections[0]}
-                toggleSectionHidden={toggleSectionHidden}
-                moveSection={moveSection}
+              <SentenceEditFormComponent
+                key={part.sentences[0].sentence.id}
+                sentence={part.sentences[0]}
+                toggleSentenceHidden={toggleSentenceHidden}
+                moveSentence={moveSentence}
                 wordSaveFunction={wordSaveFunction}
                 setActiveWord={setActiveWord}
                 isFirst={true}
-                isLast={part.sections.length === 1}
+                isLast={part.sentences.length === 1}
                 startAudioAt={startAudioAt}
                 curTime={curTime}
               />
@@ -293,20 +293,20 @@ export const PartEditFormComponent = ({
                 />
               </div>
             </div>
-            {part.sections
-              .filter((x) => !x.move_section)
-              .map((section, i) => {
+            {part.sentences
+              .filter((x) => !x.move_sentence)
+              .map((sentence, i) => {
                 return (
-                  <div key={section.section.id} className="flex flex-row">
+                  <div key={sentence.sentence.id} className="flex flex-row">
                     <div className="bg-purple-200 w-4" />
-                    <SectionEditFormComponent
-                      section={section}
-                      toggleSectionHidden={toggleSectionHidden}
-                      moveSection={moveSection}
+                    <SentenceEditFormComponent
+                      sentence={sentence}
+                      toggleSentenceHidden={toggleSentenceHidden}
+                      moveSentence={moveSentence}
                       wordSaveFunction={wordSaveFunction}
                       setActiveWord={setActiveWord}
-                      isFirst={part.sections[0].section.id === section.section.id}
-                      isLast={part.sections[part.sections.length - 1].section.id === section.section.id}
+                      isFirst={part.sentences[0].sentence.id === sentence.sentence.id}
+                      isLast={part.sentences[part.sentences.length - 1].sentence.id === sentence.sentence.id}
                       startAudioAt={startAudioAt}
                       curTime={curTime}
                     />
@@ -314,17 +314,17 @@ export const PartEditFormComponent = ({
                 );
               })}
           </div>
-          {part.sections.length && part.sections[part.sections.length - 1].move_section?.startsWith("down") ? (
+          {part.sentences.length && part.sentences[part.sentences.length - 1].move_sentence?.startsWith("down") ? (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
-              <SectionEditFormComponent
-                key={part.sections[part.sections.length - 1].section.id}
-                section={part.sections[part.sections.length - 1]}
-                toggleSectionHidden={toggleSectionHidden}
-                moveSection={moveSection}
+              <SentenceEditFormComponent
+                key={part.sentences[part.sentences.length - 1].sentence.id}
+                sentence={part.sentences[part.sentences.length - 1]}
+                toggleSentenceHidden={toggleSentenceHidden}
+                moveSentence={moveSentence}
                 wordSaveFunction={wordSaveFunction}
                 setActiveWord={setActiveWord}
-                isFirst={part.sections.length === 1}
+                isFirst={part.sentences.length === 1}
                 isLast={true}
                 startAudioAt={startAudioAt}
                 curTime={curTime}
@@ -344,10 +344,10 @@ export const PartEditFormComponent = ({
                 </span>
               </div>
               <div onClick={moveWords(activeWord.id, "up", false)} onKeyDown={moveWords(activeWord.id, "up", false)}>
-                Move up to next section
+                Move up to next sentence
               </div>
               <div onClick={moveWords(activeWord.id, "up", true)} onKeyDown={moveWords(activeWord.id, "up", true)}>
-                Move up to new section
+                Move up to new sentence
               </div>
               <div>
                 <span
@@ -363,13 +363,13 @@ export const PartEditFormComponent = ({
                 </span>
               </div>
               <div onClick={moveWords(activeWord.id, "down", true)} onKeyDown={moveWords(activeWord.id, "down", true)}>
-                Move down to new section
+                Move down to new sentence
               </div>
               <div
                 onClick={moveWords(activeWord.id, "down", false)}
                 onKeyDown={moveWords(activeWord.id, "down", false)}
               >
-                Move down to next section
+                Move down to next sentence
               </div>
             </>
           ) : (

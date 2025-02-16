@@ -14,6 +14,7 @@ impl MigrationTrait for Migration {
                 ("title", ColType::String),
                 ("link", ColType::String),
                 ("description", ColType::Text),
+                ("publishet_at", ColType::TimestampNull),
                 ("filename", ColType::String),
                 ("has_audio_file", ColType::Boolean),
             ],

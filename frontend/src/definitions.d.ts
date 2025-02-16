@@ -46,16 +46,16 @@ export interface Part {
 
 export interface PartDisplay {
   part: Part;
-  sections: SectionDisplay[];
+  sentences: SentenceDisplay[];
 }
 
-export interface SectionDisplay {
-  section: Section;
+export interface SentenceDisplay {
+  sentence: Sentence;
   words: Word[];
-  move_section?: "up" | "upnew" | "downnew" | "down";
+  move_sentence?: "up" | "upnew" | "downnew" | "down";
 }
 
-export interface Section {
+export interface Sentence {
   id: number;
   part_id?: number;
   words_per_second: number;
@@ -66,7 +66,7 @@ export interface Section {
 
 export interface Word {
   id: number;
-  section_id: number;
+  sentence_id: number;
   starts_at: number;
   ends_at: number;
   probability: number;

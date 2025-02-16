@@ -12,7 +12,7 @@ const existingEpisodes = await (await fetch("http://localhost:5150/api/episodes"
 
 async function dumpFile(file) {
   console.log(`Processing ${file}`)
-  const episodeName = path.basename(file, "json");
+  const episodeName = path.basename(file, ".json");
 
   // Episodes
   let existingEpisode = existingEpisodes.find(x => x.filename === episodeName);
@@ -38,8 +38,11 @@ async function dumpFile(file) {
 
   if (!existingEpisode.has_audio_file) {
     const mp3File = path.join(path.dirname(file), `${episodeName}.mp3`)
-    if (fs.existsSync()) {
-      const audioContent = fs.readFileSync(mp3File, { encoding: "binary" });
+    console.log(mp3File)
+    if (fs.existsSync(mp3File)) {
+      console.log(`Uploading audio for ${episodeName}`)
+
+      const audioContent = fs.readFileSync(mp3File);
       const audioRequest = await fetch(
         `http://localhost:5150/api/episodes/${existingEpisode.id}/audio`,
         { method: "POST", headers: { ...headers, "Content-Type": "audio/mpeg" }, body: audioContent }
@@ -52,7 +55,11 @@ async function dumpFile(file) {
 
 const files = fs.readdirSync("collection");
 for (const file of files) {
-  if (!file.endsWith(".json") || file.startsWith(".")) {
+  if (!file.endsWith(".json")) {
+    continue;
+  }
+
+  if (file.startsWith(".") || !fs.lstatSync(`collection/${file}`).isFile()) {
     console.log(`Skipping ${file}`)
     continue
   }

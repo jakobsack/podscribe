@@ -18,7 +18,7 @@ impl MigrationTrait for Migration {
                 ("probability", ColType::Double),
                 ("hidden", ColType::Boolean),
             ],
-            &[("section", "")],
+            &[("sentence", "")],
         )
         .await
     }

@@ -9,7 +9,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, m: &SchemaManager) -> Result<(), DbErr> {
         create_table(
             m,
-            "sections",
+            "sentences",
             &[
                 ("text", ColType::Text),
                 ("starts_at", ColType::Double),
@@ -22,6 +22,6 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        drop_table(m, "sections").await
+        drop_table(m, "sentences").await
     }
 }

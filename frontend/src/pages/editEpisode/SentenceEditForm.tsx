@@ -1,12 +1,12 @@
 import { Timestamp } from "../../common/Timestamp";
-import type { SectionDisplay, Word } from "../../definitions";
+import type { SentenceDisplay, Word } from "../../definitions";
 import { getWordColor } from "./getWordColor";
 import { WordFormComponent } from "./WordForm";
 
-interface SectionEditFormParams {
-  section: SectionDisplay;
-  toggleSectionHidden: (id: number) => void;
-  moveSection: (sectionId: number, direction: "up" | "upnew" | "downnew" | "down" | "") => () => void;
+interface SentenceEditFormParams {
+  sentence: SentenceDisplay;
+  toggleSentenceHidden: (id: number) => void;
+  moveSentence: (sentenceId: number, direction: "up" | "upnew" | "downnew" | "down" | "") => () => void;
   wordSaveFunction: (newWord: Word) => void;
   setActiveWord: React.Dispatch<React.SetStateAction<Word | undefined>>;
   isFirst?: boolean;
@@ -15,56 +15,59 @@ interface SectionEditFormParams {
   curTime: number;
 }
 
-export function SectionEditFormComponent({
-  section,
-  toggleSectionHidden,
-  moveSection,
+export function SentenceEditFormComponent({
+  sentence,
+  toggleSentenceHidden,
+  moveSentence,
   wordSaveFunction,
   setActiveWord,
   isFirst,
   isLast,
   startAudioAt,
   curTime,
-}: SectionEditFormParams) {
+}: SentenceEditFormParams) {
   return (
     <div className="flex-1 flex flex-col border-b border-gray-400">
       <div className="flex-1 flex flex-row bg-gray-100">
         <div
           className="w-20 text-right"
           onClick={() => {
-            startAudioAt(section.section.starts_at);
+            startAudioAt(sentence.sentence.starts_at);
           }}
         >
-          <Timestamp seconds={section.section.starts_at} includeHundredth={true} />
+          <Timestamp seconds={sentence.sentence.starts_at} includeHundredth={true} />
         </div>
         <div className="w-14 flex flex-row">
-          <div className="w-12 text-right">{(section.section.ends_at - section.section.starts_at).toFixed(2)}</div>
+          <div className="w-12 text-right">{(sentence.sentence.ends_at - sentence.sentence.starts_at).toFixed(2)}</div>
           <div className="ml-0.5 flex-1">s</div>
         </div>
         <div className="w-14 flex flex-row ml-8">
-          <div className="w-12 text-right">{section.section.words_per_second.toFixed(2)}</div>
+          <div className="w-12 text-right">{sentence.sentence.words_per_second.toFixed(2)}</div>
           <div className="ml-0.5 flex-1">wps</div>
         </div>
         <div className="flex-1 ml-8">
           <span
             onClick={() => {
-              toggleSectionHidden(section.section.id);
+              toggleSentenceHidden(sentence.sentence.id);
             }}
             onKeyDown={() => {
-              toggleSectionHidden(section.section.id);
+              toggleSentenceHidden(sentence.sentence.id);
             }}
           >
-            {section.words.some((x) => x.hidden) ? "show all" : "hide all"}
+            {sentence.words.some((x) => x.hidden) ? "show all" : "hide all"}
           </span>
         </div>
         <div className="w-48 flex-0">
           {isFirst ? (
-            section.move_section === "up" ? (
-              <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
+            sentence.move_sentence === "up" ? (
+              <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
             ) : (
-              <span onClick={moveSection(section.section.id, "up")} onKeyDown={moveSection(section.section.id, "up")}>
+              <span
+                onClick={moveSentence(sentence.sentence.id, "up")}
+                onKeyDown={moveSentence(sentence.sentence.id, "up")}
+              >
                 Append above
               </span>
             )
@@ -73,14 +76,14 @@ export function SectionEditFormComponent({
           )}
           {isFirst && isLast ? <br /> : <></>}
           {isLast ? (
-            section.move_section === "down" ? (
-              <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
+            sentence.move_sentence === "down" ? (
+              <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
             ) : (
               <span
-                onClick={moveSection(section.section.id, "down")}
-                onKeyDown={moveSection(section.section.id, "down")}
+                onClick={moveSentence(sentence.sentence.id, "down")}
+                onKeyDown={moveSentence(sentence.sentence.id, "down")}
               >
                 Prepend below
               </span>
@@ -91,14 +94,14 @@ export function SectionEditFormComponent({
         </div>
         <div className="w-48 flex-0">
           {isFirst ? (
-            section.move_section === "upnew" ? (
-              <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
+            sentence.move_sentence === "upnew" ? (
+              <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
             ) : (
               <span
-                onClick={moveSection(section.section.id, "upnew")}
-                onKeyDown={moveSection(section.section.id, "upnew")}
+                onClick={moveSentence(sentence.sentence.id, "upnew")}
+                onKeyDown={moveSentence(sentence.sentence.id, "upnew")}
               >
                 Move up
               </span>
@@ -108,14 +111,14 @@ export function SectionEditFormComponent({
           )}
           {isFirst && isLast ? <br /> : <></>}
           {isLast ? (
-            section.move_section === "downnew" ? (
-              <span onClick={moveSection(section.section.id, "")} onKeyDown={moveSection(section.section.id, "")}>
+            sentence.move_sentence === "downnew" ? (
+              <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
             ) : (
               <span
-                onClick={moveSection(section.section.id, "downnew")}
-                onKeyDown={moveSection(section.section.id, "downnew")}
+                onClick={moveSentence(sentence.sentence.id, "downnew")}
+                onKeyDown={moveSentence(sentence.sentence.id, "downnew")}
               >
                 Move down
               </span>
@@ -126,9 +129,9 @@ export function SectionEditFormComponent({
         </div>
       </div>
       <div
-        className={`flex-1 flex flex-row flex-wrap mb-2 ${curTime >= section.section.starts_at && curTime < section.section.ends_at ? "bg-yellow-200" : ""}`}
+        className={`flex-1 flex flex-row flex-wrap mb-2 ${curTime >= sentence.sentence.starts_at && curTime < sentence.sentence.ends_at ? "bg-yellow-200" : ""}`}
       >
-        {section.words.map((w) => {
+        {sentence.words.map((w) => {
           const wordColor = getWordColor(w);
           return (
             <div key={w.id} className={`group btn sz-sm m-1 ${wordColor}`}>

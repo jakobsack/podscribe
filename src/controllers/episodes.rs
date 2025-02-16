@@ -16,7 +16,7 @@ use crate::initializers::tantivy_search::TantivyContainer;
 use crate::models::_entities::episode_speakers as EpisodeSpeakersNS;
 use crate::models::_entities::episodes::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::parts as PartsNS;
-use crate::models::_entities::sections as SectionsNS;
+use crate::models::_entities::sentences as SentencesNS;
 use crate::models::_entities::speakers as SpeakersNS;
 use crate::models::_entities::words as WordsNS;
 
@@ -25,6 +25,7 @@ pub struct Params {
     pub title: String,
     pub link: String,
     pub description: String,
+    pub published_at: Option<chrono::DateTime<chrono::FixedOffset>>,
     pub filename: String,
     pub has_audio_file: bool,
 }
@@ -34,6 +35,7 @@ impl Params {
         item.title = Set(self.title.clone());
         item.link = Set(self.link.clone());
         item.description = Set(self.description.clone());
+        item.published_at = Set(self.published_at.clone());
         item.filename = Set(self.filename.clone());
         item.has_audio_file = Set(self.has_audio_file.clone());
     }
@@ -329,22 +331,22 @@ pub async fn import(
                 index_text => part.text.clone()))
             .map_err(|e| Error::Message(e.to_string()))?;
 
-        for import_section in import_part.sections {
-            if import_section.text.is_empty() {
+        for import_sentence in import_part.sentences {
+            if import_sentence.text.is_empty() {
                 continue;
             }
 
-            let mut item = SectionsNS::ActiveModel {
+            let mut item = SentencesNS::ActiveModel {
                 ..Default::default()
             };
             item.part_id = Set(part.id);
-            item.text = Set(import_section.text.clone());
-            item.starts_at = Set(import_section.start);
-            item.ends_at = Set(import_section.end);
-            item.words_per_second = Set(import_section.words_per_second);
-            let section = item.insert(&ctx.db).await?;
+            item.text = Set(import_sentence.text.clone());
+            item.starts_at = Set(import_sentence.start);
+            item.ends_at = Set(import_sentence.end);
+            item.words_per_second = Set(import_sentence.words_per_second);
+            let sentence = item.insert(&ctx.db).await?;
 
-            let words = import_section
+            let words = import_sentence
                 .words
                 .iter()
                 .map(|x| {
@@ -352,7 +354,7 @@ pub async fn import(
                         ..Default::default()
                     };
 
-                    item.section_id = Set(section.id);
+                    item.sentence_id = Set(sentence.id);
                     item.hidden = Set(false);
                     item.overwrite = Set("".into());
                     item.text = Set(x.text.clone());
@@ -414,11 +416,11 @@ pub struct ImportPart {
     pub end: f64,
     pub speaker: String,
     pub text: String,
-    pub sections: Vec<ImportSection>,
+    pub sentences: Vec<ImportSentence>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ImportSection {
+pub struct ImportSentence {
     pub text: String,
     pub words: Vec<ImportWord>,
     pub start: f64,

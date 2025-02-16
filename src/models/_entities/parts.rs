@@ -41,8 +41,8 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Episodes,
-    #[sea_orm(has_many = "super::sections::Entity")]
-    Sections,
+    #[sea_orm(has_many = "super::sentences::Entity")]
+    Sentences,
 }
 
 impl Related<super::approvals::Entity> for Entity {
@@ -63,9 +63,9 @@ impl Related<super::episodes::Entity> for Entity {
     }
 }
 
-impl Related<super::sections::Entity> for Entity {
+impl Related<super::sentences::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Sections.def()
+        Relation::Sentences.def()
     }
 }
 

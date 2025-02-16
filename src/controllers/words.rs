@@ -8,7 +8,7 @@ use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::parts as PartsNS;
-use crate::models::_entities::sections as SectionsNS;
+use crate::models::_entities::sentences as SentencesNS;
 use crate::models::_entities::words::{ActiveModel, Column, Entity, Model};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -40,12 +40,12 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 #[debug_handler]
 pub async fn list(
     _auth: middleware::auth::JWT,
-    Path((_episode_id, _part_id, section_id)): Path<(i32, i32, i32)>,
+    Path((_episode_id, _part_id, sentence_id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     format::json(
         Entity::find()
-            .filter(Column::SectionId.eq(section_id))
+            .filter(Column::SentenceId.eq(sentence_id))
             .all(&ctx.db)
             .await?,
     )
@@ -54,7 +54,7 @@ pub async fn list(
 #[debug_handler]
 pub async fn add(
     _auth: middleware::auth::JWT,
-    Path((_episode_id, part_id, section_id)): Path<(i32, i32, i32)>,
+    Path((_episode_id, part_id, sentence_id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
@@ -62,10 +62,10 @@ pub async fn add(
         ..Default::default()
     };
     params.update(&mut item);
-    item.section_id = Set(section_id);
+    item.sentence_id = Set(sentence_id);
     let item = item.insert(&ctx.db).await?;
 
-    update_section_and_part(&ctx, part_id, section_id).await?;
+    update_sentence_and_part(&ctx, part_id, sentence_id).await?;
 
     format::json(item)
 }
@@ -73,19 +73,19 @@ pub async fn add(
 #[debug_handler]
 pub async fn update(
     _auth: middleware::auth::JWT,
-    Path((_episode_id, part_id, section_id, id)): Path<(i32, i32, i32, i32)>,
+    Path((_episode_id, part_id, sentence_id, id)): Path<(i32, i32, i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
     let item = load_item(&ctx, id).await?;
-    if item.section_id != section_id {
+    if item.sentence_id != sentence_id {
         return Err(Error::NotFound);
     }
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
 
-    update_section_and_part(&ctx, part_id, section_id).await?;
+    update_sentence_and_part(&ctx, part_id, sentence_id).await?;
 
     format::json(item)
 }
@@ -93,7 +93,7 @@ pub async fn update(
 #[debug_handler]
 pub async fn remove(
     _auth: middleware::auth::JWT,
-    Path((_episode_id, _part_id, _section_id, id)): Path<(i32, i32, i32, i32)>,
+    Path((_episode_id, _part_id, _sentence_id, id)): Path<(i32, i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
@@ -103,21 +103,21 @@ pub async fn remove(
 #[debug_handler]
 pub async fn get_one(
     _auth: middleware::auth::JWT,
-    Path((_episode_id, _part_id, _section_id, id)): Path<(i32, i32, i32, i32)>,
+    Path((_episode_id, _part_id, _sentence_id, id)): Path<(i32, i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     format::json(load_item(&ctx, id).await?)
 }
 
 // TODO: Move into model?
-async fn update_section_and_part(ctx: &AppContext, part_id: i32, section_id: i32) -> Result<()> {
-    let section = SectionsNS::Entity::find_by_id(section_id)
+async fn update_sentence_and_part(ctx: &AppContext, part_id: i32, sentence_id: i32) -> Result<()> {
+    let sentence = SentencesNS::Entity::find_by_id(sentence_id)
         .one(&ctx.db)
         .await?
         .unwrap();
 
     let words = Entity::find()
-        .filter(Column::SectionId.eq(section_id))
+        .filter(Column::SentenceId.eq(sentence_id))
         .order_by_asc(Column::StartsAt)
         .all(&ctx.db)
         .await?;
@@ -134,23 +134,23 @@ async fn update_section_and_part(ctx: &AppContext, part_id: i32, section_id: i32
         })
         .collect::<Vec<String>>()
         .join(" ");
-    let mut active_section = section.into_active_model();
-    active_section.text = Set(text);
-    active_section.save(&ctx.db).await?;
+    let mut active_sentence = sentence.into_active_model();
+    active_sentence.text = Set(text);
+    active_sentence.save(&ctx.db).await?;
 
     let part = PartsNS::Entity::find_by_id(part_id)
         .one(&ctx.db)
         .await?
         .unwrap();
 
-    let sections = SectionsNS::Entity::find()
-        .filter(SectionsNS::Column::PartId.eq(part_id))
-        .order_by_asc(SectionsNS::Column::StartsAt)
+    let sentences = SentencesNS::Entity::find()
+        .filter(SentencesNS::Column::PartId.eq(part_id))
+        .order_by_asc(SentencesNS::Column::StartsAt)
         .all(&ctx.db)
         .await?;
 
-    // Now update the section text and then the
-    let text = sections
+    // Now update the sentence text and then the
+    let text = sentences
         .iter()
         .map(|x| x.text.clone())
         .collect::<Vec<String>>()
@@ -164,7 +164,7 @@ async fn update_section_and_part(ctx: &AppContext, part_id: i32, section_id: i32
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/episodes/{episode_id}/parts/{part_id}/sections/{section_id}/words/")
+        .prefix("api/episodes/{episode_id}/parts/{part_id}/sentences/{sentence_id}/words/")
         .add("/", get(list))
         .add("/", post(add))
         .add("{id}", get(get_one))
