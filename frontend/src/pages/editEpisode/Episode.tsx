@@ -144,7 +144,7 @@ export const EpisodeComponent = () => {
               <h1 className="text-3xl text-title font-semibold pb-2 underline">{episode.episode.title}</h1>
 
               <p>
-                <Link to="./.." className="hover:link ">
+                <Link to="./.." className="hover:link btn variant-soft w-44 p-1">
                   Back to normal view
                 </Link>
               </p>
@@ -171,7 +171,7 @@ export const EpisodeComponent = () => {
                 </div>
               </div>
 
-              <h2 className="text-2xl text-title font-semibold pb-2 underline">Transcript</h2>
+              <h2 className="podscribe">Transcript</h2>
 
               <p>When editing the probability of the word is encoded in the color.</p>
               <div className="flex flex-row flex-wrap">

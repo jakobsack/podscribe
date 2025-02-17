@@ -296,11 +296,23 @@ pub async fn ui_update(
         } else if ui_sentence.move_sentence.as_deref() == Some("up") {
             // We are appending to the previous
             target_part.ends_at = Set(ui_sentence.words[ui_sentence.words.len()].ends_at);
-            target_part.text = Set(format!("{} {}", old_text, new_text));
+            let text = vec![old_text, new_text]
+                .iter()
+                .filter(|x| !x.is_empty())
+                .map(|x| x.clone())
+                .collect::<Vec<String>>()
+                .join(" ");
+            target_part.text = Set(text);
         } else {
             // We are appending to the previous
             target_part.starts_at = Set(ui_sentence.words[0].starts_at);
-            target_part.text = Set(format!("{} {}", new_text, old_text));
+            let text = vec![new_text, old_text]
+                .iter()
+                .filter(|x| !x.is_empty())
+                .map(|x| x.clone())
+                .collect::<Vec<String>>()
+                .join(" ");
+            target_part.text = Set(text);
         };
 
         let target_part: Model = target_part.update(&ctx.db).await?;
@@ -325,12 +337,17 @@ pub async fn ui_update(
             .map_err(|e| Error::Message(e.to_string()))?;
     }
 
-    let mut complete_text: String = String::new();
+    let mut texts: Vec<String> = Vec::with_capacity(sticky_sentences.len());
     for ui_sentence in &sticky_sentences {
         let new_text = update_sentence(&ui_sentence, &original_part, &ctx).await?;
-        complete_text.push_str(" ");
-        complete_text.push_str(&new_text);
+        texts.push(new_text);
     }
+    let complete_text: String = texts
+        .iter()
+        .filter(|x| !x.is_empty())
+        .map(|x| x.clone())
+        .collect::<Vec<String>>()
+        .join(" ");
 
     {
         let index_writer = index.read().unwrap();
@@ -467,9 +484,13 @@ async fn update_sentence(
     let new_text = text.join(" ");
     let text_len: i32 = text.len().try_into().unwrap();
     let text_len: f64 = text_len.try_into().unwrap();
-    let words_per_second: f64 = (ui_sentence.words[ui_sentence.words.len() - 1].ends_at
-        - ui_sentence.words[0].starts_at)
-        / text_len;
+    let words_per_second: f64 = if text_len < 0.1 {
+        // Words per second is 0 if there are no words
+        0.0
+    } else {
+        (ui_sentence.words[ui_sentence.words.len() - 1].ends_at - ui_sentence.words[0].starts_at)
+            / text_len
+    };
     sentence.part_id = Set(target_part.id);
     sentence.text = Set(new_text.clone());
     sentence.starts_at = Set(ui_sentence.words[0].starts_at);
