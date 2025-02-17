@@ -50,5 +50,19 @@ zip file next to it.
    a 90 minute episode.
 1. Collect the resulting JSON files:
    `find ./output -name complete.json -exec ./collect.sh {} \;`
-1. Until the web server has a proper JSON import upload the data using the
-   `upload.mjs` script.
+1. Run `npm clean-install` to install the dependencies of the javascript scripts
+1. Create a file called `settings.json` with the following content:
+   ```json
+   {
+    "hostname": "http://localhost:5150",
+    "token": "ey...",
+    "rssFeed": "http://feeds.libsyn.com/00000/rss",
+    "cropDescriptionAt": "A sentence that appears in every show description. Leave blank if not required."
+   }
+   ```
+
+   Note that the token needs to be updated after it expires.
+1. Run `node clean-file.mjs` to remove artifacts produced by whisper.
+1. Run `node upload.mjs` to upload the files.
+1. Run `node patch-data.mjs` to add title, publishing date and description
+   to the episodes.
