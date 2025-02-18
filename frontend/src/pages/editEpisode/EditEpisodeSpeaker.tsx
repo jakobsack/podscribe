@@ -1,11 +1,10 @@
 import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
 import { jwtFetch } from "../../common/jwtFetch";
 
-export const editEpisodeSpeakerAction = (async (event: ActionFunctionArgs) => {
-  const formData = await event.request.formData();
-
+export const editEpisodeSpeakerAction = async (event: ActionFunctionArgs, formData: FormData) => {
   const episodeId = event.params.episodeId;
-  const speakerId = event.params.episodeSpeakerId;
+
+  const speakerId = formData.get("episodeSpeakerId");
 
   const rawSpeakerId = formData.get("speaker_id");
   if (!rawSpeakerId) {
@@ -27,4 +26,4 @@ export const editEpisodeSpeakerAction = (async (event: ActionFunctionArgs) => {
     body,
   });
   return await req.json();
-}) satisfies ActionFunction;
+};

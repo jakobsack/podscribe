@@ -10,7 +10,7 @@ import { speakersAction, SpeakersComponent, speakersLoader } from "../pages/spea
 import { editSpeakerAction } from "../pages/speakers/EditSpeaker";
 import { EpisodeViewComponent, episodeViewLoader } from "../pages/episodes/EpisodeView";
 import { EpisodesComponent, episodesLoader } from "../pages/episodes/Episodes";
-import { EpisodeComponent, episodeLoader } from "../pages/editEpisode/Episode";
+import { episodeAction, EpisodeComponent, episodeLoader } from "../pages/editEpisode/Episode";
 import { editEpisodeSpeakerAction } from "../pages/editEpisode/EditEpisodeSpeaker";
 import { editPartAction } from "../pages/editEpisode/EditPart";
 import { searchAction, SearchComponent } from "../pages/search/Search";
@@ -58,17 +58,8 @@ export const Routes = () => {
         {
           path: "episodes/:episodeId/edit",
           element: <EpisodeComponent />,
+          action: episodeAction,
           loader: episodeLoader,
-          children: [
-            {
-              path: "episodeSpeakers/:episodeSpeakerId",
-              action: editEpisodeSpeakerAction,
-            },
-            {
-              path: "parts/:partId/update",
-              action: editPartAction,
-            },
-          ],
         },
         {
           path: "/logout",

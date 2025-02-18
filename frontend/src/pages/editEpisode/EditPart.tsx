@@ -1,11 +1,10 @@
 import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
 import { jwtFetch } from "../../common/jwtFetch";
 
-export const editPartAction = (async (event: ActionFunctionArgs) => {
-  const formData = await event.request.formData();
-
+export const editPartAction = async (event: ActionFunctionArgs, formData: FormData) => {
   const episodeId = event.params.episodeId;
-  const partId = event.params.partId;
+
+  const partId = formData.get("partId");
 
   const json = formData.get("json");
   if (!json) {
@@ -24,4 +23,4 @@ export const editPartAction = (async (event: ActionFunctionArgs) => {
     body,
   });
   return await req.text();
-}) satisfies ActionFunction;
+};

@@ -1,11 +1,13 @@
 import type { EpisodeDisplay } from "../../definitions";
 import { Link, useLoaderData } from "react-router-dom";
-import type { LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
+import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { TranscriptTableComponent } from "./TranscriptTable";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { EpisodeSpeakerComponent } from "./EpisodeSpeaker";
 import { jwtFetch } from "../../common/jwtFetch";
+import { editEpisodeSpeakerAction } from "./EditEpisodeSpeaker";
+import { editPartAction } from "./EditPart";
 
 export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
@@ -13,6 +15,26 @@ export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const result = (await response.json()) as EpisodeDisplay;
   return { episode: result };
 }) satisfies LoaderFunction;
+
+export const episodeAction = (async (event: ActionFunctionArgs) => {
+  console.log(event);
+  const formData = await event.request.formData();
+
+  const pressedButton = formData.get("function");
+  if (!pressedButton) {
+    throw new Error("What just happened?");
+  }
+
+  if (pressedButton === "editEpisodeSpeaker") {
+    return editEpisodeSpeakerAction(event, formData);
+  }
+
+  if (pressedButton === "editPart") {
+    return editPartAction(event, formData);
+  }
+
+  throw new Error(`Unknown action: ${pressedButton}`);
+}) satisfies ActionFunction;
 
 export const EpisodeComponent = () => {
   const { episode } = useLoaderData() as { episode: EpisodeDisplay };

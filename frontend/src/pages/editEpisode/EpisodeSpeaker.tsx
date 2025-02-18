@@ -25,7 +25,7 @@ export const EpisodeSpeakerComponent = ({ episodeSpeaker, speakers }: EpisodeSpe
     <>
       {speakers.find((y) => y.id === episodeSpeaker.speaker_id)?.name}
       {showEdit ? (
-        <fetcher.Form method="post" action={`episodeSpeakers/${episodeSpeaker.id}`}>
+        <fetcher.Form method="post">
           <div className="flex flex-row">
             <select size={1} name="speaker_id" defaultValue={episodeSpeaker.speaker_id}>
               {speakers.map((x) => (
@@ -34,12 +34,13 @@ export const EpisodeSpeakerComponent = ({ episodeSpeaker, speakers }: EpisodeSpe
                 </option>
               ))}
             </select>
-            <button type="submit" className="btn bg-primary-500 text-white p-1">
+            <input type="hidden" name="episodeSpeakerId" value={episodeSpeaker.id} />
+            <button type="submit" name="function" value="editEpisodeSpeaker" className="btn variant-primary">
               Update
             </button>
             <button
               type="button"
-              className="btn bg-slate-500 text-white p-1 ml-3"
+              className="btn variant-neutral p-1 ml-3"
               onClick={toggleShowEdit}
               onKeyDown={toggleShowEdit}
             >

@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import { useFetcher } from "react-router-dom";
 import type { Speaker, EpisodeSpeaker, PartDisplay, Word, SentenceDisplay } from "../../definitions";
 import { getWordColor } from "./getWordColor";
@@ -377,13 +377,14 @@ export const PartEditFormComponent = ({
           )}
         </div>
       </div>
-      <fetcher.Form method="post" action={`parts/${part.part.id}/update`}>
+      <fetcher.Form method="post">
         <div className="flex flex-row">
           <textarea id="json" name="json" className="hidden" readOnly={true} value={JSON.stringify(part)} />
-          <div className="btn variant-soft p-1" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
+          <input type="hidden" name="partId" value={part.part.id} />
+          <div className="btn variant-neutral p-1" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
             Cancel
           </div>
-          <button type="submit" name="update" className="btn bg-primary-500 text-white p-1 ml-3">
+          <button type="submit" name="function" value="editPart" className="btn variant-primary p-1 ml-3">
             Update
           </button>
         </div>
