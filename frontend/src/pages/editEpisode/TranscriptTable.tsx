@@ -36,6 +36,7 @@ export const TranscriptTableComponent = ({
       text: part.text,
       start: part.starts_at,
       end: part.ends_at,
+      updated_at: part.updated_at,
     };
 
     if (speaker === lastSpeaker) {
@@ -63,7 +64,6 @@ export const TranscriptTableComponent = ({
             <SpeakerPartsComponent
               parts={x.parts}
               episodeId={episode.id}
-              episodeSpeakerId={x.episodeSpeakerId}
               speakers={speakers}
               episodeSpeakers={episodeSpeakers}
               startAudioAt={startAudioAt}

@@ -369,6 +369,7 @@ pub async fn ui_update(
         original_part.starts_at = Set(sticky_sentences[0].words[0].starts_at);
         original_part.ends_at = Set(last_sentence.words[last_sentence.words.len() - 1].ends_at);
         original_part.text = Set(complete_text.clone());
+        original_part.part_type = Set(params.part.part_type);
         let original_part = original_part.update(&ctx.db).await?;
 
         // Tantivy update index
@@ -581,6 +582,7 @@ pub struct UiUpdateParamsPart {
     pub id: i32,
     pub text: String,
     pub starts_at: f64,
+    pub part_type: i32,
     pub ends_at: f64,
     pub episode_speaker_id: i32,
 }

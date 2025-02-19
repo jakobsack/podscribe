@@ -2,8 +2,8 @@ export interface Speaker {
   id: number;
   name: string;
   description?: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Episode {
@@ -14,16 +14,16 @@ export interface Episode {
   published_at?: string;
   filename: string;
   has_audio_file: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface EpisodeSpeaker {
   id: number;
   episode_id: number;
   speaker_id: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface EpisodeDisplay {
@@ -41,8 +41,8 @@ export interface Part {
   part_type: number;
   starts_at: number;
   ends_at: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PartDisplay {
@@ -74,4 +74,9 @@ export interface Word {
   text: string;
   overwrite: string;
   hidden: boolean;
+}
+
+export enum PartType {
+  Default = 0,
+  Jingle = 1,
 }

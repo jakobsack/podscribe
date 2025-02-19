@@ -10,6 +10,7 @@ export interface NewPart {
   text: string;
   start: number;
   end: number;
+  updated_at: string;
 }
 
 export interface AudioControl {

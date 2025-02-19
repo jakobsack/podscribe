@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [pluginReact()],
   html: {
     favicon: "src/assets/favicon.ico",
-    title: "Loco SaaS Starter",
+    title: "Podscribe",
   },
   server: {
     proxy: {

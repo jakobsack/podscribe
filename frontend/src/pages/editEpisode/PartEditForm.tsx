@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { useFetcher } from "react-router-dom";
-import type { Speaker, EpisodeSpeaker, PartDisplay, Word, SentenceDisplay } from "../../definitions";
+import { Form } from "react-router-dom";
+import { Speaker, EpisodeSpeaker, PartDisplay, Word, SentenceDisplay, PartType } from "../../definitions";
 import { getWordColor } from "./getWordColor";
 import { PartSpeakerComponent } from "./PartSpeaker";
 import { SentenceEditFormComponent } from "./SentenceEditForm";
 import { jwtFetch } from "../../common/jwtFetch";
+import { PartTypeComponent } from "./PartType";
 
 interface PartEditFormParams {
   episodeId: number;
   partId: number;
   toggleShowEdit: () => void;
-  episodeSpeakerId: number;
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
   startAudioAt: (position: number) => void;
@@ -21,7 +21,6 @@ export const PartEditFormComponent = ({
   episodeId,
   partId,
   toggleShowEdit,
-  episodeSpeakerId,
   speakers,
   episodeSpeakers,
   startAudioAt,
@@ -233,6 +232,16 @@ export const PartEditFormComponent = ({
   };
 
   // -------------------------------------------------------------------
+  // Change part type
+  const partTypeSaveFunction = (newPartType: PartType) => {
+    if (!part) return;
+
+    part.part.part_type = newPartType;
+
+    setPart({ part: part.part, sentences: part.sentences });
+  };
+
+  // -------------------------------------------------------------------
   // Move a sentence
   const moveSentence = (sentenceId: number, direction: "up" | "upnew" | "downnew" | "down" | "") => {
     return (): void => {
@@ -252,8 +261,6 @@ export const PartEditFormComponent = ({
       setPart({ part: part.part, sentences: part.sentences });
     };
   };
-
-  const fetcher = useFetcher();
 
   if (!part) {
     return <p>Loading</p>;
@@ -284,13 +291,18 @@ export const PartEditFormComponent = ({
           )}
           <div className="flex-1">
             <div className="bg-purple-200 flex-1">
-              <div className="flex-1 ml-4">
-                <PartSpeakerComponent
-                  speakerId={part.part.episode_speaker_id}
-                  speakers={speakers}
-                  episodeSpeakers={episodeSpeakers}
-                  saveFunction={episodeSpeakerSaveFunction}
-                />
+              <div className="flex-1 ml-4 flex flex-row">
+                <div>
+                  <PartSpeakerComponent
+                    speakerId={part.part.episode_speaker_id}
+                    speakers={speakers}
+                    episodeSpeakers={episodeSpeakers}
+                    saveFunction={episodeSpeakerSaveFunction}
+                  />
+                </div>
+                <div className="ml-8">
+                  <PartTypeComponent partType={part.part.part_type} saveFunction={partTypeSaveFunction} />
+                </div>
               </div>
             </div>
             {part.sentences
@@ -377,7 +389,7 @@ export const PartEditFormComponent = ({
           )}
         </div>
       </div>
-      <fetcher.Form method="post">
+      <Form method="post">
         <div className="flex flex-row">
           <textarea id="json" name="json" className="hidden" readOnly={true} value={JSON.stringify(part)} />
           <input type="hidden" name="partId" value={part.part.id} />
@@ -388,7 +400,7 @@ export const PartEditFormComponent = ({
             Update
           </button>
         </div>
-      </fetcher.Form>
+      </Form>
     </div>
   );
 };

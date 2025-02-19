@@ -5,7 +5,6 @@ import type { NewPart } from "./definitions";
 interface SpeakerPartsParams {
   parts: NewPart[];
   episodeId: number;
-  episodeSpeakerId: number;
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
   startAudioAt: (position: number) => void;
@@ -15,7 +14,6 @@ interface SpeakerPartsParams {
 export const SpeakerPartsComponent = ({
   parts,
   episodeId,
-  episodeSpeakerId,
   speakers,
   episodeSpeakers,
   startAudioAt,
@@ -29,7 +27,6 @@ export const SpeakerPartsComponent = ({
             <ShowPartComponent
               episodeId={episodeId}
               part={x}
-              episodeSpeakerId={episodeSpeakerId}
               speakers={speakers}
               episodeSpeakers={episodeSpeakers}
               startAudioAt={startAudioAt}

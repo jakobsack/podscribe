@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Speaker, EpisodeSpeaker } from "../../definitions";
 import { PartEditFormComponent } from "./PartEditForm";
 import type { NewPart } from "./definitions";
 import { Timestamp } from "../../common/Timestamp";
+import { useRevalidator } from "react-router-dom";
 
 interface ShowPartParams {
   episodeId: number;
   part: NewPart;
-  episodeSpeakerId: number;
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
   startAudioAt: (position: number) => void;
@@ -17,24 +17,30 @@ interface ShowPartParams {
 export const ShowPartComponent = ({
   part,
   episodeId,
-  episodeSpeakerId,
   speakers,
   episodeSpeakers,
   startAudioAt,
   curTime,
 }: ShowPartParams) => {
+  const [updatedAt, setUpdatedAt] = useState(part.updated_at);
   const [showEdit, setShowEdit] = useState(false);
 
   const toggleShowEdit = () => {
     setShowEdit(!showEdit);
   };
 
+  useEffect(() => {
+    if (part.updated_at !== updatedAt) {
+      setShowEdit(false);
+      setUpdatedAt(part.updated_at);
+    }
+  }, [updatedAt, part]);
+
   return showEdit ? (
     <PartEditFormComponent
       episodeId={episodeId}
       partId={part.id}
       toggleShowEdit={toggleShowEdit}
-      episodeSpeakerId={episodeSpeakerId}
       speakers={speakers}
       episodeSpeakers={episodeSpeakers}
       startAudioAt={startAudioAt}
