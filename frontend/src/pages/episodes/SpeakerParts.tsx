@@ -10,7 +10,11 @@ interface SpeakerPartsParams {
 export const SpeakerPartsComponent = ({ speakerPart, isLastRow, isHighlighted }: SpeakerPartsParams) => {
   return (
     <div className={`flex flex-row items-stretch border-b-2 border-gray-300 ${isHighlighted ? "bg-slate-100" : ""}`}>
-      <div className={`w-40 ${isLastRow ? "" : "border-r border-gray-200"}`}>{speakerPart.speaker}</div>
+      <div
+        className={`w-40 ${isLastRow && "border-r border-gray-200"} ${speakerPart.part_type === 1 && "bg-pink-100"}`}
+      >
+        {speakerPart.speaker}
+      </div>
       <div className="flex-1">
         <div className="flex flex-col">
           {speakerPart.parts.map((x, i, a) => (

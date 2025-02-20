@@ -8,6 +8,7 @@ import { EpisodeSpeakerComponent } from "./EpisodeSpeaker";
 import { jwtFetch } from "../../common/jwtFetch";
 import { editEpisodeSpeakerAction } from "./EditEpisodeSpeaker";
 import { editPartAction } from "./EditPart";
+import { Timestamp } from "../../common/Timestamp";
 
 export const episodeLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
@@ -129,36 +130,67 @@ export const EpisodeComponent = () => {
   return (
     <section className="relative">
       <div className="relative">
-        {episode?.episode.has_audio_file ? (
-          <div className="fixed right-4 border-gray-300 border rounded">
-            <audio id="audio" controls preload="none">
+        {episode?.episode.has_audio_file && (
+          <div className="fixed right-4 border-gray-300 border rounded-lg p-2 bg-slate-100 w-24 text-right">
+            <audio id="audio" preload="none">
               <source id="audioSrc" type="audio/mpeg" />
               <track kind="captions" />
             </audio>
-            <span>{curTime.toFixed(2)}</span>
+            <span>
+              <Timestamp seconds={curTime || 0} />
+            </span>
             <br />
-            <span>{duration?.toFixed(2)}</span>
+            <span>
+              <Timestamp seconds={duration || 0} />
+            </span>
             <br />
             {playing ? (
-              <span
+              <div
                 onClick={() => {
                   setPlaying(false);
                 }}
+                className="flex flex-row"
               >
-                Pause
-              </span>
+                <svg
+                  width="1.6em"
+                  height="1.45em"
+                  viewBox="0 0 512 512"
+                  fill="#000000"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <title>Pause</title>
+                  <g>
+                    <g>
+                      <rect x="40.0" y="60.885" width="148.088" height="390.23" />
+                      <rect x="303.912" y="60.885" width="148.088" height="390.23" />
+                    </g>
+                  </g>
+                </svg>
+                <span>Pause</span>
+              </div>
             ) : (
-              <span
+              <div
                 onClick={() => {
-                  setPlaying(true);
+                  curTime ? setPlaying(true) : startAudioAt(0);
                 }}
+                className="flex flex-row content-center"
               >
-                Play
-              </span>
+                <svg
+                  width="1.6em"
+                  height="1.45em"
+                  viewBox="0 0 24 24"
+                  fill="#000000"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <title>Play</title>
+                  <g>
+                    <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" />
+                  </g>
+                </svg>
+                <span>Play</span>
+              </div>
             )}
           </div>
-        ) : (
-          <></>
         )}
         <div className="mx-auto px-6 max-w-7xl md:px-12">
           {episode ? (

@@ -116,7 +116,7 @@ export const SpeakersComponent = () => {
                   <button type="submit" className="btn variant-primary p-1">
                     Create Speaker
                   </button>
-                  {speakers.length ? (
+                  {speakers.length && (
                     <button
                       type="button"
                       className="btn variant-soft p-1 ml-5"
@@ -125,8 +125,6 @@ export const SpeakersComponent = () => {
                     >
                       Cancel
                     </button>
-                  ) : (
-                    <></>
                   )}
                 </div>
               </div>

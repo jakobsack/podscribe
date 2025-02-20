@@ -133,6 +133,7 @@ pub async fn get_display(
 
     let sentences = SentencesNS::Entity::find()
         .filter(SentencesNS::Column::PartId.eq(id))
+        .order_by_asc(SentencesNS::Column::StartsAt)
         .all(&ctx.db)
         .await?;
 

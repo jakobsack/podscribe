@@ -80,7 +80,7 @@ export const SearchComponent = () => {
           </Form>
         </div>
 
-        {actionData && episodesInOrder && partsInOrder ? (
+        {actionData && episodesInOrder && partsInOrder && (
           <div className="mx-auto px-6 max-w-7xl md:px-12">
             <h2 className="text-2xl text-title font-semibold pb-2 underline">Search results</h2>
 
@@ -108,8 +108,6 @@ export const SearchComponent = () => {
               <p>Sorry, we did not find any results.</p>
             )}
           </div>
-        ) : (
-          <></>
         )}
       </div>
     </section>

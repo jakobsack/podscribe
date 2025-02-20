@@ -4,6 +4,7 @@ import { PartEditFormComponent } from "./PartEditForm";
 import type { NewPart } from "./definitions";
 import { Timestamp } from "../../common/Timestamp";
 import { useRevalidator } from "react-router-dom";
+import { SentenceBreaker } from "../../common/SentenceBreaker";
 
 interface ShowPartParams {
   episodeId: number;
@@ -52,10 +53,10 @@ export const ShowPartComponent = ({
         <Timestamp seconds={part.start} />
       </div>
       <div className={`flex-1 ml-2 ${curTime >= part.start && curTime < part.end ? "bg-yellow-200" : ""}`}>
-        {part.text}
+        <SentenceBreaker text={part.text} />
       </div>
       <div className="w-10 ml-2">
-        <p onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
+        <p className="hover:link" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
           Edit
         </p>
       </div>

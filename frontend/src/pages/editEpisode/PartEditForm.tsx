@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Form } from "react-router-dom";
-import { Speaker, EpisodeSpeaker, PartDisplay, Word, SentenceDisplay, PartType } from "../../definitions";
+import type { Speaker, EpisodeSpeaker, PartDisplay, Word, SentenceDisplay, PartType } from "../../definitions";
 import { getWordColor } from "./getWordColor";
 import { PartSpeakerComponent } from "./PartSpeaker";
 import { SentenceEditFormComponent } from "./SentenceEditForm";
@@ -270,7 +270,7 @@ export const PartEditFormComponent = ({
     <div className="flex-1">
       <div className="flex flex-row">
         <div className="flex-1">
-          {part.sentences.length && part.sentences[0].move_sentence?.startsWith("up") ? (
+          {part.sentences.length && part.sentences[0].move_sentence?.startsWith("up") && (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
               <SentenceEditFormComponent
@@ -286,8 +286,6 @@ export const PartEditFormComponent = ({
                 curTime={curTime}
               />
             </div>
-          ) : (
-            <></>
           )}
           <div className="flex-1">
             <div className="bg-purple-200 flex-1">
@@ -326,7 +324,7 @@ export const PartEditFormComponent = ({
                 );
               })}
           </div>
-          {part.sentences.length && part.sentences[part.sentences.length - 1].move_sentence?.startsWith("down") ? (
+          {part.sentences.length && part.sentences[part.sentences.length - 1].move_sentence?.startsWith("down") && (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
               <SentenceEditFormComponent
@@ -342,28 +340,40 @@ export const PartEditFormComponent = ({
                 curTime={curTime}
               />
             </div>
-          ) : (
-            <></>
           )}
         </div>
-        <div className="w-40 border-b border-l border-gray-400">
-          <p>Info</p>
+        <div className="w-60 border-b border-l border-gray-400 bg-slate-100 flex flex-col text-center">
+          <strong className="text-center mb-4">Info</strong>
           {activeWord ? (
             <>
+              {/* Word and maybe original word */}
               <div className={`group btn sz-sm m-1 ${getWordColor(activeWord)}`}>
                 <span className={activeWord.hidden ? "line-through" : ""}>
                   {activeWord.overwrite || activeWord.text}
                 </span>
               </div>
-              <div onClick={moveWords(activeWord.id, "up", false)} onKeyDown={moveWords(activeWord.id, "up", false)}>
-                Move up to next sentence
+              {activeWord.overwrite && (
+                <>
+                  <i>Original:</i>{" "}
+                  <div className={`group btn sz-sm m-1 ${getWordColor(activeWord, true)}`}>
+                    <span className={activeWord.hidden ? "line-through" : ""}>{activeWord.text}</span>
+                  </div>
+                </>
+              )}
+
+              {/* Move and hide */}
+              <div
+                onClick={moveWords(activeWord.id, "up", false)}
+                onKeyDown={moveWords(activeWord.id, "up", false)}
+                className="mt-4"
+              >
+                Move up to previous sentence
               </div>
               <div onClick={moveWords(activeWord.id, "up", true)} onKeyDown={moveWords(activeWord.id, "up", true)}>
                 Move up to new sentence
               </div>
-              <div>
+              <div className="mt-4 mb-4">
                 <span
-                  className="border-l pl-1 w-3"
                   onClick={() => {
                     toggleWordHidden(activeWord.id);
                   }}

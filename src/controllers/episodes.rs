@@ -5,6 +5,7 @@ use axum::extract::Query;
 use axum::{debug_handler, Extension};
 use loco_rs::controller::middleware;
 use loco_rs::prelude::*;
+use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use tantivy::collector::TopDocs;
@@ -107,6 +108,7 @@ pub async fn get_display(
     let episode = load_item(&ctx, id).await?;
     let parts = PartsNS::Entity::find()
         .filter(PartsNS::Column::EpisodeId.eq(id))
+        .order_by_asc(PartsNS::Column::StartsAt)
         .all(&ctx.db)
         .await?;
 

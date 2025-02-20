@@ -1,3 +1,4 @@
+import { SentenceBreaker } from "../../common/SentenceBreaker";
 import { Timestamp } from "../../common/Timestamp";
 import type { ReducedPart, SpeakerPart } from "./Transcript";
 
@@ -12,7 +13,9 @@ export const SpeakerPartComponent = ({ part, isLastRow }: SpeakerPartsParams) =>
       <div className="w-20 text-right">
         <Timestamp seconds={part.start} />
       </div>
-      <div className="flex-1 ml-2">{part.text}</div>
+      <div className="flex-1 ml-2">
+        <SentenceBreaker text={part.text} />
+      </div>
     </div>
   );
 };

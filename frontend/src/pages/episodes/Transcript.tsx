@@ -12,6 +12,7 @@ export interface SpeakerPart {
   id: number;
   speaker: string;
   speaker_id: number;
+  part_type: number;
   parts: ReducedPart[];
 }
 
@@ -28,6 +29,7 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
   }
 
   let lastSpeaker = "";
+  let lastType = 0;
   const newParts: SpeakerPart[] = [];
   for (const part of parts) {
     if (!part.text) {
@@ -41,14 +43,16 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
       start: part.starts_at,
     };
 
-    if (speaker === lastSpeaker) {
+    if (speaker === lastSpeaker && part.part_type === lastType) {
       newParts[newParts.length - 1].parts.push(somepart);
     } else {
       lastSpeaker = speaker;
+      lastType = part.part_type;
       newParts.push({
         id: part.id,
         speaker: speaker,
         speaker_id: part.episode_speaker_id,
+        part_type: part.part_type,
         parts: [somepart],
       });
     }

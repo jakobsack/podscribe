@@ -58,8 +58,8 @@ export function SentenceEditFormComponent({
           </span>
         </div>
         <div className="w-48 flex-0">
-          {isFirst ? (
-            sentence.move_sentence === "up" ? (
+          {isFirst &&
+            (sentence.move_sentence === "up" ? (
               <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
@@ -70,13 +70,10 @@ export function SentenceEditFormComponent({
               >
                 Append above
               </span>
-            )
-          ) : (
-            <></>
-          )}
-          {isFirst && isLast ? <br /> : <></>}
-          {isLast ? (
-            sentence.move_sentence === "down" ? (
+            ))}
+          {isFirst && isLast && <br />}
+          {isLast &&
+            (sentence.move_sentence === "down" ? (
               <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
@@ -87,14 +84,11 @@ export function SentenceEditFormComponent({
               >
                 Prepend below
               </span>
-            )
-          ) : (
-            <></>
-          )}
+            ))}
         </div>
         <div className="w-48 flex-0">
-          {isFirst ? (
-            sentence.move_sentence === "upnew" ? (
+          {isFirst &&
+            (sentence.move_sentence === "upnew" ? (
               <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
@@ -105,13 +99,10 @@ export function SentenceEditFormComponent({
               >
                 Move up
               </span>
-            )
-          ) : (
-            <></>
-          )}
-          {isFirst && isLast ? <br /> : <></>}
-          {isLast ? (
-            sentence.move_sentence === "downnew" ? (
+            ))}
+          {isFirst && isLast && <br />}
+          {isLast &&
+            (sentence.move_sentence === "downnew" ? (
               <span onClick={moveSentence(sentence.sentence.id, "")} onKeyDown={moveSentence(sentence.sentence.id, "")}>
                 Undo move
               </span>
@@ -122,10 +113,7 @@ export function SentenceEditFormComponent({
               >
                 Move down
               </span>
-            )
-          ) : (
-            <></>
-          )}
+            ))}
         </div>
       </div>
       <div

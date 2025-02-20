@@ -885,3 +885,7 @@ p+p {
   list-style: decimal;
   @apply ml-5;
 }
+
+.timestamp {
+  font-family: GeistMono;
+}

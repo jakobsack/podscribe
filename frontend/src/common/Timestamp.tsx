@@ -13,10 +13,10 @@ export const Timestamp = ({ seconds, includeHundredth }: TimestampParams) => {
   const displayHours = calcHours ? `${calcHours}:` : "";
 
   return (
-    <>
+    <span className="timestamp">
       {displayHours}
       {displayMinutes}
       {displaySeconds}
-    </>
+    </span>
   );
 };
