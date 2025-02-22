@@ -292,11 +292,11 @@ pub async fn ui_update(
         if old_starts_at == old_ends_at {
             // We just created this part
             target_part.starts_at = Set(ui_sentence.words[0].starts_at);
-            target_part.ends_at = Set(ui_sentence.words[ui_sentence.words.len()].ends_at);
+            target_part.ends_at = Set(ui_sentence.words[ui_sentence.words.len() - 1].ends_at);
             target_part.text = Set(new_text)
         } else if ui_sentence.move_sentence.as_deref() == Some("up") {
             // We are appending to the previous
-            target_part.ends_at = Set(ui_sentence.words[ui_sentence.words.len()].ends_at);
+            target_part.ends_at = Set(ui_sentence.words[ui_sentence.words.len() - 1].ends_at);
             let text = vec![old_text, new_text]
                 .iter()
                 .filter(|x| !x.is_empty())
@@ -371,6 +371,7 @@ pub async fn ui_update(
         original_part.ends_at = Set(last_sentence.words[last_sentence.words.len() - 1].ends_at);
         original_part.text = Set(complete_text.clone());
         original_part.part_type = Set(params.part.part_type);
+        original_part.episode_speaker_id = Set(params.part.episode_speaker_id);
         let original_part = original_part.update(&ctx.db).await?;
 
         // Tantivy update index
@@ -453,6 +454,7 @@ async fn create_part(part: &Model, ctx: &AppContext) -> Result<Model> {
         ..Default::default()
     };
     item.text = Set("".into());
+    item.part_type = Set(part.part_type);
     item.starts_at = Set(part.starts_at);
     item.ends_at = Set(part.starts_at);
     item.episode_speaker_id = Set(part.episode_speaker_id);

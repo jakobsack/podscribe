@@ -18,8 +18,9 @@ async function fixFile(file) {
       }
 
       return true;
-    }
-    )
+    })
+
+    part.text = part.sentences.map((x) => x.text).join(' ')
   }
 
   // Remove parts without sentences

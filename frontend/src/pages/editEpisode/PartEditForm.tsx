@@ -270,7 +270,7 @@ export const PartEditFormComponent = ({
     <div className="flex-1">
       <div className="flex flex-row">
         <div className="flex-1">
-          {part.sentences.length && part.sentences[0].move_sentence?.startsWith("up") && (
+          {!!part.sentences.length && part.sentences[0].move_sentence?.startsWith("up") && (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
               <SentenceEditFormComponent
@@ -324,7 +324,7 @@ export const PartEditFormComponent = ({
                 );
               })}
           </div>
-          {part.sentences.length && part.sentences[part.sentences.length - 1].move_sentence?.startsWith("down") && (
+          {!!part.sentences.length && part.sentences[part.sentences.length - 1].move_sentence?.startsWith("down") && (
             <div className="flex flex-row">
               <div className="bg-purple-600 w-4" />
               <SentenceEditFormComponent
