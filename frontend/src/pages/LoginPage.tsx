@@ -1,6 +1,7 @@
 import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
-import { Form, Navigate, useActionData } from "react-router-dom";
+import { Form, Navigate, redirect, useActionData, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export const loginAction = (async (event: ActionFunctionArgs) => {
   const formData = await event.request.formData();
@@ -23,16 +24,22 @@ export const LoginPage = () => {
   const { setToken } = useAuth();
 
   const actionData = useActionData() as LoginParams;
+  const navigate = useNavigate();
 
-  if (actionData?.token) {
-    setToken(actionData.token);
-    return <Navigate to="/" replace />;
-  }
+  useEffect(() => {
+    if (actionData?.token) {
+      setToken(actionData.token);
+      navigate("/", { replace: true });
+    }
+  }, [actionData, setToken, navigate]);
 
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto px-6 max-w-xl md:px-12">
+          <h1 className="podscribe">Login</h1>
+          <p>Please enter your credentials.</p>
+
           <Form method="post">
             <div className="flex flex-col">
               <div className="flex flex-row">
@@ -44,7 +51,7 @@ export const LoginPage = () => {
                     type="text"
                     name="email"
                     id="formEmail"
-                    className="border border-gray-300"
+                    className="input variant-outlined border border-gray-300 p-1"
                     placeholder="email@domain.com"
                   />
                 </div>
@@ -53,16 +60,18 @@ export const LoginPage = () => {
                 <div className="w-40">
                   <label htmlFor="formPassword">Password</label>
                 </div>
-                <input
-                  type="password"
-                  className="border border-gray-300"
-                  name="password"
-                  id="formPassword"
-                  placeholder="password"
-                />
+                <div className="flex-1">
+                  <input
+                    type="password"
+                    className="input variant-outlined border border-gray-300 p-1"
+                    name="password"
+                    id="formPassword"
+                    placeholder="password"
+                  />
+                </div>
               </div>
               <div className="flex flex-row pt-2">
-                <button type="submit" className="btn bg-primary-500 text-white p-1">
+                <button type="submit" className="btn variant-primary p-1">
                   Login
                 </button>
               </div>

@@ -68,12 +68,12 @@ export const SearchComponent = () => {
                   type="text"
                   name="query"
                   id="formQuery"
-                  className="border border-gray-300 rounded-md w-80 p-1"
+                  className="input variant-outlined border border-gray-300 p-1"
                   placeholder="Search"
                   defaultValue=""
                 />
               </div>
-              <button type="submit" className="btn bg-primary-500 text-white p-1 ml-2">
+              <button type="submit" className="btn variant-primary p-1 ml-2">
                 Search
               </button>
             </div>
@@ -82,12 +82,12 @@ export const SearchComponent = () => {
 
         {actionData && episodesInOrder && partsInOrder && (
           <div className="mx-auto px-6 max-w-7xl md:px-12">
-            <h2 className="text-2xl text-title font-semibold pb-2 underline">Search results</h2>
+            <h2 className="podscribe">Search results</h2>
 
             {episodesInOrder.length ? (
               episodesInOrder.map((episode) => (
                 <>
-                  <h3 key={episode.id} className="text-xl text-title pt-2 pb-4 underline">
+                  <h3 key={episode.id} className="podscribe">
                     {episode.title}
                   </h3>
 

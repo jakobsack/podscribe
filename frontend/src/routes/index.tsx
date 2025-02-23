@@ -11,9 +11,9 @@ import { editSpeakerAction } from "../pages/speakers/EditSpeaker";
 import { EpisodeViewComponent, episodeViewLoader } from "../pages/episodes/EpisodeView";
 import { EpisodesComponent, episodesLoader } from "../pages/episodes/Episodes";
 import { episodeAction, EpisodeComponent, episodeLoader } from "../pages/editEpisode/Episode";
-import { editEpisodeSpeakerAction } from "../pages/editEpisode/EditEpisodeSpeaker";
-import { editPartAction } from "../pages/editEpisode/EditPart";
 import { searchAction, SearchComponent } from "../pages/search/Search";
+import { Layout } from "../layouts/Layout";
+import { WelcomeGuestPage } from "../pages/WelcomeGuestPage";
 
 export const Routes = () => {
   const { token } = useAuth();
@@ -33,66 +33,56 @@ export const Routes = () => {
   // Define routes accessible only to authenticated users
   const routesForAuthenticatedOnly = [
     {
-      path: "/",
-      element: <MainLayout />, // Wrap the component in ProtectedRoute
-      errorElement: <ErrorPage />,
-      children: [
-        {
-          path: "",
-          element: <WelcomePage />,
-        },
-        {
-          path: "speakers",
-          element: <SpeakersComponent />,
-          loader: speakersLoader,
-          action: speakersAction,
-          children: [{ path: ":speakerId/edit", action: editSpeakerAction }],
-        },
-        { path: "episodes", element: <EpisodesComponent />, loader: episodesLoader },
-        { path: "search", element: <SearchComponent />, action: searchAction },
-        {
-          path: "episodes/:episodeId",
-          element: <EpisodeViewComponent />,
-          loader: episodeViewLoader,
-        },
-        {
-          path: "episodes/:episodeId/edit",
-          element: <EpisodeComponent />,
-          action: episodeAction,
-          loader: episodeLoader,
-        },
-        {
-          path: "/logout",
-          element: <LogoutPage />,
-        },
-      ],
+      path: "",
+      element: <WelcomePage />,
+    },
+    {
+      path: "speakers",
+      element: <SpeakersComponent />,
+      loader: speakersLoader,
+      action: speakersAction,
+      children: [{ path: ":speakerId/edit", action: editSpeakerAction }],
+    },
+    { path: "episodes", element: <EpisodesComponent />, loader: episodesLoader },
+    { path: "search", element: <SearchComponent />, action: searchAction },
+    {
+      path: "episodes/:episodeId",
+      element: <EpisodeViewComponent />,
+      loader: episodeViewLoader,
+    },
+    {
+      path: "episodes/:episodeId/edit",
+      element: <EpisodeComponent />,
+      action: episodeAction,
+      loader: episodeLoader,
+    },
+    {
+      path: "/logout",
+      element: <LogoutPage />,
     },
   ];
 
   // Define routes accessible only to non-authenticated users
   const routesForNotAuthenticatedOnly = [
     {
-      path: "/",
-      element: <GuestLayout />,
-      errorElement: <ErrorPage />,
-      children: [
-        {
-          path: "",
-          element: <div>Welcome</div>,
-        },
-        {
-          path: "/login",
-          element: <LoginPage />,
-          action: loginAction,
-        },
-      ],
+      path: "",
+      element: <WelcomeGuestPage />,
+    },
+    {
+      path: "/login",
+      element: <LoginPage />,
+      action: loginAction,
     },
   ];
 
   // Combine and conditionally include routes based on authentication status
   const router = createBrowserRouter([
-    ...routesForPublic,
-    ...(token ? routesForAuthenticatedOnly : routesForNotAuthenticatedOnly),
+    {
+      path: "/",
+      element: <Layout />, // Wrap the component in ProtectedRoute
+      errorElement: <ErrorPage />,
+      children: [...routesForPublic, ...(token ? routesForAuthenticatedOnly : routesForNotAuthenticatedOnly)],
+    },
   ]);
 
   // Provide the router configuration using RouterProvider

@@ -141,6 +141,7 @@ pub async fn get_display(
 
     let words = WordsNS::Entity::find()
         .filter(WordsNS::Column::SentenceId.is_in(sentence_ids))
+        .order_by_asc(WordsNS::Column::StartsAt)
         .all(&ctx.db)
         .await?;
 

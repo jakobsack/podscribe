@@ -877,6 +877,10 @@ h2.podscribe {
   @apply text-2xl text-title font-semibold pb-2 underline mt-5;
 }
 
+h3.podscribe {
+  @apply text-xl text-title pt-2 pb-4 underline
+}
+
 p+p {
   @apply pt-2
 }
