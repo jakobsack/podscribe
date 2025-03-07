@@ -1,4 +1,10 @@
 # Loco configuration file documentation
+# Our own settings
+settings:
+  # "From" address of sent emails
+  from_address: mail@example.com
+  # Website URL used in emails
+  website_url: http://localhost:5150
 
 # Application logging configuration
 logger:

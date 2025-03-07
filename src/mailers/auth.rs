@@ -4,7 +4,7 @@
 use loco_rs::prelude::*;
 use serde_json::json;
 
-use crate::models::users;
+use crate::{common::settings::Settings, models::users};
 
 static welcome: Dir<'_> = include_dir!("src/mailers/auth/welcome");
 static forgot: Dir<'_> = include_dir!("src/mailers/auth/forgot");
@@ -26,11 +26,12 @@ impl AuthMailer {
             ctx,
             &welcome,
             mailer::Args {
+                from: get_from_address(ctx)?,
                 to: user.email.to_string(),
                 locals: json!({
                   "name": user.name,
                   "verifyToken": user.email_verification_token,
-                  "domain": ctx.config.server.full_url()
+                  "website_url": get_website_url(ctx)?
                 }),
                 ..Default::default()
             },
@@ -50,11 +51,12 @@ impl AuthMailer {
             ctx,
             &forgot,
             mailer::Args {
+                from: get_from_address(ctx)?,
                 to: user.email.to_string(),
                 locals: json!({
                   "name": user.name,
                   "resetToken": user.reset_token,
-                  "domain": ctx.config.server.full_url()
+                  "website_url": get_website_url(ctx)?
                 }),
                 ..Default::default()
             },
@@ -74,13 +76,14 @@ impl AuthMailer {
             ctx,
             &magic_link,
             mailer::Args {
+                from: get_from_address(ctx)?,
                 to: user.email.to_string(),
                 locals: json!({
                   "name": user.name,
                   "token": user.magic_link_token.clone().ok_or_else(|| Error::string(
                             "the user model not contains magic link token",
                     ))?,
-                  "host": ctx.config.server.full_url()
+                  "website_url": get_website_url(ctx)?
                 }),
                 ..Default::default()
             },
@@ -89,4 +92,22 @@ impl AuthMailer {
 
         Ok(())
     }
+}
+
+fn get_from_address(ctx: &AppContext) -> Result<Option<String>> {
+    if let Some(settings) = &ctx.config.settings {
+        let settings = Settings::from_json(settings)?;
+        return Ok(settings.from_address);
+    }
+
+    Ok(None)
+}
+
+fn get_website_url(ctx: &AppContext) -> Result<Option<String>> {
+    if let Some(settings) = &ctx.config.settings {
+        let settings = Settings::from_json(settings)?;
+        return Ok(settings.website_url);
+    }
+
+    Ok(Some(ctx.config.server.full_url()))
 }

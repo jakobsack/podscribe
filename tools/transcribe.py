@@ -110,7 +110,9 @@ def run():
                 )
                 continue
 
-            sentence_duration = section_result["offsets"]["to"] - section_result["offsets"]["from"]
+            sentence_duration = (
+                section_result["offsets"]["to"] - section_result["offsets"]["from"]
+            )
             if sentence_duration <= 0:
                 log("Skipping section in file {i}.wav.json that has length 0")
                 continue
@@ -146,8 +148,10 @@ def run():
                 {
                     "text": section_result["text"].strip(),
                     "words": words,
-                    "start": (section_result["offsets"]["from"] / 1000.0) + section["start"],
-                    "end": (section_result["offsets"]["to"] / 1000.0) + section["start"],
+                    "start": (section_result["offsets"]["from"] / 1000.0)
+                    + section["start"],
+                    "end": (section_result["offsets"]["to"] / 1000.0)
+                    + section["start"],
                     "words_per_second": words_per_second,
                 }
             )
@@ -156,9 +160,22 @@ def run():
             {**section, "text": text.strip(), "sentences": sentences}
         )
 
+    # Dump output
+    log("Transcription complete, writing file")
     with open(complete_json, mode="w", encoding="utf-8") as outfile:
         outfile.write(json.dumps(data, indent=2))
         outfile.write("\n")
+
+    # Clean files (wav is big and easy to recreate)
+    log("Cleaning up wav files")
+    files = os.listdir(str(output_folder))
+    for file in files:
+        file_path = f"{output_folder}/{file}"
+        if not os.path.isfile(file_path) or not file.endswith(".wav"):
+            continue
+
+        os.unlink(file_path)
+    log("Done")
 
 
 def convert_to_wav(mp3_file, output_folder):
@@ -185,6 +202,7 @@ def convert_to_wav(mp3_file, output_folder):
     log(f"Executing: {' '.join(command)}")
     _ = subprocess.check_output(command)
 
+
 def convert_to_mp3(output_folder):
     wav_file = output_folder.joinpath("converted.wav")
     output_file = output_folder.joinpath("tiny.mp3")
@@ -205,6 +223,7 @@ def convert_to_mp3(output_folder):
     ]
     log(f"Executing: {' '.join(command)}")
     _ = subprocess.check_output(command)
+
 
 def run_diarization(output_folder):
     global pipeline
