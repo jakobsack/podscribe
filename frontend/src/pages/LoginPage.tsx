@@ -23,7 +23,7 @@ interface LoginParams {
 export const LoginPage = () => {
   const { setToken } = useAuth();
 
-  const actionData = useActionData() as LoginParams;
+  const actionData = useActionData() as LoginParams | undefined;
   const navigate = useNavigate();
 
   useEffect(() => {

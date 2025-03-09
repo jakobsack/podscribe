@@ -14,6 +14,7 @@ import { episodeAction, EpisodeComponent, episodeLoader } from "../pages/editEpi
 import { searchAction, SearchComponent } from "../pages/search/Search";
 import { Layout } from "../layouts/Layout";
 import { WelcomeGuestPage } from "../pages/WelcomeGuestPage";
+import { signUpAction, SignUpPage } from "../pages/SignUpPage";
 
 export const Routes = () => {
   const { token } = useAuth();
@@ -72,6 +73,11 @@ export const Routes = () => {
       path: "/login",
       element: <LoginPage />,
       action: loginAction,
+    },
+    {
+      path: "/signup",
+      element: <SignUpPage />,
+      action: signUpAction,
     },
   ];
 

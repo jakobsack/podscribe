@@ -43,9 +43,11 @@ export const Layout = () => {
           <span className="btn-label">Login</span>
         </button>
       </Link>
-      <button className="btn variant-neutral sz-sm" type="button">
-        <span>Sign Up</span>
-      </button>
+      <Link to={"signup"}>
+        <button className="btn variant-neutral sz-sm" type="button">
+          <span className="btn-label">Sign Up</span>
+        </button>
+      </Link>
     </div>
   );
 
