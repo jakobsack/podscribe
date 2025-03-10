@@ -185,7 +185,7 @@ pub async fn search(
         .map_err(|e| Error::Message(e.to_string()))?;
 
     let top_docs = searcher
-        .search(&query, &TopDocs::with_limit(10))
+        .search(&query, &TopDocs::with_limit(50))
         .map_err(|e| Error::Message(e.to_string()))?;
 
     let mut search_results: Vec<SearchDocument> = vec![];
