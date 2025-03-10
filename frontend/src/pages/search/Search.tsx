@@ -2,8 +2,8 @@ import type { ActionFunctionArgs, ActionFunction } from "react-router-dom";
 import { Form, useActionData } from "react-router-dom";
 import { jwtFetch } from "../../common/jwtFetch";
 import type { Episode, Part } from "../../definitions";
-import { SpeakerPartsComponent } from "../episodes/SpeakerParts";
 import { SpeakerPartComponent } from "../episodes/SpeakerPart";
+import React from "react";
 
 interface SearchResult {
   episodes: Episode[];
@@ -86,12 +86,10 @@ export const SearchComponent = () => {
 
             {episodesInOrder.length ? (
               episodesInOrder.map((episode) => (
-                <>
-                  <h3 key={episode.id} className="podscribe">
-                    {episode.title}
-                  </h3>
+                <React.Fragment key={episode.id}>
+                  <h3 className="podscribe">{episode.title}</h3>
 
-                  <div key={episode.id} className="flex flex-col">
+                  <div className="flex flex-col">
                     {partsInOrder
                       .filter((x) => x.episode_id === episode.id)
                       .map((part, i, a) => (
@@ -102,7 +100,7 @@ export const SearchComponent = () => {
                         />
                       ))}
                   </div>
-                </>
+                </React.Fragment>
               ))
             ) : (
               <p>Sorry, we did not find any results.</p>
