@@ -1,8 +1,20 @@
-import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
+import { jwtDecode } from "jwt-decode";
+import { useEffect } from "react";
 
 export const Layout = () => {
-  const { token } = useAuth();
+  const { token, setToken } = useAuth();
+
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode(token);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        console.log("Session expired, logging out");
+        setToken(null);
+      }
+    }
+  }, [token, setToken]);
 
   const navBar = token ? (
     <>

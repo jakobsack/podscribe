@@ -2,8 +2,6 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { loginAction, LoginPage } from "../pages/LoginPage";
 import { LogoutPage } from "../pages/LogoutPage";
-import { MainLayout } from "../layouts/MainLayout";
-import { GuestLayout } from "../layouts/GuestLayout";
 import { ErrorPage } from "../pages/ErrorPage";
 import { WelcomePage } from "../pages/WelcomePage";
 import { speakersAction, SpeakersComponent, speakersLoader } from "../pages/speakers/SpeakersPage";
@@ -15,6 +13,7 @@ import { searchAction, SearchComponent } from "../pages/search/Search";
 import { Layout } from "../layouts/Layout";
 import { WelcomeGuestPage } from "../pages/WelcomeGuestPage";
 import { signUpAction, SignUpPage } from "../pages/SignUpPage";
+import { verifyLoader, VerifyPage } from "../pages/VerifyPage";
 
 export const Routes = () => {
   const { token } = useAuth();
@@ -78,6 +77,11 @@ export const Routes = () => {
       path: "/signup",
       element: <SignUpPage />,
       action: signUpAction,
+    },
+    {
+      path: "/verify/:verificationToken",
+      element: <VerifyPage />,
+      loader: verifyLoader,
     },
   ];
 

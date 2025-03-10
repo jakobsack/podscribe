@@ -18,7 +18,6 @@ export const episodeLoader = (async (args: LoaderFunctionArgs) => {
 }) satisfies LoaderFunction;
 
 export const episodeAction = (async (event: ActionFunctionArgs) => {
-  console.log(event);
   const formData = await event.request.formData();
 
   const pressedButton = formData.get("function");
