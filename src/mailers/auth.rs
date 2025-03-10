@@ -31,7 +31,7 @@ impl AuthMailer {
                 locals: json!({
                   "name": user.name,
                   "verifyToken": user.email_verification_token,
-                  "website_url": get_website_url(ctx)?
+                  "websiteUrl": get_website_url(ctx)?
                 }),
                 ..Default::default()
             },
@@ -56,7 +56,7 @@ impl AuthMailer {
                 locals: json!({
                   "name": user.name,
                   "resetToken": user.reset_token,
-                  "website_url": get_website_url(ctx)?
+                  "websiteUrl": get_website_url(ctx)?
                 }),
                 ..Default::default()
             },
@@ -83,7 +83,7 @@ impl AuthMailer {
                   "token": user.magic_link_token.clone().ok_or_else(|| Error::string(
                             "the user model not contains magic link token",
                     ))?,
-                  "website_url": get_website_url(ctx)?
+                  "websiteUrl": get_website_url(ctx)?
                 }),
                 ..Default::default()
             },
