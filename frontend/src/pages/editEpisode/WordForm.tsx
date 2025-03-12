@@ -29,7 +29,12 @@ export const WordFormComponent = ({ word, saveFunction }: WordFormParams) => {
   };
 
   return showEdit ? (
-    <input type="text" defaultValue={word.overwrite || word.text} onKeyDown={keyDown} className="w-20" />
+    <input
+      type="text"
+      defaultValue={word.overwrite || word.text}
+      onKeyDown={keyDown}
+      className="w-20 bg-white text-black"
+    />
   ) : (
     <span onClick={toggleShowEdit} onKeyDown={toggleShowEdit} className={word.hidden ? "line-through" : ""}>
       {word.overwrite || word.text}

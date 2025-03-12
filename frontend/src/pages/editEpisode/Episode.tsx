@@ -215,7 +215,7 @@ export const EpisodeComponent = () => {
                         key={x.id}
                         onClick={selectHighlightedSpeaker(x.id)}
                         onKeyDown={selectHighlightedSpeaker(x.id)}
-                        className={highlightedSpeaker === x.id ? "bg-slate-100" : ""}
+                        className={highlightedSpeaker === x.id ? "bg-slate-100 dark:bg-slate-800" : ""}
                       >
                         <EpisodeSpeakerComponent episodeSpeaker={x} speakers={episode.speakers} />
                       </li>
@@ -227,7 +227,7 @@ export const EpisodeComponent = () => {
               <h2 className="podscribe">Transcript</h2>
 
               <p>When editing the probability of the word is encoded in the color.</p>
-              <div className="flex flex-row flex-wrap">
+              <div className="mt-3 mb-3 flex flex-row flex-wrap">
                 <div className="group btn sz-sm m-1 bg-gray-200 dark:bg-gray-700">manual</div>
                 <div className="group btn sz-sm m-1 bg-blue-200 dark:bg-blue-700">&gt; 99%</div>
                 <div className="group btn sz-sm m-1 bg-green-200 dark:bg-green-700">&gt; 90%</div>

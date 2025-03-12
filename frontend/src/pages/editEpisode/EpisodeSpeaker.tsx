@@ -35,7 +35,7 @@ export const EpisodeSpeakerComponent = ({ episodeSpeaker, speakers }: EpisodeSpe
               ))}
             </select>
             <input type="hidden" name="episodeSpeakerId" value={episodeSpeaker.id} />
-            <button type="submit" name="function" value="editEpisodeSpeaker" className="btn variant-primary">
+            <button type="submit" name="function" value="editEpisodeSpeaker" className="btn variant-primary ml-3 p-1">
               Update
             </button>
             <button
