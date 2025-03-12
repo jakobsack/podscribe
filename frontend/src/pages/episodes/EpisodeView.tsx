@@ -27,7 +27,7 @@ export const EpisodeViewComponent = () => {
     return (
       <section className="relative">
         <div className="relative">
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <strong>Loading</strong>
           </div>
         </div>
@@ -38,7 +38,7 @@ export const EpisodeViewComponent = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
           <h1 className="podscribe">{episode.episode.title}</h1>
 
           <p>
@@ -47,20 +47,20 @@ export const EpisodeViewComponent = () => {
             </Link>
           </p>
 
-          <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-start lg:gap-12">
-            <div className="lg:pr-24 pt-2">
+          <div className="grid items-start gap-12 md:grid-cols-2 md:gap-0 lg:gap-12">
+            <div className="pt-2 lg:pr-24">
               <Markdown className="markdown">{episode.episode.description}</Markdown>
             </div>
             <div className="card variant-outlined overflow-hidden ">
-              <h3 className="text-xl text-title font-semibold pb-2 underline">Speakers</h3>
+              <h3 className="pb-2 font-semibold text-title text-xl underline">Speakers</h3>
 
-              <ul className="mt-8 divide-y border-y *:py-1 *:flex *:items-center *:gap-3">
+              <ul className="mt-8 divide-y border-y *:flex *:items-center *:gap-3 *:py-1">
                 {episode.episode_speakers.map((x) => (
                   <li
                     key={x.id}
                     onClick={selectHighlightedSpeaker(x.id)}
                     onKeyDown={selectHighlightedSpeaker(x.id)}
-                    className={highlightedSpeaker === x.id ? "bg-slate-100" : ""}
+                    className={highlightedSpeaker === x.id ? "bg-slate-100 dark:bg-slate-800" : ""}
                   >
                     {episode.speakers.find((y) => y.id === x.speaker_id)?.name}
                   </li>

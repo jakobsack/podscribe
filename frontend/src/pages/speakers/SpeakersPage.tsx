@@ -35,7 +35,7 @@ export const SpeakersComponent = () => {
     return (
       <section className="relative">
         <div className="relative">
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h1 className="podscribe">Speakers</h1>
 
             <p>Loading</p>
@@ -61,14 +61,14 @@ export const SpeakersComponent = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
           <h1 className="podscribe">Speakers</h1>
 
           {speakers.length ? (
             <>
               <p>Here you can find all speakers in all episodes.</p>
 
-              <ul className="mt-8 divide-y border-y *:py-3 *:flex *:items-center *:gap-3">
+              <ul className="mt-8 divide-y border-y *:flex *:items-center *:gap-3 *:py-3">
                 {speakers.map((x) => (
                   <li key={x.id}>
                     <SpeakerDetailComponent speaker={x} />
@@ -93,7 +93,7 @@ export const SpeakersComponent = () => {
                       type="text"
                       name="name"
                       id="formName"
-                      className="input variant-outlined border border-gray-300 p-1"
+                      className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600"
                       placeholder="Name"
                     />
                   </div>
@@ -104,7 +104,7 @@ export const SpeakersComponent = () => {
                   </div>
                   <div className="flex-1">
                     <textarea
-                      className="textarea variant-outlined border border-gray-300 p-1 h-48"
+                      className="textarea variant-outlined h-48 border border-gray-300 p-1 dark:border-gray-600"
                       name="description"
                       id="formDescription"
                       placeholder="Description (optional)"
@@ -119,7 +119,7 @@ export const SpeakersComponent = () => {
                   {!!speakers.length && (
                     <button
                       type="button"
-                      className="btn variant-soft p-1 ml-5"
+                      className="btn variant-soft ml-5 p-1"
                       onClick={toggleShowForm}
                       onKeyDown={toggleShowForm}
                     >

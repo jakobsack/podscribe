@@ -36,7 +36,7 @@ export const LoginPage = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-xl md:px-12">
+        <div className="mx-auto max-w-xl px-6 md:px-12">
           <h1 className="podscribe">Login</h1>
           <p>Please enter your credentials.</p>
 
@@ -51,7 +51,7 @@ export const LoginPage = () => {
                     type="text"
                     name="email"
                     id="formEmail"
-                    className="input variant-outlined border border-gray-300 p-1"
+                    className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600 "
                     placeholder="email@domain.com"
                   />
                 </div>
@@ -63,7 +63,7 @@ export const LoginPage = () => {
                 <div className="flex-1">
                   <input
                     type="password"
-                    className="input variant-outlined border border-gray-300 p-1"
+                    className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600 "
                     name="password"
                     id="formPassword"
                     placeholder="password"

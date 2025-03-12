@@ -272,7 +272,7 @@ export const PartEditFormComponent = ({
         <div className="flex-1">
           {!!part.sentences.length && part.sentences[0].move_sentence?.startsWith("up") && (
             <div className="flex flex-row">
-              <div className="bg-purple-600 w-4" />
+              <div className="w-4 bg-purple-600 dark:bg-purple-300" />
               <SentenceEditFormComponent
                 key={part.sentences[0].sentence.id}
                 sentence={part.sentences[0]}
@@ -288,8 +288,8 @@ export const PartEditFormComponent = ({
             </div>
           )}
           <div className="flex-1">
-            <div className="bg-purple-200 flex-1">
-              <div className="flex-1 ml-4 flex flex-row">
+            <div className="flex-1 bg-purple-200 dark:bg-purple-700">
+              <div className="ml-4 flex flex-1 flex-row">
                 <div>
                   <PartSpeakerComponent
                     speakerId={part.part.episode_speaker_id}
@@ -308,7 +308,7 @@ export const PartEditFormComponent = ({
               .map((sentence, i) => {
                 return (
                   <div key={sentence.sentence.id} className="flex flex-row">
-                    <div className="bg-purple-200 w-4" />
+                    <div className="w-4 bg-purple-200 dark:bg-purple-700" />
                     <SentenceEditFormComponent
                       sentence={sentence}
                       toggleSentenceHidden={toggleSentenceHidden}
@@ -326,7 +326,7 @@ export const PartEditFormComponent = ({
           </div>
           {!!part.sentences.length && part.sentences[part.sentences.length - 1].move_sentence?.startsWith("down") && (
             <div className="flex flex-row">
-              <div className="bg-purple-600 w-4" />
+              <div className="w-4 bg-purple-600 dark:bg-purple-300" />
               <SentenceEditFormComponent
                 key={part.sentences[part.sentences.length - 1].sentence.id}
                 sentence={part.sentences[part.sentences.length - 1]}
@@ -342,8 +342,8 @@ export const PartEditFormComponent = ({
             </div>
           )}
         </div>
-        <div className="w-60 border-b border-l border-gray-400 bg-slate-100 flex flex-col text-center">
-          <strong className="text-center mb-4">Info</strong>
+        <div className="flex w-60 flex-col border-gray-400 border-b border-l bg-slate-100 text-center dark:border-gray-500 dark:bg-slate-800">
+          <strong className="mb-4 text-center">Info</strong>
           {activeWord ? (
             <>
               {/* Word and maybe original word */}
@@ -406,7 +406,7 @@ export const PartEditFormComponent = ({
           <div className="btn variant-neutral p-1" onClick={toggleShowEdit} onKeyDown={toggleShowEdit}>
             Cancel
           </div>
-          <button type="submit" name="function" value="editPart" className="btn variant-primary p-1 ml-3">
+          <button type="submit" name="function" value="editPart" className="btn variant-primary ml-3 p-1">
             Update
           </button>
         </div>

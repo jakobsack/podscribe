@@ -1,4 +1,4 @@
-import type { ActionFunction, ActionFunctionArgs } from "react-router-dom";
+import type { ActionFunctionArgs } from "react-router-dom";
 import { jwtFetch } from "../../common/jwtFetch";
 
 export const editEpisodeSpeakerAction = async (event: ActionFunctionArgs, formData: FormData) => {

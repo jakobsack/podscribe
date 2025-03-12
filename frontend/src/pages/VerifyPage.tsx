@@ -14,7 +14,7 @@ export const VerifyPage = () => {
     return (
       <section className="relative">
         <div className="relative">
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h1 className="podscribe">Verification succeeded</h1>
 
             <p>Thank you for verifying your email address. You are able to login now.</p>
@@ -27,7 +27,7 @@ export const VerifyPage = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
           <h1 className="podscribe">Verification failed</h1>
 
           <p>For some reason the verification failed. Sorry. Please contact the administrator.</p>

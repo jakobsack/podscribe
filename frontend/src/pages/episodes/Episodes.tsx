@@ -29,7 +29,7 @@ export const EpisodesComponent = () => {
     return (
       <section className="relative">
         <div className="relative">
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h1 className="podscribe">Episodes</h1>
 
             <p>Loading ...</p>
@@ -43,7 +43,7 @@ export const EpisodesComponent = () => {
     return (
       <section className="relative">
         <div className="relative">
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h1 className="podscribe">Episodes</h1>
             <p>No episodes have been imported yet</p>
           </div>
@@ -55,10 +55,10 @@ export const EpisodesComponent = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
           <h1 className="podscribe">Episodes</h1>
 
-          <ul className="mt-8 divide-y border-y *:py-3 *:flex *:items-center *:gap-3">
+          <ul className="mt-8 divide-y border-y *:flex *:items-center *:gap-3 *:py-3">
             {episodes.map((x) => (
               <li key={x.id}>
                 <Link to={`${x.id}`} className="hover:link">

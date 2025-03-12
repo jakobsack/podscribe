@@ -58,9 +58,9 @@ export const TranscriptTableComponent = ({
         return (
           <div
             key={x.id}
-            className={`flex flex-row items-stretch border-b-2 border-gray-300 ${x.episodeSpeakerId === highlightedSpeaker ? "bg-slate-100" : ""}`}
+            className={`flex flex-row items-stretch border-gray-300 border-b-2 dark:border-gray-600 ${x.episodeSpeakerId === highlightedSpeaker ? "bg-slate-100 dark:bg-slate-800" : ""}`}
           >
-            <div className="w-40 border-r border-gray-200">{x.speaker}</div>
+            <div className="w-40 border-gray-200 border-r dark:border-gray-700">{x.speaker}</div>
             <SpeakerPartsComponent
               parts={x.parts}
               episodeId={episode.id}

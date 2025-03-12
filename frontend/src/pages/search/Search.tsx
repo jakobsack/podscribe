@@ -53,13 +53,13 @@ export const SearchComponent = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
-          <h1 className="text-3xl text-title font-semibold pb-2 underline">Search</h1>
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
+          <h1 className="podscribe">Search</h1>
 
           <p>Welcome to the search page. You can use the box below to search for text in all episodes.</p>
 
           <Form method="post">
-            <div className="flex flex-row">
+            <div className="mt-3 flex flex-row">
               <div className="hidden w-40">
                 <label htmlFor="formQuery">Name</label>
               </div>
@@ -68,12 +68,12 @@ export const SearchComponent = () => {
                   type="text"
                   name="query"
                   id="formQuery"
-                  className="input variant-outlined border border-gray-300 p-1"
+                  className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600"
                   placeholder="Search"
                   defaultValue=""
                 />
               </div>
-              <button type="submit" className="btn variant-primary p-1 ml-2">
+              <button type="submit" className="btn variant-primary ml-2 p-1">
                 Search
               </button>
             </div>
@@ -81,7 +81,7 @@ export const SearchComponent = () => {
         </div>
 
         {actionData && episodesInOrder && partsInOrder && (
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h2 className="podscribe">Search results</h2>
 
             {episodesInOrder.length ? (

@@ -40,7 +40,7 @@ export const EpisodeSpeakerComponent = ({ episodeSpeaker, speakers }: EpisodeSpe
             </button>
             <button
               type="button"
-              className="btn variant-neutral p-1 ml-3"
+              className="btn variant-neutral ml-3 p-1"
               onClick={toggleShowEdit}
               onKeyDown={toggleShowEdit}
             >

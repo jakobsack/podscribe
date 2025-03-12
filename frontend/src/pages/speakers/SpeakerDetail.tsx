@@ -30,7 +30,7 @@ export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
 
   if (mode === "inline") {
     return (
-      <div className="flex flex-row w-full">
+      <div className="flex w-full flex-row">
         <div className="w-40">{speaker.name}</div>
         <div className="flex-1 truncate">{(speaker.description || "").split("\n")[0]}</div>
         <div className="w-20">
@@ -44,7 +44,7 @@ export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
 
   if (mode === "expand") {
     return (
-      <div className="flex flex-row w-full">
+      <div className="flex w-full flex-row">
         <div className="w-40">{speaker.name}</div>
         <div className="flex-1">
           <Markdown>{speaker.description}</Markdown>
@@ -70,7 +70,7 @@ export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
               type="text"
               name="name"
               id="formName"
-              className="input variant-outlined border border-gray-300 p-1"
+              className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600"
               placeholder="Name"
               defaultValue={speaker.name}
             />
@@ -82,7 +82,7 @@ export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
           </div>
           <div className="flex-1">
             <textarea
-              className="textarea variant-outlined border border-gray-300 p-1 h-48"
+              className="textarea variant-outlined h-48 border border-gray-300 p-1 dark:border-gray-600"
               name="description"
               id="formDescription"
               placeholder="Description (optional)"
@@ -97,7 +97,7 @@ export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
           </button>
           <button
             type="button"
-            className="btn variant-soft p-1 ml-5"
+            className="btn variant-soft ml-5 p-1"
             onClick={toggleShowEdit}
             onKeyDown={toggleShowEdit}
           >

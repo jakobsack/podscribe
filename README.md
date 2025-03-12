@@ -8,6 +8,8 @@ frontend is a React app written in TypeScript.
 
 Styling is done using [tailwindcss](https://tailwindcss.com/).
 
+Most SVG icons are inspired from icons on [SVG Repo](https://www.svgrepo.com).
+
 # Code quality
 
 I've been programming for years, but I'm relatively new to Rust, the Loco

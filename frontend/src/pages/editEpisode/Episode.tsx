@@ -130,7 +130,7 @@ export const EpisodeComponent = () => {
     <section className="relative">
       <div className="relative">
         {episode?.episode.has_audio_file && (
-          <div className="fixed right-4 border-gray-300 border rounded-lg p-2 bg-slate-100 w-24 text-right">
+          <div className="fixed right-4 w-24 rounded-lg border border-gray-300 bg-slate-100 p-2 text-right dark:border-gray-500 dark:bg-slate-800">
             <audio id="audio" preload="none">
               <source id="audioSrc" type="audio/mpeg" />
               <track kind="captions" />
@@ -154,7 +154,7 @@ export const EpisodeComponent = () => {
                   width="1.6em"
                   height="1.45em"
                   viewBox="0 0 512 512"
-                  fill="#000000"
+                  fill="currentColor"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <title>Pause</title>
@@ -178,7 +178,7 @@ export const EpisodeComponent = () => {
                   width="1.6em"
                   height="1.45em"
                   viewBox="0 0 24 24"
-                  fill="#000000"
+                  fill="currentColor"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <title>Play</title>
@@ -191,10 +191,10 @@ export const EpisodeComponent = () => {
             )}
           </div>
         )}
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
           {episode ? (
             <>
-              <h1 className="text-3xl text-title font-semibold pb-2 underline">{episode.episode.title}</h1>
+              <h1 className="pb-2 font-semibold text-3xl text-title underline">{episode.episode.title}</h1>
 
               <p>
                 <Link to="./.." className="hover:link btn variant-soft w-44 p-1">
@@ -202,14 +202,14 @@ export const EpisodeComponent = () => {
                 </Link>
               </p>
 
-              <div className="grid gap-12 md:gap-0 md:grid-cols-2 items-start lg:gap-12">
-                <div className="lg:pr-24 pt-2">
+              <div className="grid items-start gap-12 md:grid-cols-2 md:gap-0 lg:gap-12">
+                <div className="pt-2 lg:pr-24">
                   <Markdown>{episode.episode.description}</Markdown>
                 </div>
                 <div className="card variant-outlined overflow-hidden ">
-                  <h3 className="text-xl text-title font-semibold pb-2 underline">Speakers</h3>
+                  <h3 className="pb-2 font-semibold text-title text-xl underline">Speakers</h3>
 
-                  <ul className="mt-8 divide-y border-y *:py-1 *:flex *:items-center *:gap-3">
+                  <ul className="mt-8 divide-y border-y *:flex *:items-center *:gap-3 *:py-1">
                     {episode.episode_speakers.map((x) => (
                       <li
                         key={x.id}
@@ -228,11 +228,11 @@ export const EpisodeComponent = () => {
 
               <p>When editing the probability of the word is encoded in the color.</p>
               <div className="flex flex-row flex-wrap">
-                <div className="group btn sz-sm m-1 bg-gray-200">manual</div>
-                <div className="group btn sz-sm m-1 bg-blue-200">&gt; 99%</div>
-                <div className="group btn sz-sm m-1 bg-green-200">&gt; 90%</div>
-                <div className="group btn sz-sm m-1 bg-yellow-200">&gt; 70%</div>
-                <div className="group btn sz-sm m-1 bg-red-200">&lt;= 70%</div>
+                <div className="group btn sz-sm m-1 bg-gray-200 dark:bg-gray-700">manual</div>
+                <div className="group btn sz-sm m-1 bg-blue-200 dark:bg-blue-700">&gt; 99%</div>
+                <div className="group btn sz-sm m-1 bg-green-200 dark:bg-green-700">&gt; 90%</div>
+                <div className="group btn sz-sm m-1 bg-yellow-200 dark:bg-yellow-700">&gt; 70%</div>
+                <div className="group btn sz-sm m-1 bg-red-200 dark:bg-red-700">&lt;= 70%</div>
               </div>
 
               <TranscriptTableComponent

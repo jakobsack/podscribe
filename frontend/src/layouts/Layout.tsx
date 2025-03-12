@@ -18,29 +18,29 @@ export const Layout = () => {
 
   const navBar = token ? (
     <>
-      <div className="mt-6 dark:text-body md:-ml-4 lg:pr-4 lg:mt-0">
-        <ul className="space-y-6 tracking-wide text-base lg:text-sm lg:flex lg:space-y-0">
+      <div className="md:-ml-4 mt-6 lg:mt-0 lg:pr-4 dark:text-body">
+        <ul className="space-y-6 text-base tracking-wide lg:flex lg:space-y-0 lg:text-sm">
           <li>
-            <Link to={"search"} className="hover:link md:px-4 block">
+            <Link to={"search"} className="hover:link block md:px-4">
               <span>Search</span>
             </Link>
           </li>
 
           <li>
-            <Link to={"episodes"} className="hover:link md:px-4 block">
+            <Link to={"episodes"} className="hover:link block md:px-4">
               <span>Episode</span>
             </Link>
           </li>
 
           <li>
-            <Link to={"speakers"} className="hover:link md:px-4 block">
+            <Link to={"speakers"} className="hover:link block md:px-4">
               <span>Speakers</span>
             </Link>
           </li>
         </ul>
       </div>
 
-      <div className="w-full space-y-2 gap-2 pt-6 pb-4 lg:pb-0 border-t items-center flex flex-col lg:flex-row lg:space-y-0 lg:w-fit lg:border-l lg:border-t-0 lg:pt-0 lg:pl-2">
+      <div className="flex w-full flex-col items-center gap-2 space-y-2 border-t pt-6 pb-4 lg:w-fit lg:flex-row lg:space-y-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pb-0 lg:pl-2">
         <Link to="logout" className="hover:link">
           <button className="btn variant-danger sz-sm" type="button">
             <span>Logout</span>
@@ -49,7 +49,7 @@ export const Layout = () => {
       </div>
     </>
   ) : (
-    <div className="w-full space-y-2 gap-2 pt-6 pb-4 lg:pb-0 border-t items-center flex flex-col lg:flex-row lg:space-y-0 lg:w-fit lg:border-l lg:border-t-0 lg:pt-0 lg:pl-2">
+    <div className="flex w-full flex-col items-center gap-2 space-y-2 border-t pt-6 pb-4 lg:w-fit lg:flex-row lg:space-y-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pb-0 lg:pl-2">
       <Link to={"login"}>
         <button className="btn variant-ghost sz-sm" type="button">
           <span className="btn-label">Login</span>
@@ -66,10 +66,10 @@ export const Layout = () => {
   return (
     <>
       <header id="header" className="group">
-        <nav className="fixed overflow-hidden z-20 w-full border-b bg-white/50 dark:bg-gray-950/50 backdrop-blur-2xl">
-          <div className="px-6 m-auto max-w-6xl ">
+        <nav className="fixed z-20 w-full overflow-hidden border-b bg-white/50 backdrop-blur-2xl dark:bg-gray-950/50">
+          <div className="m-auto max-w-6xl px-6 ">
             <div className="flex flex-wrap items-center justify-between py-2 sm:py-4">
-              <div className="w-full items-center flex justify-between lg:w-auto">
+              <div className="flex w-full items-center justify-between lg:w-auto">
                 <a href="/" aria-label="tailus logo">
                   Podscribe
                 </a>
@@ -78,10 +78,10 @@ export const Layout = () => {
                     type="button"
                     id="menu-btn"
                     aria-label="open menu"
-                    className="btn variant-ghost sz-md icon-only relative z-20 -mr-2.5 block cursor-pointer lg:hidden"
+                    className="btn variant-ghost sz-md icon-only -mr-2.5 relative z-20 block cursor-pointer lg:hidden"
                   >
                     <svg
-                      className="text-title m-auto size-6 transition-[transform,opacity] duration-300 group-data-[state=active]:rotate-180 group-data-[state=active]:scale-0 group-data-[state=active]:opacity-0"
+                      className="m-auto size-6 text-title transition-[transform,opacity] duration-300 group-data-[state=active]:rotate-180 group-data-[state=active]:scale-0 group-data-[state=active]:opacity-0"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -92,7 +92,7 @@ export const Layout = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
                     </svg>
                     <svg
-                      className="text-title absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 transition-[transform,opacity] duration-300 group-data-[state=active]:rotate-0 group-data-[state=active]:scale-100 group-data-[state=active]:opacity-100"
+                      className="-rotate-180 absolute inset-0 m-auto size-6 scale-0 text-title opacity-0 transition-[transform,opacity] duration-300 group-data-[state=active]:rotate-0 group-data-[state=active]:scale-100 group-data-[state=active]:opacity-100"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -105,7 +105,7 @@ export const Layout = () => {
                   </button>
                 </div>
               </div>
-              <div className="w-full group-data-[state=active]:h-fit h-0 lg:w-fit flex-wrap justify-end items-center space-y-8 lg:space-y-0 lg:flex lg:h-fit md:flex-nowrap">
+              <div className="h-0 w-full flex-wrap items-center justify-end space-y-8 group-data-[state=active]:h-fit md:flex-nowrap lg:flex lg:h-fit lg:w-fit lg:space-y-0">
                 {navBar}
               </div>
             </div>

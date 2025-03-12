@@ -27,8 +27,8 @@ export function SentenceEditFormComponent({
   curTime,
 }: SentenceEditFormParams) {
   return (
-    <div className="flex-1 flex flex-col border-b border-gray-400">
-      <div className="flex-1 flex flex-row bg-gray-100">
+    <div className="flex flex-1 flex-col border-gray-400 border-b dark:border-gray-500">
+      <div className="flex flex-1 flex-row bg-gray-100 dark:bg-gray-800">
         <div
           className="w-20 text-right"
           onClick={() => {
@@ -37,15 +37,15 @@ export function SentenceEditFormComponent({
         >
           <Timestamp seconds={sentence.sentence.starts_at} includeHundredth={true} />
         </div>
-        <div className="w-14 flex flex-row">
+        <div className="flex w-14 flex-row">
           <div className="w-12 text-right">{(sentence.sentence.ends_at - sentence.sentence.starts_at).toFixed(2)}</div>
           <div className="ml-0.5 flex-1">s</div>
         </div>
-        <div className="w-14 flex flex-row ml-8">
+        <div className="ml-8 flex w-14 flex-row">
           <div className="w-12 text-right">{sentence.sentence.words_per_second.toFixed(2)}</div>
           <div className="ml-0.5 flex-1">wps</div>
         </div>
-        <div className="flex-1 ml-8">
+        <div className="ml-8 flex-1">
           <span
             onClick={() => {
               toggleSentenceHidden(sentence.sentence.id);
@@ -117,7 +117,7 @@ export function SentenceEditFormComponent({
         </div>
       </div>
       <div
-        className={`flex-1 flex flex-row flex-wrap mb-2 ${curTime >= sentence.sentence.starts_at && curTime < sentence.sentence.ends_at ? "bg-yellow-200" : ""}`}
+        className={`mb-2 flex flex-1 flex-row flex-wrap ${curTime >= sentence.sentence.starts_at && curTime < sentence.sentence.ends_at ? "bg-sky-200 dark:bg-sky-700" : ""}`}
       >
         {sentence.words.map((w) => {
           const wordColor = getWordColor(w);
@@ -125,12 +125,12 @@ export function SentenceEditFormComponent({
             <div key={w.id} className={`group btn sz-sm m-1 ${wordColor}`}>
               <WordFormComponent word={w} saveFunction={wordSaveFunction} />
               <svg
-                fill="#000000"
+                fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
                 width="2em"
                 height="2em"
                 viewBox="0 0 479.79 479.79"
-                className="border-l pl-1 w-3"
+                className="w-3 border-l pl-1"
                 onClick={() => {
                   setActiveWord(w);
                 }}

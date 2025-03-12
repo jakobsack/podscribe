@@ -30,7 +30,7 @@ export const SignUpPage = () => {
     return (
       <section className="relative">
         <div className="relative">
-          <div className="mx-auto px-6 max-w-7xl md:px-12">
+          <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h1 className="podscribe">Sign up</h1>
 
             <p>
@@ -45,7 +45,7 @@ export const SignUpPage = () => {
   return (
     <section className="relative">
       <div className="relative">
-        <div className="mx-auto px-6 max-w-7xl md:px-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12">
           <h1 className="podscribe">Sign up</h1>
           <p>Sign up.</p>
 
@@ -60,7 +60,7 @@ export const SignUpPage = () => {
                     type="text"
                     name="name"
                     id="formName"
-                    className="input variant-outlined border border-gray-300 p-1"
+                    className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600"
                     placeholder="Name"
                   />
                 </div>
@@ -74,7 +74,7 @@ export const SignUpPage = () => {
                     type="text"
                     name="email"
                     id="formEmail"
-                    className="input variant-outlined border border-gray-300 p-1"
+                    className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600"
                     placeholder="Email"
                   />
                 </div>
@@ -86,7 +86,7 @@ export const SignUpPage = () => {
                 <div className="flex-1">
                   <input
                     type="password"
-                    className="input variant-outlined border border-gray-300 p-1"
+                    className="input variant-outlined border border-gray-300 p-1 dark:border-gray-600"
                     name="password"
                     id="formPassword"
                     placeholder="password"

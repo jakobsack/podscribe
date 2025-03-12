@@ -5,6 +5,7 @@ import { pluginReact } from "@rsbuild/plugin-react";
 export default defineConfig({
   plugins: [pluginReact()],
   html: {
+    template: "./src/index.html",
     favicon: "src/assets/favicon.ico",
     title: "Podscribe",
   },

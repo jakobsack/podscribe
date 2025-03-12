@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
-  content: ["./src/**/*.tsx"],
+  content: ["./src/index.html", "./src/**/*.tsx"],
   darkMode: "media",
   safelist: ["isToggled"],
   theme: {

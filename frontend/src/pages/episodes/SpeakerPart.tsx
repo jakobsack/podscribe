@@ -9,11 +9,11 @@ interface SpeakerPartsParams {
 
 export const SpeakerPartComponent = ({ part, isLastRow }: SpeakerPartsParams) => {
   return (
-    <div className={`flex flex-row ${isLastRow ? "" : "border-b border-gray-200"}`}>
+    <div className={`flex flex-row ${isLastRow ? "" : "border-gray-200 border-b dark:border-gray-700"}`}>
       <div className="w-20 text-right">
         <Timestamp seconds={part.start} />
       </div>
-      <div className="flex-1 ml-2">
+      <div className="ml-2 flex-1">
         <SentenceBreaker text={part.text} />
       </div>
     </div>
