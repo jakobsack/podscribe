@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import type { Speaker, EpisodeSpeaker } from "../../definitions";
+import type { Speaker, EpisodeSpeaker, ApprovalResult } from "../../definitions";
 import { PartEditFormComponent } from "./PartEditForm";
 import type { NewPart } from "./definitions";
 import { Timestamp } from "../../common/Timestamp";
-import { useRevalidator } from "react-router-dom";
 import { SentenceBreaker } from "../../common/SentenceBreaker";
+import { jwtFetch } from "../../common/jwtFetch";
 
 interface ShowPartParams {
   episodeId: number;
@@ -25,6 +25,7 @@ export const ShowPartComponent = ({
 }: ShowPartParams) => {
   const [updatedAt, setUpdatedAt] = useState(part.updated_at);
   const [showEdit, setShowEdit] = useState(false);
+  const [approvals, setApprovals] = useState(part.approvals);
 
   const toggleShowEdit = () => {
     setShowEdit(!showEdit);
@@ -34,8 +35,18 @@ export const ShowPartComponent = ({
     if (part.updated_at !== updatedAt) {
       setShowEdit(false);
       setUpdatedAt(part.updated_at);
+      setApprovals(part.approvals);
     }
   }, [updatedAt, part]);
+
+  const approve = () => {
+    const url = `/api/episodes/${episodeId}/parts/${part.id}/approve`;
+    jwtFetch(url, { method: "POST" }).then((result) => {
+      result.json().then((x: ApprovalResult) => {
+        setApprovals(x.approvals);
+      });
+    });
+  };
 
   return showEdit ? (
     <PartEditFormComponent
@@ -52,6 +63,9 @@ export const ShowPartComponent = ({
       <div className="w-20 text-right" onClick={() => startAudioAt(part.start)}>
         <Timestamp seconds={part.start} />
       </div>
+      <div
+        className={`ml-1 w-1 ${approvals < 1 ? "bg-red-700 dark:bg-red-200" : approvals < 2 && "bg-yellow-400 dark:bg-yellow-500"}`}
+      />
       <div className={`ml-2 flex-1 ${curTime >= part.start && curTime < part.end ? "bg-sky-200 dark:bg-sky-700" : ""}`}>
         <SentenceBreaker text={part.text} />
       </div>
@@ -74,12 +88,14 @@ export const ShowPartComponent = ({
         </svg>
         <svg
           fill="currentColor"
-          className="ml-2"
+          className="hover:link ml-2"
           width="1.6em"
           height="1.45em"
           viewBox="0 0 512 512"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
+          onClick={approve}
+          onKeyDown={approve}
         >
           <title>Approve</title>
           <g>

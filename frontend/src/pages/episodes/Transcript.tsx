@@ -1,4 +1,4 @@
-import type { Episode, EpisodeSpeaker, Part, Speaker } from "../../definitions";
+import type { Approval, Episode, EpisodeSpeaker, Part, Speaker } from "../../definitions";
 import { SpeakerPartsComponent } from "./SpeakerParts";
 
 interface TranscriptParams {
@@ -6,6 +6,7 @@ interface TranscriptParams {
   speakers: Speaker[];
   episodeSpeakers: EpisodeSpeaker[];
   highlightedSpeaker: number;
+  approvals: Approval[];
 }
 
 export interface SpeakerPart {
@@ -18,11 +19,18 @@ export interface SpeakerPart {
 
 export interface ReducedPart {
   id: number;
+  approvals: number;
   text: string;
   start: number;
 }
 
-export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highlightedSpeaker }: TranscriptParams) => {
+export const TranscriptComponent = ({
+  parts,
+  speakers,
+  episodeSpeakers,
+  highlightedSpeaker,
+  approvals,
+}: TranscriptParams) => {
   const speakerNames: { [key: number]: string } = {};
   for (const episodeSpeaker of episodeSpeakers) {
     speakerNames[episodeSpeaker.id] = speakers.find((x) => x.id === episodeSpeaker.speaker_id)?.name || "UNKNOWN";
@@ -41,6 +49,7 @@ export const TranscriptComponent = ({ parts, speakers, episodeSpeakers, highligh
       id: part.id,
       text: part.text,
       start: part.starts_at,
+      approvals: approvals.filter((x) => x.part_id === part.id).length,
     };
 
     if (speaker === lastSpeaker && part.part_type === lastType) {

@@ -14,6 +14,7 @@ use tantivy::schema::Value;
 use tantivy::{doc, Score, TantivyDocument};
 
 use crate::initializers::tantivy_search::TantivyContainer;
+use crate::models::_entities::approvals as ApprovalsNS;
 use crate::models::_entities::episode_speakers as EpisodeSpeakersNS;
 use crate::models::_entities::episodes::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::parts as PartsNS;
@@ -112,6 +113,13 @@ pub async fn get_display(
         .all(&ctx.db)
         .await?;
 
+    let part_ids: Vec<i32> = parts.iter().map(|x| x.id).collect();
+
+    let approvals = ApprovalsNS::Entity::find()
+        .filter(ApprovalsNS::Column::PartId.is_in(part_ids))
+        .all(&ctx.db)
+        .await?;
+
     let episode_speakers = EpisodeSpeakersNS::Entity::find()
         .filter(EpisodeSpeakersNS::Column::EpisodeId.eq(id))
         .all(&ctx.db)
@@ -124,6 +132,7 @@ pub async fn get_display(
         parts,
         episode_speakers,
         speakers,
+        approvals,
     };
 
     format::json(output)
@@ -405,6 +414,7 @@ pub struct Display {
     pub parts: Vec<PartsNS::Model>,
     pub episode_speakers: Vec<EpisodeSpeakersNS::Model>,
     pub speakers: Vec<SpeakersNS::Model>,
+    pub approvals: Vec<ApprovalsNS::Model>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

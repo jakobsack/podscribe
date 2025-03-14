@@ -243,6 +243,7 @@ export const EpisodeComponent = () => {
                 highlightedSpeaker={highlightedSpeaker}
                 startAudioAt={startAudioAt}
                 curTime={curTime}
+                approvals={episode.approvals}
               />
             </>
           ) : (

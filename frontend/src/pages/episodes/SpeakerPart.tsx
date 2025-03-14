@@ -13,7 +13,10 @@ export const SpeakerPartComponent = ({ part, isLastRow }: SpeakerPartsParams) =>
       <div className="w-20 text-right">
         <Timestamp seconds={part.start} />
       </div>
-      <div className="ml-2 flex-1">
+      <div
+        className={`ml-1 w-1 ${part.approvals < 1 ? "bg-red-700 dark:bg-red-200" : part.approvals < 2 && "bg-yellow-400 dark:bg-yellow-500"}`}
+      />
+      <div className="ml-1 flex-1">
         <SentenceBreaker text={part.text} />
       </div>
     </div>

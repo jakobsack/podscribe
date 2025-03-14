@@ -11,6 +11,7 @@ export interface NewPart {
   start: number;
   end: number;
   updated_at: string;
+  approvals: number;
 }
 
 export interface AudioControl {

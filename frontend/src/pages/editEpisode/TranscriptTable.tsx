@@ -1,4 +1,4 @@
-import type { Episode, EpisodeSpeaker, Part, Speaker } from "../../definitions";
+import type { Approval, Episode, EpisodeSpeaker, Part, Speaker } from "../../definitions";
 import type { NewPart, SpeakerPart } from "./definitions";
 import { SpeakerPartsComponent } from "./SpeakerParts";
 
@@ -10,6 +10,7 @@ interface TranscriptTableParams {
   highlightedSpeaker: number;
   startAudioAt: (position: number) => void;
   curTime: number;
+  approvals: Approval[];
 }
 
 export const TranscriptTableComponent = ({
@@ -20,6 +21,7 @@ export const TranscriptTableComponent = ({
   highlightedSpeaker,
   startAudioAt,
   curTime,
+  approvals,
 }: TranscriptTableParams) => {
   const speakerNames: { [key: number]: string } = {};
   for (const episodeSpeaker of episodeSpeakers) {
@@ -37,6 +39,7 @@ export const TranscriptTableComponent = ({
       start: part.starts_at,
       end: part.ends_at,
       updated_at: part.updated_at,
+      approvals: approvals.filter((x) => x.part_id == part.id).length,
     };
 
     if (speaker === lastSpeaker) {

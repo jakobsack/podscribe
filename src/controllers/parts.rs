@@ -12,6 +12,7 @@ use tantivy::schema::IndexRecordOption;
 use tantivy::{doc, IndexReader, TantivyDocument, Term};
 
 use crate::initializers::tantivy_search::TantivyContainer;
+use crate::models::_entities::approvals as ApprovalsNS;
 use crate::models::_entities::parts::{ActiveModel, Column, Entity, Model};
 use crate::models::_entities::sentences as SentencesNS;
 use crate::models::_entities::words as WordsNS;
@@ -157,9 +158,15 @@ pub async fn get_display(
         })
         .collect();
 
+    let approvals = ApprovalsNS::Entity::find()
+        .filter(ApprovalsNS::Column::PartId.eq(id))
+        .all(&ctx.db)
+        .await?;
+
     let output = Display {
         part,
         sentences: display_sentences,
+        approvals: u32::try_from(approvals.len()).map_err(|e| Error::Message(e.to_string()))?,
     };
 
     format::json(output)
@@ -167,7 +174,7 @@ pub async fn get_display(
 
 #[debug_handler]
 pub async fn ui_update(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Extension(tantivy): Extension<TantivyContainer>,
     Path((episode_id, id)): Path<(i32, i32)>,
     State(ctx): State<AppContext>,
@@ -394,6 +401,21 @@ pub async fn ui_update(
         sentence.delete(&ctx.db).await?;
     }
 
+    // Remove all approvals, then add ours
+    ApprovalsNS::Entity::delete_many()
+        .filter(ApprovalsNS::Column::PartId.eq(id))
+        .exec(&ctx.db)
+        .await?;
+
+    {
+        let mut item = ApprovalsNS::ActiveModel {
+            ..Default::default()
+        };
+        item.part_id = Set(id);
+        item.user_id = Set(auth.user.id);
+        item.insert(&ctx.db).await?;
+    }
+
     index
         .write()
         .unwrap()
@@ -405,6 +427,39 @@ pub async fn ui_update(
     format::empty()
 }
 
+#[debug_handler]
+pub async fn approve(
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
+    Path((_episode_id, id)): Path<(i32, i32)>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let approvals = ApprovalsNS::Entity::find()
+        .filter(ApprovalsNS::Column::PartId.eq(id))
+        .all(&ctx.db)
+        .await?;
+
+    if approvals.iter().any(|x| x.user_id == auth.user.id) {
+        let output = ApprovalResult {
+            approvals: u32::try_from(approvals.len()).map_err(|e| Error::Message(e.to_string()))?,
+        };
+
+        return format::json(output);
+    }
+
+    let mut item = ApprovalsNS::ActiveModel {
+        ..Default::default()
+    };
+    item.part_id = Set(id);
+    item.user_id = Set(auth.user.id);
+    item.insert(&ctx.db).await?;
+
+    let output = ApprovalResult {
+        approvals: u32::try_from(approvals.len()).map_err(|e| Error::Message(e.to_string()))? + 1,
+    };
+
+    return format::json(output);
+}
+
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/episodes/{episode_id}/parts/")
@@ -412,6 +467,7 @@ pub fn routes() -> Routes {
         .add("/", post(add))
         .add("{id}", get(get_one))
         .add("{id}/display", get(get_display))
+        .add("{id}/approve", post(approve))
         .add("{id}/update", post(ui_update))
         .add("{id}", delete(remove))
         .add("{id}", put(update))
@@ -567,6 +623,12 @@ fn extract_part_from_search_index(
 pub struct Display {
     pub part: Model,
     pub sentences: Vec<SentenceDisplay>,
+    pub approvals: u32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ApprovalResult {
+    pub approvals: u32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

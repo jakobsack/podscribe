@@ -31,6 +31,7 @@ export interface EpisodeDisplay {
   episode_speakers: EpisodeSpeaker[];
   speakers: Speaker[];
   parts: Part[];
+  approvals: Approval[];
 }
 
 export interface Part {
@@ -48,6 +49,7 @@ export interface Part {
 export interface PartDisplay {
   part: Part;
   sentences: SentenceDisplay[];
+  approvals: number;
 }
 
 export interface SentenceDisplay {
@@ -74,6 +76,15 @@ export interface Word {
   text: string;
   overwrite: string;
   hidden: boolean;
+}
+
+export interface Approval {
+  part_id: number;
+  user_id: number;
+}
+
+export interface ApprovalResult {
+  approvals: number;
 }
 
 export enum PartType {

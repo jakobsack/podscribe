@@ -74,6 +74,7 @@ export const EpisodeViewComponent = () => {
           <TranscriptComponent
             episodeSpeakers={episode.episode_speakers}
             parts={episode.parts}
+            approvals={episode.approvals}
             speakers={episode.speakers}
             highlightedSpeaker={highlightedSpeaker}
           />
