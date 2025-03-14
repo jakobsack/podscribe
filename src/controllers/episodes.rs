@@ -214,6 +214,11 @@ pub async fn search(
         search_results.push(SearchDocument { id, score });
     }
 
+    let approvals = ApprovalsNS::Entity::find()
+        .filter(ApprovalsNS::Column::PartId.is_in(part_ids.clone()))
+        .all(&ctx.db)
+        .await?;
+
     let parts = PartsNS::Entity::find()
         .filter(PartsNS::Column::Id.is_in(part_ids))
         .all(&ctx.db)
@@ -234,6 +239,7 @@ pub async fn search(
         search_results,
         episodes,
         parts,
+        approvals,
     };
 
     format::json(search_result)
@@ -464,4 +470,5 @@ pub struct SearchResult {
     pub search_results: Vec<SearchDocument>,
     pub episodes: Vec<Model>,
     pub parts: Vec<PartsNS::Model>,
+    pub approvals: Vec<ApprovalsNS::Model>,
 }

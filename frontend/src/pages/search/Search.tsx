@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, ActionFunction } from "react-router-dom";
-import { Form, useActionData } from "react-router-dom";
+import { Form, Link, useActionData } from "react-router-dom";
 import { jwtFetch } from "../../common/jwtFetch";
-import type { Episode, Part } from "../../definitions";
+import type { Approval, Episode, Part } from "../../definitions";
 import { SpeakerPartComponent } from "../episodes/SpeakerPart";
 import React from "react";
 
@@ -9,6 +9,7 @@ interface SearchResult {
   episodes: Episode[];
   parts: Part[];
   search_results: { id: number; score: number }[];
+  approvals: Approval[];
 }
 
 export const searchAction = (async (event: ActionFunctionArgs) => {
@@ -84,18 +85,29 @@ export const SearchComponent = () => {
           <div className="mx-auto max-w-7xl px-6 md:px-12">
             <h2 className="podscribe">Search results</h2>
 
+            <p>The episodes are sorted by the result score of their parts.</p>
+
             {episodesInOrder.length ? (
               episodesInOrder.map((episode) => (
                 <React.Fragment key={episode.id}>
                   <h3 className="podscribe">{episode.title}</h3>
 
-                  <div className="flex flex-col">
+                  <Link className="hover:link" to={`/episodes/${episode.id}`}>
+                    Go to episode.
+                  </Link>
+
+                  <div className="mt-5 flex flex-col">
                     {partsInOrder
                       .filter((x) => x.episode_id === episode.id)
                       .map((part, i, a) => (
                         <SpeakerPartComponent
                           key={part.id}
-                          part={{ id: part.id, text: part.text, start: part.starts_at }}
+                          part={{
+                            id: part.id,
+                            text: part.text,
+                            start: part.starts_at,
+                            approvals: actionData.approvals.filter((x) => x.part_id === part.id).length,
+                          }}
                           isLastRow={i === a.length - 1}
                         />
                       ))}

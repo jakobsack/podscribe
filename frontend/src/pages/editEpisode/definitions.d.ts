@@ -3,6 +3,7 @@ export interface SpeakerPart {
   speaker: string;
   episodeSpeakerId: number;
   parts: NewPart[];
+  part_type: number;
 }
 
 export interface NewPart {

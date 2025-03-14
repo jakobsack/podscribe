@@ -382,14 +382,16 @@ pub async fn ui_update(
         original_part.episode_speaker_id = Set(params.part.episode_speaker_id);
         let original_part = original_part.update(&ctx.db).await?;
 
-        // Tantivy update index
-        index
-            .read()
-            .unwrap()
-            .add_document(doc!(
-                    index_id => original_part.id.to_string(),
-                    index_text => original_part.text.clone()))
-            .map_err(|e| Error::Message(e.to_string()))?;
+        // Tantivy update index (Only add if part type is "normal")
+        if original_part.part_type == 0 {
+            index
+                .read()
+                .unwrap()
+                .add_document(doc!(
+                index_id => original_part.id.to_string(),
+                index_text => original_part.text.clone()))
+                .map_err(|e| Error::Message(e.to_string()))?;
+        }
     }
 
     // Remove sentences that are not required anymore
