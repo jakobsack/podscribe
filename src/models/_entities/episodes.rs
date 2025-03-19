@@ -10,6 +10,7 @@ pub struct Model {
     pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key)]
     pub id: i32,
+    pub external_id: Option<String>,
     pub title: String,
     pub link: String,
     #[sea_orm(column_type = "Text")]

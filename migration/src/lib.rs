@@ -10,6 +10,8 @@ mod m20250131_212307_parts;
 mod m20250131_212332_sentences;
 mod m20250131_212358_words;
 mod m20250131_212844_approvals;
+mod m20250315_175307_add_external_id_to_episodes;
+mod m20250315_193802_add_role_to_users;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -24,6 +26,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20250131_212332_sentences::Migration),
             Box::new(m20250131_212358_words::Migration),
             Box::new(m20250131_212844_approvals::Migration),
+            Box::new(m20250315_175307_add_external_id_to_episodes::Migration),
+            Box::new(m20250315_193802_add_role_to_users::Migration),
             // inject-above (do not remove this comment)
         ]
     }

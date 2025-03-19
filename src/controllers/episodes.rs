@@ -24,6 +24,7 @@ use crate::models::_entities::words as WordsNS;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
+    pub external_id: Option<String>,
     pub title: String,
     pub link: String,
     pub description: String,
@@ -34,6 +35,7 @@ pub struct Params {
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
+        item.external_id = Set(self.external_id.clone());
         item.title = Set(self.title.clone());
         item.link = Set(self.link.clone());
         item.description = Set(self.description.clone());
