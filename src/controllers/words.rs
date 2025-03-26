@@ -7,6 +7,7 @@ use loco_rs::prelude::*;
 use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 
+use crate::common::check_auth::check_admin;
 use crate::models::_entities::parts as PartsNS;
 use crate::models::_entities::sentences as SentencesNS;
 use crate::models::_entities::words::{ActiveModel, Column, Entity, Model};
@@ -39,10 +40,11 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 
 #[debug_handler]
 pub async fn list(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWT,
     Path((_episode_id, _part_id, sentence_id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_admin(auth.claims)?;
     format::json(
         Entity::find()
             .filter(Column::SentenceId.eq(sentence_id))
@@ -53,11 +55,12 @@ pub async fn list(
 
 #[debug_handler]
 pub async fn add(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWT,
     Path((_episode_id, part_id, sentence_id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
+    check_admin(auth.claims)?;
     let mut item = ActiveModel {
         ..Default::default()
     };
@@ -72,11 +75,12 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn update(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWT,
     Path((_episode_id, part_id, sentence_id, id)): Path<(i32, i32, i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
+    check_admin(auth.claims)?;
     let item = load_item(&ctx, id).await?;
     if item.sentence_id != sentence_id {
         return Err(Error::NotFound);
@@ -92,20 +96,22 @@ pub async fn update(
 
 #[debug_handler]
 pub async fn remove(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWT,
     Path((_episode_id, _part_id, _sentence_id, id)): Path<(i32, i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_admin(auth.claims)?;
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
 pub async fn get_one(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWT,
     Path((_episode_id, _part_id, _sentence_id, id)): Path<(i32, i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_admin(auth.claims)?;
     format::json(load_item(&ctx, id).await?)
 }
 

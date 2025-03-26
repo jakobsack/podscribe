@@ -91,3 +91,14 @@ export enum PartType {
   Default = 0,
   Jingle = 1,
 }
+
+export interface Claims {
+  role: RoleEnum;
+}
+
+export enum RoleEnum {
+  Guest = 0,
+  Reader = 1,
+  Contributor = 2,
+  Admin = 3,
+}
