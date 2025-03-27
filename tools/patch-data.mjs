@@ -12,7 +12,17 @@ const rss = JSON.parse(xml.xml2json(rssXml, { compact: true, ignoreComment: true
 const headers = { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${settings.token}` }
 const existingEpisodes = await (await fetch(`${settings.hostname}/api/episodes`, { headers })).json();
 
+if (!Array.isArray(rss.rss?.channel?.item)) {
+  console.log("Downloaded file does not have expected format.")
+  process.exit(1)
+}
+
 for (const item of rss.rss.channel.item) {
+  if (!(item.enclosure?._attributes?.url && item.title?._text && item.link?._cdata && item.pubDate?._text && item.description?._cdata)) {
+    console.log("item is missing required fields!")
+    continue;
+  }
+
   const fileUrl = item.enclosure._attributes.url;
   const fileNameQuery = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
   const fileName = fileNameQuery.substring(0, fileNameQuery.indexOf(".mp3"));
