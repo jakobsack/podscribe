@@ -35,11 +35,11 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 
 #[debug_handler]
 pub async fn list(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path((_episode_id, part_id)): Path<(i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    check_admin(auth.claims)?;
+    check_admin(&auth.user)?;
     format::json(
         Entity::find()
             .filter(Column::PartId.eq(part_id))
@@ -50,12 +50,12 @@ pub async fn list(
 
 #[debug_handler]
 pub async fn add(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path((_episode_id, part_id)): Path<(i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
-    check_admin(auth.claims)?;
+    check_admin(&auth.user)?;
     let mut item = ActiveModel {
         ..Default::default()
     };
@@ -67,12 +67,12 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn update(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path((_episode_id, part_id, id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
-    check_admin(auth.claims)?;
+    check_admin(&auth.user)?;
     let item = load_item(&ctx, id).await?;
     if item.part_id != part_id {
         return Err(Error::NotFound);
@@ -85,22 +85,22 @@ pub async fn update(
 
 #[debug_handler]
 pub async fn remove(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path((_episode_id, _part_id, id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    check_admin(auth.claims)?;
+    check_admin(&auth.user)?;
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
 pub async fn get_one(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path((_episode_id, _part_id, id)): Path<(i32, i32, i32)>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    check_admin(auth.claims)?;
+    check_admin(&auth.user)?;
     format::json(load_item(&ctx, id).await?)
 }
 

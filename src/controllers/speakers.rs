@@ -30,18 +30,21 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 #[debug_handler]
-pub async fn list(auth: middleware::auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
-    check_auth::check_reader(auth.claims)?;
+pub async fn list(
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    check_auth::check_reader(&auth.user)?;
     format::json(Entity::find().all(&ctx.db).await?)
 }
 
 #[debug_handler]
 pub async fn add(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
-    check_auth::check_contributor(auth.claims)?;
+    check_auth::check_contributor(&auth.user)?;
     let mut item = ActiveModel {
         ..Default::default()
     };
@@ -52,12 +55,12 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn update(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
-    check_auth::check_contributor(auth.claims)?;
+    check_auth::check_contributor(&auth.user)?;
     let item = load_item(&ctx, id).await?;
     let mut item = item.into_active_model();
     params.update(&mut item);
@@ -67,22 +70,22 @@ pub async fn update(
 
 #[debug_handler]
 pub async fn remove(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    check_auth::check_admin(auth.claims)?;
+    check_auth::check_admin(&auth.user)?;
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
 pub async fn get_one(
-    auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    check_auth::check_reader(auth.claims)?;
+    check_auth::check_reader(&auth.user)?;
     format::json(load_item(&ctx, id).await?)
 }
 
