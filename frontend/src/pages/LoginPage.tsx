@@ -29,6 +29,7 @@ export const LoginPage = () => {
   useEffect(() => {
     if (actionData?.token) {
       setToken(actionData.token);
+      localStorage.setItem("lastRefresh", Date.now().toString());
       navigate("/", { replace: true });
     }
   }, [actionData, setToken, navigate]);

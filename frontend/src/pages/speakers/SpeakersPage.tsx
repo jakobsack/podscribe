@@ -5,6 +5,7 @@ import { Form, useActionData, useLoaderData } from "react-router-dom";
 import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "react-router-dom";
 import { SpeakerDetailComponent } from "./SpeakerDetail";
 import { jwtFetch } from "../../common/jwtFetch";
+import { useAuth } from "../../providers/AuthProvider";
 
 export const speakersLoader = (async (_args: LoaderFunctionArgs) => {
   const response = await jwtFetch("/api/speakers");
@@ -27,9 +28,10 @@ export const speakersAction = (async (event: ActionFunctionArgs) => {
 }) satisfies ActionFunction;
 
 export const SpeakersComponent = () => {
+  const { decoded } = useAuth();
   const { speakers } = useLoaderData() as { speakers: Speaker[] | undefined };
   const actionData = useActionData();
-  const [showNew, setShowNew] = useState(!speakers || !speakers.length);
+  const [showNew, setShowNew] = useState((decoded?.claims?.role || 0) > 2 && (!speakers || !speakers.length));
 
   if (!speakers) {
     return (
@@ -130,14 +132,18 @@ export const SpeakersComponent = () => {
               </div>
             </Form>
           ) : (
-            <button
-              type="button"
-              className="btn variant-ghost mt-8 p-1"
-              onClick={toggleShowForm}
-              onKeyDown={toggleShowForm}
-            >
-              Add speaker
-            </button>
+            <>
+              {(decoded?.claims?.role || 0) > 2 && (
+                <button
+                  type="button"
+                  className="btn variant-ghost mt-8 p-1"
+                  onClick={toggleShowForm}
+                  onKeyDown={toggleShowForm}
+                >
+                  Add speaker
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

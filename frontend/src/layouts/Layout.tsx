@@ -2,6 +2,7 @@ import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
+import { jwtFetch } from "../common/jwtFetch";
 
 export const Layout = () => {
   const { token, setToken } = useAuth();
@@ -9,9 +10,19 @@ export const Layout = () => {
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
+      const lastRefresh = Number.parseInt(localStorage.getItem("lastRefresh") || "0") || 0;
+
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         console.log("Session expired, logging out");
         setToken(null);
+        localStorage.removeItem("lastRefresh");
+      } else if (Date.now() - lastRefresh > 1000 * 20) {
+        jwtFetch("/api/auth/refresh-token", { method: "POST" })
+          .then((x) => x.json())
+          .then((x) => {
+            setToken(x.token);
+            localStorage.setItem("lastRefresh", Date.now().toString());
+          });
       }
     }
   }, [token, setToken]);

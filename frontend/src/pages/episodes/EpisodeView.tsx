@@ -5,6 +5,7 @@ import { useState } from "react";
 import Markdown from "react-markdown";
 import { TranscriptComponent } from "./Transcript";
 import { jwtFetch } from "../../common/jwtFetch";
+import { useAuth } from "../../providers/AuthProvider";
 
 export const episodeViewLoader = (async (args: LoaderFunctionArgs) => {
   const episodeId = args.params.episodeId;
@@ -14,6 +15,7 @@ export const episodeViewLoader = (async (args: LoaderFunctionArgs) => {
 }) satisfies LoaderFunction;
 
 export const EpisodeViewComponent = () => {
+  const { decoded } = useAuth();
   const { episode } = useLoaderData() as { episode: EpisodeDisplay };
 
   const [highlightedSpeaker, setHighlightedSpeaker] = useState(0);
@@ -41,11 +43,13 @@ export const EpisodeViewComponent = () => {
         <div className="mx-auto max-w-7xl px-6 md:px-12">
           <h1 className="podscribe">{episode.episode.title}</h1>
 
-          <p>
-            <Link to="edit" className="hover:link btn variant-soft w-44 p-1">
-              Change to edit view
-            </Link>
-          </p>
+          {(decoded?.claims?.role || 0) > 1 && (
+            <p>
+              <Link to="edit" className="hover:link btn variant-soft w-44 p-1">
+                Change to edit view
+              </Link>
+            </p>
+          )}
 
           <div className="grid items-start gap-12 md:grid-cols-2 md:gap-0 lg:gap-12">
             <div className="pt-2 lg:pr-24">

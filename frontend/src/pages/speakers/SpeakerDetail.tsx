@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useFetcher } from "react-router-dom";
 import type { Speaker } from "../../definitions";
 import Markdown from "react-markdown";
+import { useAuth } from "../../providers/AuthProvider";
 
 interface SpeakerDetailParams {
   speaker: Speaker;
@@ -10,6 +11,7 @@ interface SpeakerDetailParams {
 export type ViewMode = "inline" | "expand" | "form";
 
 export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
+  const { decoded } = useAuth();
   const [mode, setMode] = useState<ViewMode>("inline");
 
   const toggleExpand = () => {
@@ -50,9 +52,11 @@ export const SpeakerDetailComponent = ({ speaker }: SpeakerDetailParams) => {
           <Markdown>{speaker.description}</Markdown>
         </div>
         <div className="w-20">
-          <button type="button" onClick={toggleShowEdit} onKeyDown={toggleShowEdit} className="btn variant-ghost p-1">
-            Edit
-          </button>
+          {(decoded?.claims?.role || 0) > 1 && (
+            <button type="button" onClick={toggleShowEdit} onKeyDown={toggleShowEdit} className="btn variant-ghost p-1">
+              Edit
+            </button>
+          )}
         </div>
       </div>
     );

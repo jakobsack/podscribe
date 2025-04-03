@@ -7,7 +7,7 @@ use crate::{
     views::auth::{CurrentResponse, LoginResponse},
 };
 use axum::debug_handler;
-use loco_rs::prelude::*;
+use loco_rs::{controller::middleware, prelude::*};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::sync::OnceLock;
@@ -146,6 +146,23 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
     format::json(LoginResponse::new(&user, &token))
 }
 
+/// Creates a user login and returns a token
+#[debug_handler]
+async fn refresh_token(
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let user = auth.user;
+
+    let jwt_secret = ctx.config.get_jwt_config()?;
+
+    let token = user
+        .generate_jwt(&jwt_secret.secret, &jwt_secret.expiration)
+        .or_else(|_| unauthorized("unauthorized!"))?;
+
+    format::json(LoginResponse::new(&user, &token))
+}
+
 #[debug_handler]
 async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
     let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
@@ -155,14 +172,14 @@ async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Respo
 /// Magic link authentication provides a secure and passwordless way to log in to the application.
 ///
 /// # Flow
-/// 1. **Request a Magic Link**:  
-///    A registered user sends a POST request to `/magic-link` with their email.  
-///    If the email exists, a short-lived, one-time-use token is generated and sent to the user's email.  
+/// 1. **Request a Magic Link**:
+///    A registered user sends a POST request to `/magic-link` with their email.
+///    If the email exists, a short-lived, one-time-use token is generated and sent to the user's email.
 ///    For security and to avoid exposing whether an email exists, the response always returns 200, even if the email is invalid.
 ///
-/// 2. **Click the Magic Link**:  
-///    The user clicks the link (/magic-link/{token}), which validates the token and its expiration.  
-///    If valid, the server generates a JWT and responds with a [`LoginResponse`].  
+/// 2. **Click the Magic Link**:
+///    The user clicks the link (/magic-link/{token}), which validates the token and its expiration.
+///    If valid, the server generates a JWT and responds with a [`LoginResponse`].
 ///    If invalid or expired, an unauthorized response is returned.
 ///
 /// This flow enhances security by avoiding traditional passwords and providing a seamless login experience.
@@ -220,6 +237,7 @@ pub fn routes() -> Routes {
         .add("/register", post(register))
         .add("/verify/{token}", get(verify))
         .add("/login", post(login))
+        .add("/refresh-token", post(refresh_token))
         .add("/forgot", post(forgot))
         .add("/reset", post(reset))
         .add("/current", get(current))

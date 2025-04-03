@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use uuid::Uuid;
 
+use crate::common::claims::Claims;
+
 pub use super::_entities::users::{self, ActiveModel, Entity, Model};
 
 pub const MAGIC_LINK_LENGTH: i8 = 32;
@@ -260,10 +262,11 @@ impl Model {
     ///
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: &u64) -> ModelResult<String> {
+        let claims = Claims { role: self.role };
         Ok(jwt::JWT::new(secret).generate_token(
             expiration,
             self.pid.to_string(),
-            Some(json!({ "role": self.role })),
+            Some(json!(claims)),
         )?)
     }
 }

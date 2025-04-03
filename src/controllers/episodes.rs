@@ -13,6 +13,7 @@ use tantivy::query::QueryParser;
 use tantivy::schema::Value;
 use tantivy::{doc, Score, TantivyDocument};
 
+use crate::common::check_auth;
 use crate::initializers::tantivy_search::TantivyContainer;
 use crate::models::_entities::approvals as ApprovalsNS;
 use crate::models::_entities::episode_speakers as EpisodeSpeakersNS;
@@ -51,16 +52,20 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 #[debug_handler]
-pub async fn list(_auth: middleware::auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list(
+    _auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     format::json(Entity::find().all(&ctx.db).await?)
 }
 
 #[debug_handler]
 pub async fn add(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
+    check_auth::check_admin(&auth.user)?;
     let mut item = ActiveModel {
         ..Default::default()
     };
@@ -71,11 +76,12 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn update(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
+    check_auth::check_admin(&auth.user)?;
     let item = load_item(&ctx, id).await?;
     let mut item = item.into_active_model();
     params.update(&mut item);
@@ -85,29 +91,32 @@ pub async fn update(
 
 #[debug_handler]
 pub async fn remove(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_auth::check_admin(&auth.user)?;
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
 pub async fn get_one(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_auth::check_reader(&auth.user)?;
     format::json(load_item(&ctx, id).await?)
 }
 
 #[debug_handler]
 pub async fn get_display(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_auth::check_reader(&auth.user)?;
     let episode = load_item(&ctx, id).await?;
     let parts = PartsNS::Entity::find()
         .filter(PartsNS::Column::EpisodeId.eq(id))
@@ -142,11 +151,12 @@ pub async fn get_display(
 
 #[debug_handler]
 pub async fn attach_audio(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     content: axum::body::Bytes,
 ) -> Result<Response> {
+    check_auth::check_admin(&auth.user)?;
     let item = load_item(&ctx, id).await?;
     let path = std::path::PathBuf::from("episodes").join(format!("{}.mp3", id));
     ctx.storage
@@ -163,10 +173,11 @@ pub async fn attach_audio(
 
 #[debug_handler]
 pub async fn get_audio(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    check_auth::check_contributor(&auth.user)?;
     let item = load_item(&ctx, id).await?;
     if !item.has_audio_file {
         return Err(Error::BadRequest("Episode has no audio file".into()));
@@ -179,11 +190,12 @@ pub async fn get_audio(
 
 #[debug_handler]
 pub async fn search(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Extension(tantivy): Extension<TantivyContainer>,
     State(ctx): State<AppContext>,
     search: Query<SearchQueryParams>,
 ) -> Result<Response> {
+    check_auth::check_reader(&auth.user)?;
     let searcher = tantivy.reader.searcher();
 
     let schema = tantivy.schema;
@@ -249,12 +261,13 @@ pub async fn search(
 
 #[debug_handler]
 pub async fn import(
-    _auth: middleware::auth::JWT,
+    auth: middleware::auth::JWTWithUser<crate::models::users::Model>,
     Extension(tantivy): Extension<TantivyContainer>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(transcription): Json<ImportTranscription>,
 ) -> Result<Response> {
+    check_auth::check_admin(&auth.user)?;
     // Bad request if anything already exists
     let existing_parts = PartsNS::Entity::find()
         .filter(PartsNS::Column::EpisodeId.eq(id))
